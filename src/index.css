@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-cream text-gray-800 antialiased;
+  }
+  h1, h2, h3 {
+    @apply font-display;
+  }
+}
+
+@layer components {
+  .section-heading {
+    @apply font-display text-3xl md:text-4xl font-bold text-paddy-900 mb-3 leading-tight;
+  }
+  .section-subheading {
+    @apply text-base md:text-lg text-paddy-700/70 mb-10 max-w-2xl mx-auto leading-relaxed;
+  }
+  .card {
+    @apply bg-cream border border-turmeric-200/60 rounded-2xl shadow-sm p-6 hover:shadow-md hover:border-turmeric-400/50 transition-all duration-300;
+  }
+  .card-dark {
+    @apply bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center bg-paddy-700 hover:bg-paddy-800 text-white font-semibold py-3 px-8 rounded-full transition-all duration-200 cursor-pointer shadow-md hover:shadow-lg;
+  }
+  .btn-gold {
+    @apply inline-flex items-center justify-center bg-turmeric-500 hover:bg-turmeric-600 text-white font-semibold py-3 px-8 rounded-full transition-all duration-200 cursor-pointer shadow-md hover:shadow-lg;
+  }
+  .telugu {
+    @apply font-telugu;
+  }
+  .icon-circle {
+    @apply w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0;
+  }
+  .gold-divider {
+    @apply w-16 h-1 bg-gradient-to-r from-turmeric-400 to-marigold-400 rounded-full mx-auto mb-8;
+  }
+  .gold-divider-left {
+    @apply w-16 h-1 bg-gradient-to-r from-turmeric-400 to-marigold-400 rounded-full mb-6;
+  }
+}
+
+/* Wave divider utility */
+.wave-bottom {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  line-height: 0;
+}
+.wave-bottom svg {
+  display: block;
+  width: 100%;
+}
