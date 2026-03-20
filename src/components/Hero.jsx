@@ -1,9 +1,160 @@
 'use client'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-scroll'
 import { Phone } from 'lucide-react'
 import { useLang } from '../context/LanguageContext'
 import { content } from '../data/content'
 
+// ─── Decoration data — ALL values pre-computed at module level ───────────────
+const MANGO_DATA = [
+  { pos: { left: '6%',  top: '20%' }, rotate: -15, scale: 0.9,  opacity: 0.16, dur: '6s',   delay: '0s',   size: 38 },
+  { pos: { right: '9%', top: '17%' }, rotate:  20, scale: 1.0,  opacity: 0.14, dur: '7s',   delay: '1s',   size: 44 },
+  { pos: { right: '6%', top: '54%' }, rotate: -25, scale: 0.75, opacity: 0.12, dur: '8s',   delay: '2s',   size: 34 },
+  { pos: { left: '5%',  top: '60%' }, rotate:  30, scale: 0.85, opacity: 0.15, dur: '9s',   delay: '0.5s', size: 36 },
+  { pos: { left: '17%', top: '12%' }, rotate:  -8, scale: 0.8,  opacity: 0.10, dur: '7.5s', delay: '3s',   size: 32 },
+]
+const BANANA_DATA = [
+  { pos: { left: '11%',  top: '36%' }, rotate: -20, opacity: 0.13, dur: '9s',  delay: '1.5s', size: 32 },
+  { pos: { right: '12%', top: '43%' }, rotate:  15, opacity: 0.11, dur: '10s', delay: '3.5s', size: 28 },
+]
+const COCONUT_DATA = [
+  { pos: { right: '0%', top: '2%' }, flip: false, opacity: 0.12, dur: '12s', delay: '0s',  size: 72 },
+  { pos: { left: '0%',  top: '4%' }, flip: true,  opacity: 0.10, dur: '14s', delay: '2s',  size: 62 },
+]
+const CART_DATA = [
+  { pos: { right: '4%', top: '38%' }, opacity: 0.11, dur: '16s', delay: '1s', size: 185 },
+]
+
+// ─── Agricultural SVG sub-components ─────────────────────────────────────────
+function MangoSVG({ size = 40 }) {
+  return (
+    <svg width={size} height={Math.round(size * 1.4)} viewBox="0 0 40 56" fill="none" aria-hidden="true">
+      <path d="M20,52 C10,52 3,42 3,30 C3,14 10,4 20,4 C30,4 37,14 37,30 C37,42 30,52 20,52Z" fill="#f59e0b"/>
+      <path d="M12,16 C13,13 16,10 20,10" stroke="rgba(255,255,255,0.25)" strokeWidth="2" strokeLinecap="round"/>
+      <path d="M20,4 C17,-2 10,-6 7,-2 C10,4 16,4 20,4Z" fill="#16a34a"/>
+      <line x1="20" y1="4" x2="22" y2="-1" stroke="#78350f" strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
+function BananaBunchSVG({ size = 35 }) {
+  return (
+    <svg width={size} height={Math.round(size * 1.4)} viewBox="0 0 35 49" fill="none" aria-hidden="true">
+      <path d="M17,4 C12,-4 4,-6 2,-2 C6,4 13,4 17,4Z" fill="#16a34a"/>
+      <path d="M17,4 C10,6 5,14 8,20 C12,15 15,9 17,4Z" fill="#fbbf24"/>
+      <path d="M17,4 C24,6 29,14 26,20 C22,15 19,9 17,4Z" fill="#f59e0b"/>
+      <path d="M17,12 C10,14 5,22 8,28 C12,23 15,17 17,12Z" fill="#fbbf24"/>
+      <path d="M17,12 C24,14 28,22 25,28 C21,23 18,17 17,12Z" fill="#f59e0b"/>
+      <path d="M17,21 C10,23 6,31 9,37 C13,32 16,26 17,21Z" fill="#fbbf24"/>
+      <path d="M17,21 C24,23 28,31 25,37 C21,32 18,26 17,21Z" fill="#f59e0b"/>
+      <path d="M17,4 C17,4 19,10 20,16 C21,22 20,30 18,38" stroke="#78350f" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
+function CoconutTreeSVG({ size = 80, flip = false }) {
+  return (
+    <svg
+      width={size} height={Math.round(size * 2)}
+      viewBox="0 0 80 160" fill="none"
+      aria-hidden="true"
+      style={flip ? { transform: 'scaleX(-1)' } : undefined}
+    >
+      <path d="M40,158 C38,132 35,106 37,82 C39,58 41,38 45,12" stroke="#92400e" strokeWidth="7" strokeLinecap="round"/>
+      <path d="M45,12 C60,-8 78,-14 80,-4 C68,6 54,10 45,12Z" fill="#16a34a"/>
+      <path d="M45,12 C28,-10 10,-15 6,-5 C18,6 33,10 45,12Z" fill="#16a34a"/>
+      <path d="M45,12 C62,4 74,18 72,27 C60,20 52,16 45,12Z" fill="#22c55e"/>
+      <path d="M45,12 C26,5 16,20 18,30 C30,22 39,16 45,12Z" fill="#22c55e"/>
+      <path d="M45,12 C52,-6 60,-18 66,-14 C60,-4 53,4 45,12Z" fill="#15803d"/>
+      <circle cx="43" cy="22" r="6" fill="#92400e"/>
+      <circle cx="50" cy="18" r="5" fill="#a16207"/>
+      <circle cx="38" cy="25" r="4" fill="#78350f"/>
+    </svg>
+  )
+}
+
+function BullockCartSVG({ size = 185 }) {
+  return (
+    <svg width={size} height={Math.round(size * 120 / 260)} viewBox="0 0 260 120" fill="none" aria-hidden="true">
+      {/* Bullock body */}
+      <ellipse cx="30" cy="65" rx="18" ry="11" fill="#d97706"/>
+      {/* Head */}
+      <path d="M14,60 Q5,50 9,46 Q18,55 24,60Z" fill="#d97706"/>
+      {/* Horns */}
+      <line x1="9" y1="48" x2="5" y2="38" stroke="#92400e" strokeWidth="1.5" strokeLinecap="round"/>
+      <line x1="14" y1="46" x2="14" y2="36" stroke="#92400e" strokeWidth="1.5" strokeLinecap="round"/>
+      {/* Hump */}
+      <path d="M34,54 Q40,46 46,54" stroke="#b45309" strokeWidth="2" fill="none"/>
+      {/* Legs */}
+      <line x1="17" y1="75" x2="15" y2="95" stroke="#92400e" strokeWidth="2" strokeLinecap="round"/>
+      <line x1="23" y1="76" x2="22" y2="95" stroke="#92400e" strokeWidth="2" strokeLinecap="round"/>
+      <line x1="35" y1="76" x2="34" y2="95" stroke="#92400e" strokeWidth="2" strokeLinecap="round"/>
+      <line x1="43" y1="75" x2="42" y2="95" stroke="#92400e" strokeWidth="2" strokeLinecap="round"/>
+      {/* Tail */}
+      <path d="M48,65 Q57,55 55,44" stroke="#92400e" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+      {/* Yoke pole */}
+      <line x1="48" y1="62" x2="80" y2="60" stroke="#78350f" strokeWidth="3.5" strokeLinecap="round"/>
+      {/* Left wheel */}
+      <circle cx="90" cy="85" r="24" stroke="#d97706" strokeWidth="4" fill="rgba(217,119,6,0.08)"/>
+      <line x1="90" y1="61" x2="90" y2="109" stroke="#d97706" strokeWidth="2"/>
+      <line x1="66" y1="85" x2="114" y2="85" stroke="#d97706" strokeWidth="2"/>
+      <line x1="73" y1="68" x2="107" y2="102" stroke="#d97706" strokeWidth="2"/>
+      <line x1="107" y1="68" x2="73" y2="102" stroke="#d97706" strokeWidth="2"/>
+      <circle cx="90" cy="85" r="4" fill="#d97706"/>
+      {/* Right wheel */}
+      <circle cx="180" cy="85" r="24" stroke="#d97706" strokeWidth="4" fill="rgba(217,119,6,0.08)"/>
+      <line x1="180" y1="61" x2="180" y2="109" stroke="#d97706" strokeWidth="2"/>
+      <line x1="156" y1="85" x2="204" y2="85" stroke="#d97706" strokeWidth="2"/>
+      <line x1="163" y1="68" x2="197" y2="102" stroke="#d97706" strokeWidth="2"/>
+      <line x1="197" y1="68" x2="163" y2="102" stroke="#d97706" strokeWidth="2"/>
+      <circle cx="180" cy="85" r="4" fill="#d97706"/>
+      {/* Cart body */}
+      <path d="M84,61 L186,61 L190,28 L80,28 Z" fill="#92400e" opacity="0.9"/>
+      <rect x="78" y="23" width="114" height="7" rx="2" fill="#78350f"/>
+      {/* Cart decorative stripes */}
+      <line x1="110" y1="28" x2="106" y2="61" stroke="rgba(255,200,50,0.3)" strokeWidth="1.5"/>
+      <line x1="135" y1="28" x2="135" y2="61" stroke="rgba(255,200,50,0.3)" strokeWidth="1.5"/>
+      <line x1="160" y1="28" x2="164" y2="61" stroke="rgba(255,200,50,0.3)" strokeWidth="1.5"/>
+    </svg>
+  )
+}
+
+function FloatingDecor() {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      {COCONUT_DATA.map((d, i) => (
+        <div key={`coconut-${i}`} className="absolute"
+          style={{ ...d.pos, opacity: d.opacity, animation: `agri-sway-tree ${d.dur} ease-in-out infinite ${d.delay}` }}>
+          <CoconutTreeSVG size={d.size} flip={d.flip} />
+        </div>
+      ))}
+      {MANGO_DATA.map((d, i) => (
+        <div key={`mango-${i}`} className="absolute"
+          style={{ ...d.pos, opacity: d.opacity, animation: `agri-float ${d.dur} ease-in-out infinite ${d.delay}` }}>
+          <div style={{ transform: `rotate(${d.rotate}deg) scale(${d.scale})` }}>
+            <MangoSVG size={d.size} />
+          </div>
+        </div>
+      ))}
+      {BANANA_DATA.map((d, i) => (
+        <div key={`banana-${i}`} className="absolute"
+          style={{ ...d.pos, opacity: d.opacity, animation: `agri-float ${d.dur} ease-in-out infinite ${d.delay}` }}>
+          <div style={{ transform: `rotate(${d.rotate}deg)` }}>
+            <BananaBunchSVG size={d.size} />
+          </div>
+        </div>
+      ))}
+      {CART_DATA.map((d, i) => (
+        <div key={`cart-${i}`} className="absolute"
+          style={{ ...d.pos, opacity: d.opacity, animation: `agri-drift ${d.dur} ease-in-out infinite ${d.delay}` }}>
+          <BullockCartSVG size={d.size} />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ─── Paddy stalks at bottom wave ─────────────────────────────────────────────
 // Pre-computed at module level — same values on server and client
 const STALKS = Array.from({ length: 48 }).map((_, i) => {
   const x    = Number(((i / 48) * 1440 + 10).toFixed(4))
@@ -74,6 +225,9 @@ function MangoLeafBorder() {
 export default function Hero() {
   const { lang } = useLang()
   const t = content[lang].hero
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => { setMounted(true) }, [])
 
   return (
     <section
@@ -119,6 +273,9 @@ export default function Hero() {
 
       {/* Marigold glow top-right */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-marigold-400/10 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Agricultural background decorations — client-only to avoid hydration mismatch */}
+      {mounted && <FloatingDecor />}
 
       {/* Main content */}
       <div className="relative z-10 text-center px-4 sm:px-6 max-w-4xl mx-auto pt-20">
