@@ -1,15 +1,38 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-scroll'
-import { Menu, X } from 'lucide-react'
+import NextLink from 'next/link'
+import { useRouter } from 'next/navigation'
+import { Menu, X, User, LogOut, LayoutDashboard } from 'lucide-react'
 import { useLang } from '../context/LanguageContext'
 import { content } from '../data/content'
+import { createClient } from '../lib/supabase'
 
 export default function Navbar() {
   const { lang, toggle } = useLang()
   const t = content[lang].nav
-  const [open, setOpen] = useState(false)
+  const router = useRouter()
+  const [open, setOpen]         = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [user, setUser]         = useState(null)
+  const [userMenu, setUserMenu] = useState(false)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null))
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setUser(session?.user ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  async function handleLogout() {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    setUser(null)
+    setUserMenu(false)
+    router.refresh()
+  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
@@ -77,6 +100,44 @@ export default function Navbar() {
               {lang === 'en' ? 'తెలుగు' : 'English'}
             </button>
 
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenu(m => !m)}
+                  className={`flex items-center gap-2 text-sm font-medium border rounded-full px-3 py-1.5 transition-all ${
+                    scrolled ? 'border-paddy-300 text-paddy-800 hover:bg-paddy-50' : 'border-white/30 text-white hover:bg-white/10'
+                  }`}
+                >
+                  <User size={14} />
+                  <span className="max-w-[80px] truncate">{user.user_metadata?.full_name?.split(' ')[0] || 'Account'}</span>
+                </button>
+                {userMenu && (
+                  <div className="absolute right-0 top-10 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 w-44 z-50">
+                    <NextLink
+                      href={user.user_metadata?.role === 'admin' ? '/admin' : '/dashboard'}
+                      onClick={() => setUserMenu(false)}
+                      className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      <LayoutDashboard size={14} />
+                      {user.user_metadata?.role === 'admin' ? 'Admin Panel' : 'My Dashboard'}
+                    </NextLink>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                    >
+                      <LogOut size={14} /> Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <NextLink href="/auth/login" className={`text-sm font-semibold border rounded-full px-3 py-1.5 transition-all ${
+                scrolled ? 'border-paddy-600 text-paddy-700 hover:bg-paddy-600 hover:text-white' : 'border-white/40 text-white/90 hover:bg-white/15'
+              }`}>
+                Sign in
+              </NextLink>
+            )}
+
             <Link
               to="contact"
               smooth
@@ -127,13 +188,36 @@ export default function Navbar() {
               {l.label}
             </Link>
           ))}
+          {user ? (
+            <div className="mt-4 space-y-2">
+              <NextLink
+                href={user.user_metadata?.role === 'admin' ? '/admin' : '/dashboard'}
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2 py-2.5 px-4 rounded-xl bg-paddy-50 text-paddy-800 font-medium text-sm"
+              >
+                <LayoutDashboard size={14} />
+                {user.user_metadata?.role === 'admin' ? 'Admin Panel' : 'My Dashboard'}
+              </NextLink>
+              <button onClick={handleLogout} className="w-full flex items-center gap-2 py-2.5 px-4 rounded-xl bg-red-50 text-red-600 font-medium text-sm">
+                <LogOut size={14} /> Sign out
+              </button>
+            </div>
+          ) : (
+            <NextLink
+              href="/auth/login"
+              onClick={() => setOpen(false)}
+              className="block mt-3 py-2.5 px-4 rounded-xl border border-paddy-300 text-paddy-700 text-sm font-medium text-center"
+            >
+              Sign in / Register
+            </NextLink>
+          )}
           <Link
             to="contact"
             smooth
             duration={500}
             offset={-64}
             onClick={() => setOpen(false)}
-            className="btn-gold mt-4 text-sm text-center w-full block"
+            className="btn-gold mt-3 text-sm text-center w-full block"
           >
             {t.bookVisit}
           </Link>
