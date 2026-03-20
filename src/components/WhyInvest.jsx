@@ -1,3 +1,4 @@
+'use client'
 import {
   ShieldCheck, BadgeCheck, FileText, Tag, TrendingUp,
   Sprout, Lock, ArrowLeftRight, Heart,

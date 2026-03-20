@@ -1,12 +1,13 @@
+'use client'
 import { useState } from 'react'
 import emailjs from '@emailjs/browser'
 import { Send, CheckCircle, AlertCircle, Phone } from 'lucide-react'
 import { useLang } from '../context/LanguageContext'
 import { content } from '../data/content'
 
-const EMAILJS_SERVICE_ID  = import.meta.env.VITE_EMAILJS_SERVICE_ID
-const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
-const EMAILJS_PUBLIC_KEY  = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+const EMAILJS_SERVICE_ID  = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
+const EMAILJS_TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
+const EMAILJS_PUBLIC_KEY  = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
 
 export default function EnquiryForm() {
   const { lang } = useLang()
@@ -121,7 +122,7 @@ export default function EnquiryForm() {
                 onChange={handleChange}
                 required
                 placeholder={t.namePlaceholder}
-                className={`w-full bg-white/8 border border-white/15 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-turmeric-400 focus:bg-white/12 transition-all ${lang === 'te' ? 'telugu' : ''}`}
+                className={`w-full bg-white/15 border border-white/25 rounded-xl px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:border-turmeric-400 focus:bg-white/20 transition-all ${lang === 'te' ? 'telugu' : ''}`}
               />
             </div>
             <div>
@@ -135,7 +136,7 @@ export default function EnquiryForm() {
                 required
                 type="tel"
                 placeholder={t.phonePlaceholder}
-                className={`w-full bg-white/8 border border-white/15 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-turmeric-400 focus:bg-white/12 transition-all ${lang === 'te' ? 'telugu' : ''}`}
+                className={`w-full bg-white/15 border border-white/25 rounded-xl px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:border-turmeric-400 focus:bg-white/20 transition-all ${lang === 'te' ? 'telugu' : ''}`}
               />
             </div>
           </div>
@@ -150,7 +151,7 @@ export default function EnquiryForm() {
               onChange={handleChange}
               type="email"
               placeholder={t.emailPlaceholder}
-              className={`w-full bg-white/8 border border-white/15 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-turmeric-400 focus:bg-white/12 transition-all ${lang === 'te' ? 'telugu' : ''}`}
+              className={`w-full bg-white/15 border border-white/25 rounded-xl px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:border-turmeric-400 focus:bg-white/20 transition-all ${lang === 'te' ? 'telugu' : ''}`}
             />
           </div>
 
@@ -164,7 +165,7 @@ export default function EnquiryForm() {
               onChange={handleChange}
               rows={4}
               placeholder={t.messagePlaceholder}
-              className={`w-full bg-white/8 border border-white/15 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-turmeric-400 focus:bg-white/12 transition-all resize-none ${lang === 'te' ? 'telugu' : ''}`}
+              className={`w-full bg-white/15 border border-white/25 rounded-xl px-4 py-3 text-white placeholder-white/50 focus:outline-none focus:border-turmeric-400 focus:bg-white/20 transition-all resize-none ${lang === 'te' ? 'telugu' : ''}`}
             />
           </div>
 

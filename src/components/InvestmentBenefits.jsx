@@ -1,3 +1,4 @@
+'use client'
 import { TrendingUp, Wheat, ShieldCheck, Users } from 'lucide-react'
 import { useLang } from '../context/LanguageContext'
 import { content } from '../data/content'

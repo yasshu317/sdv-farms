@@ -1,7 +1,16 @@
+'use client'
 import { Link } from 'react-scroll'
 import { Phone } from 'lucide-react'
 import { useLang } from '../context/LanguageContext'
 import { content } from '../data/content'
+
+// Pre-computed at module level — same values on server and client
+const STALKS = Array.from({ length: 48 }).map((_, i) => {
+  const x    = Number(((i / 48) * 1440 + 10).toFixed(4))
+  const h    = Number((40 + Math.sin(i * 1.7) * 20 + Math.cos(i * 0.9) * 15).toFixed(4))
+  const sway = Number((Math.sin(i * 1.2) * 6).toFixed(4))
+  return { x, h, sway, opacity: Number((0.18 + (i % 3) * 0.06).toFixed(2)) }
+})
 
 function PaddyField() {
   return (
@@ -12,32 +21,25 @@ function PaddyField() {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      {/* Paddy stalks silhouette */}
-      {Array.from({ length: 48 }).map((_, i) => {
-        const x = (i / 48) * 1440 + 10
-        const h = 40 + Math.sin(i * 1.7) * 20 + Math.cos(i * 0.9) * 15
-        const sway = Math.sin(i * 1.2) * 6
-        return (
-          <g key={i} opacity={0.18 + (i % 3) * 0.06}>
-            <path
-              d={`M${x},160 C${x + sway},${160 - h * 0.5} ${x + sway * 0.5},${160 - h * 0.8} ${x + sway * 0.3},${160 - h}`}
-              stroke="#f6de55"
-              strokeWidth="1.5"
-              fill="none"
-              strokeLinecap="round"
-            />
-            {/* grain head */}
-            <ellipse
-              cx={x + sway * 0.3}
-              cy={160 - h - 5}
-              rx="3"
-              ry="7"
-              fill="#f1c929"
-              opacity="0.7"
-            />
-          </g>
-        )
-      })}
+      {STALKS.map(({ x, h, sway, opacity }, i) => (
+        <g key={i} opacity={opacity}>
+          <path
+            d={`M${x},160 C${x + sway},${160 - h * 0.5} ${x + sway * 0.5},${160 - h * 0.8} ${x + sway * 0.3},${160 - h}`}
+            stroke="#f6de55"
+            strokeWidth="1.5"
+            fill="none"
+            strokeLinecap="round"
+          />
+          <ellipse
+            cx={x + sway * 0.3}
+            cy={160 - h - 5}
+            rx="3"
+            ry="7"
+            fill="#f1c929"
+            opacity="0.7"
+          />
+        </g>
+      ))}
       {/* Wave transition to cream */}
       <path
         d="M0,120 C200,80 400,145 600,110 C800,75 1000,140 1200,100 C1300,82 1380,110 1440,95 L1440,160 L0,160 Z"

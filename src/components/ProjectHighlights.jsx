@@ -1,3 +1,4 @@
+'use client'
 import { FileCheck, Map, Navigation, Sprout, BarChart2 } from 'lucide-react'
 import { useLang } from '../context/LanguageContext'
 import { content } from '../data/content'
