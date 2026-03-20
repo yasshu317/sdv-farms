@@ -4,6 +4,7 @@ import emailjs from '@emailjs/browser'
 import { Send, CheckCircle, AlertCircle, Phone } from 'lucide-react'
 import { useLang } from '../context/LanguageContext'
 import { content } from '../data/content'
+import { createClient } from '../lib/supabase'
 
 const EMAILJS_SERVICE_ID  = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
 const EMAILJS_TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
@@ -23,18 +24,34 @@ export default function EnquiryForm() {
     if (!form.name || !form.phone) return
     setStatus('sending')
     try {
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        {
-          from_name: form.name,
-          from_phone: form.phone,
-          from_email: form.email || 'Not provided',
-          message: form.message || 'No message provided',
-          to_email: 'info@sdvfarms.in',
-        },
-        EMAILJS_PUBLIC_KEY
-      )
+      // Save to Supabase (works with or without logged-in user)
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      await supabase.from('enquiries').insert({
+        user_id: user?.id ?? null,
+        name: form.name,
+        phone: form.phone,
+        email: form.email || null,
+        message: form.message || null,
+        status: 'pending',
+      })
+
+      // Also send email notification via EmailJS
+      if (EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY) {
+        await emailjs.send(
+          EMAILJS_SERVICE_ID,
+          EMAILJS_TEMPLATE_ID,
+          {
+            from_name: form.name,
+            from_phone: form.phone,
+            from_email: form.email || 'Not provided',
+            message: form.message || 'No message provided',
+            to_email: 'info@sdvfarms.in',
+          },
+          EMAILJS_PUBLIC_KEY
+        )
+      }
+
       setStatus('success')
       setForm({ name: '', phone: '', email: '', message: '' })
     } catch {

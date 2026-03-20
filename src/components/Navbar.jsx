@@ -112,20 +112,20 @@ export default function Navbar() {
                   <span className="max-w-[80px] truncate">{user.user_metadata?.full_name?.split(' ')[0] || 'Account'}</span>
                 </button>
                 {userMenu && (
-                  <div className="absolute right-0 top-10 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 w-44 z-50">
+                  <div className="absolute right-0 top-10 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 w-48 z-50">
                     <NextLink
                       href={user.user_metadata?.role === 'admin' ? '/admin' : '/dashboard'}
                       onClick={() => setUserMenu(false)}
-                      className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      className={`flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors ${lang === 'te' ? 'telugu' : ''}`}
                     >
                       <LayoutDashboard size={14} />
-                      {user.user_metadata?.role === 'admin' ? 'Admin Panel' : 'My Dashboard'}
+                      {user.user_metadata?.role === 'admin' ? t.adminPanel : t.myDashboard}
                     </NextLink>
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                      className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors ${lang === 'te' ? 'telugu' : ''}`}
                     >
-                      <LogOut size={14} /> Sign out
+                      <LogOut size={14} /> {t.signOut}
                     </button>
                   </div>
                 )}
@@ -133,8 +133,8 @@ export default function Navbar() {
             ) : (
               <NextLink href="/auth/login" className={`text-sm font-semibold border rounded-full px-3 py-1.5 transition-all ${
                 scrolled ? 'border-paddy-600 text-paddy-700 hover:bg-paddy-600 hover:text-white' : 'border-white/40 text-white/90 hover:bg-white/15'
-              }`}>
-                Sign in
+              } ${lang === 'te' ? 'telugu' : ''}`}>
+                {t.signIn}
               </NextLink>
             )}
 
@@ -193,22 +193,22 @@ export default function Navbar() {
               <NextLink
                 href={user.user_metadata?.role === 'admin' ? '/admin' : '/dashboard'}
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2 py-2.5 px-4 rounded-xl bg-paddy-50 text-paddy-800 font-medium text-sm"
+                className={`flex items-center gap-2 py-2.5 px-4 rounded-xl bg-paddy-50 text-paddy-800 font-medium text-sm ${lang === 'te' ? 'telugu' : ''}`}
               >
                 <LayoutDashboard size={14} />
-                {user.user_metadata?.role === 'admin' ? 'Admin Panel' : 'My Dashboard'}
+                {user.user_metadata?.role === 'admin' ? t.adminPanel : t.myDashboard}
               </NextLink>
-              <button onClick={handleLogout} className="w-full flex items-center gap-2 py-2.5 px-4 rounded-xl bg-red-50 text-red-600 font-medium text-sm">
-                <LogOut size={14} /> Sign out
+              <button onClick={handleLogout} className={`w-full flex items-center gap-2 py-2.5 px-4 rounded-xl bg-red-50 text-red-600 font-medium text-sm ${lang === 'te' ? 'telugu' : ''}`}>
+                <LogOut size={14} /> {t.signOut}
               </button>
             </div>
           ) : (
             <NextLink
               href="/auth/login"
               onClick={() => setOpen(false)}
-              className="block mt-3 py-2.5 px-4 rounded-xl border border-paddy-300 text-paddy-700 text-sm font-medium text-center"
+              className={`block mt-3 py-2.5 px-4 rounded-xl border border-paddy-300 text-paddy-700 text-sm font-medium text-center ${lang === 'te' ? 'telugu' : ''}`}
             >
-              Sign in / Register
+              {t.signInRegister}
             </NextLink>
           )}
           <Link
