@@ -1,3 +1,4 @@
+'use client'
 export default function WhatsAppButton() {
   const phone = '917780312525' // country code + number, no +
   const message = encodeURIComponent('Hello! I am interested in SDV Farms Phase 1. Please share more details.')
