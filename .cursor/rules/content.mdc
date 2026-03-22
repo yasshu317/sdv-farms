@@ -1,1 +1,32 @@
 
+---
+description: Bilingual content file rules
+globs: ["src/data/content.js"]
+alwaysApply: true
+---
+
+# content.js Rules
+
+This file is the single source of truth for ALL user-facing text.
+
+## Structure
+```js
+export const content = {
+  en: {
+    sectionName: {
+      key: 'English text',
+    },
+  },
+  te: {
+    sectionName: {
+      key: 'తెలుగు వచనం',
+    },
+  },
+}
+```
+
+## Rules
+- Every new string must have both `en` and `te` entries
+- Telugu uses native Devanagari/Telugu script — no romanized transliteration
+- Keep keys consistent between `en` and `te` objects
+- Group keys by component/section for readability
