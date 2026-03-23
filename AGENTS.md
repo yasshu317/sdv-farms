@@ -9,6 +9,12 @@ SDV Farms Phase 1 is a **bilingual (English + Telugu) agricultural land investme
 - **Live URL:** https://sdv-farms.vercel.app
 - **Stack:** Next.js 15 (App Router) · Tailwind CSS · Supabase · Vercel AI SDK · Resend · Vercel
 
+### Mobile & logos (for docs / marketing)
+
+- **Mobile:** Same responsive site + PWA (`manifest.js`, `public/sw.js`, `PWARegister.jsx`). No separate mobile repo.
+- **Downloadable logos:** `public/brand/` — `sdv-farms-mark.svg`, `sdv-farms-wordmark.svg`, plus `public/brand/README.md`.
+- **PNG icons:** `/api/icon?size=192` and `?size=512` on the deployed domain; Apple: `/apple-icon`.
+
 ---
 
 ## Tech Stack

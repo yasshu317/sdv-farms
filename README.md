@@ -12,7 +12,8 @@ A bilingual (English + Telugu) agricultural land investment marketing website wi
 |---|---|
 | Bilingual UI | English + Telugu toggle throughout |
 | Hero section | Animated paddy, mangoes, coconut trees, bullock cart |
-| Enquiry form | Saves to Supabase + email via EmailJS |
+| Enquiry form | Saves to Supabase + email via Resend |
+| **Mobile & PWA** | Responsive layout; installable app; offline-friendly shell |
 | AI Chatbot | Google Gemini 2.0 Flash — answers SDV Farms questions |
 | WhatsApp button | Click-to-chat with pre-filled message |
 | Google Maps | Embedded location |
@@ -31,7 +32,7 @@ A bilingual (English + Telugu) agricultural land investment marketing website wi
 | Styling | Tailwind CSS |
 | Database + Auth | Supabase (free tier) |
 | AI Chatbot | Vercel AI SDK + Google Gemini 2.0 Flash |
-| Email notifications | EmailJS (free tier) |
+| Email notifications | Resend (free tier) |
 | Hosting | Vercel (free tier) |
 
 ---
@@ -58,10 +59,8 @@ cp .env.example .env.local
 # Google Gemini — https://aistudio.google.com/apikey
 GOOGLE_GENERATIVE_AI_API_KEY=AIza...
 
-# EmailJS — https://www.emailjs.com
-NEXT_PUBLIC_EMAILJS_SERVICE_ID=service_xxx
-NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=template_xxx
-NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=xxx
+# Resend — https://resend.com (enquiry emails from API route)
+RESEND_API_KEY=re_...
 
 # Supabase — https://supabase.com → Project Settings → API
 NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
@@ -134,6 +133,53 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ---
 
+## Mobile & PWA
+
+The site is **mobile-first responsive** (Tailwind breakpoints). There is no separate native app repo — the **same Next.js app** is the mobile experience in the browser.
+
+### Install on phone (Add to Home Screen)
+
+| Platform | Steps |
+|----------|--------|
+| **Android (Chrome)** | Open the live site → menu (⋮) → **Install app** or **Add to Home screen** |
+| **iPhone (Safari)** | Open the live site → Share → **Add to Home Screen** |
+
+After install, it opens in **standalone** mode (full screen, like an app). Shortcuts in the web manifest include *Book a Visit* and *My Dashboard*.
+
+### What powers “mobile app” behaviour
+
+| Piece | Location / note |
+|-------|------------------|
+| Web App Manifest | `src/app/manifest.js` — name, colours, icons, `display: standalone` |
+| Service worker | `public/sw.js` — caches key pages for basic offline shell |
+| Registration | `src/components/PWARegister.jsx` in root layout |
+| Icons (PNG) | Generated at runtime: `/api/icon?size=192` and `?size=512` |
+| Apple icon | `src/app/apple-icon.jsx` → `/apple-icon` |
+
+### Test on a real device
+
+1. Deploy to Vercel (or use your machine with a tunnel like `ngrok` for HTTPS).
+2. Open the **HTTPS** URL on the phone — PWA install requires a secure context.
+
+---
+
+## Logo & brand assets (download)
+
+Static files live in **`public/brand/`** in this repo:
+
+- **`sdv-farms-mark.svg`** — square mark (good for app icon–style use)
+- **`sdv-farms-wordmark.svg`** — horizontal logo + tagline
+- **`public/brand/README.md`** — full asset table and colour reference
+
+**Download from GitHub:** [public/brand](https://github.com/yasshu317/sdv-farms/tree/main/public/brand) → open a file → **Raw** → save.
+
+**PNG icons from production** (right-click → save image):
+
+- `https://sdv-farms.vercel.app/api/icon?size=512`
+- `https://sdv-farms.vercel.app/api/icon?size=192`
+
+---
+
 ## Admin Setup
 
 1. Register at `/auth/register` with your email
@@ -177,6 +223,10 @@ In Supabase → Authentication → URL Configuration:
 ## Project Structure
 
 ```
+public/
+├── brand/                    # Downloadable logos (SVG) + brand README
+├── sw.js                     # PWA service worker
+└── favicon.svg
 src/
 ├── app/
 │   ├── page.jsx              # Home page
@@ -197,7 +247,7 @@ src/
 │   ├── ClientApp.jsx         # Root client wrapper
 │   ├── Navbar.jsx            # Bilingual navbar + auth menu
 │   ├── Hero.jsx              # Hero + floating agri decorations
-│   ├── EnquiryForm.jsx       # Contact form → Supabase + EmailJS
+│   ├── EnquiryForm.jsx       # Contact form → Supabase + Resend API
 │   ├── ChatBot.jsx           # AI chatbot widget
 │   └── ...                   # About, Gallery, Location, etc.
 ├── context/
@@ -217,9 +267,7 @@ src/
 | Variable | Required | Description |
 |---|---|---|
 | `GOOGLE_GENERATIVE_AI_API_KEY` | Yes | Gemini AI key from aistudio.google.com |
-| `NEXT_PUBLIC_EMAILJS_SERVICE_ID` | Yes | EmailJS service ID |
-| `NEXT_PUBLIC_EMAILJS_TEMPLATE_ID` | Yes | EmailJS template ID |
-| `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY` | Yes | EmailJS public key |
+| `RESEND_API_KEY` | Yes | Resend API key (server-only; enquiry emails) |
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anon/public key |
 

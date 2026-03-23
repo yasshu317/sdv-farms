@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="SDV Farms mark">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#175239"/>
+      <stop offset="100%" style="stop-color:#0e2c13"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <!-- Stylized wheat / grain -->
+  <g fill="none" stroke="#d4a017" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M256 420V140"/>
+    <path d="M256 200c-28-40-72-52-100-32 28 24 52 56 100 72"/>
+    <path d="M256 260c28-40 72-52 100-32-28 24-52 56-100 72"/>
+    <path d="M256 320c-36-28-56-68-72-108 36 20 56 52 72 88"/>
+    <path d="M256 380c36-28 56-68 72-108-36 20-56 52-72 88"/>
+  </g>
+  <text x="256" y="120" text-anchor="middle" fill="#fbbf24" font-family="Georgia, serif" font-size="56" font-weight="bold">SDV</text>
+</svg>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" role="img" aria-label="SDV Farms wordmark">
+  <defs>
+    <linearGradient id="leaf" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#175239"/>
+      <stop offset="100%" style="stop-color:#2d6b3f"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="200" fill="#ffffff"/>
+  <!-- Mark -->
+  <g transform="translate(24 24) scale(0.28)">
+    <rect width="512" height="512" rx="112" fill="url(#leaf)"/>
+    <g fill="none" stroke="#d4a017" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M256 420V140"/>
+      <path d="M256 200c-28-40-72-52-100-32 28 24 52 56 100 72"/>
+      <path d="M256 260c28-40 72-52 100-32-28 24-52 56-100 72"/>
+    </g>
+    <text x="256" y="118" text-anchor="middle" fill="#fbbf24" font-family="Georgia, serif" font-size="56" font-weight="bold">SDV</text>
+  </g>
+  <text x="200" y="118" fill="#175239" font-family="Georgia, 'Times New Roman', serif" font-size="52" font-weight="bold">SDV Farms</text>
+  <text x="200" y="158" fill="#4a7c59" font-family="system-ui, sans-serif" font-size="22" letter-spacing="0.15em">PHASE 1 · AGRICULTURAL LAND</text>
+</svg>
