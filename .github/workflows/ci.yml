@@ -7,6 +7,31 @@ on:
     branches: [main]
 
 jobs:
+  # ── 0. SECURITY AUDIT (CVE + outdated packages) ───────────────────────────
+  audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check for CVEs (npm audit)
+        # Fail on high or critical severity vulnerabilities only
+        # moderate/low are reported but do not block the build
+        run: npm audit --audit-level=high
+
+      - name: Check for outdated packages (report only)
+        # Lists outdated packages as a summary — never blocks the build
+        run: npm outdated || true
+
   # ── 1. TESTS ──────────────────────────────────────────────────────────────
   test:
     name: Run Tests
@@ -72,11 +97,11 @@ jobs:
           path: test-results/
           retention-days: 7
 
-  # ── 3. BUILD (only after both test jobs pass) ─────────────────────────────
+  # ── 3. BUILD (only after audit + both test jobs pass) ────────────────────
   build:
     name: Build Check
     runs-on: ubuntu-latest
-    needs: [test, e2e]
+    needs: [audit, test, e2e]
     env:
       # Dummy values so Next.js build doesn't fail on missing env vars
       NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
