@@ -23,20 +23,30 @@ function PropertyCard({ p }) {
             <span className="text-5xl opacity-30">🌾</span>
           </div>
         )}
-        {p.property_id && (
-          <span className="absolute top-2 left-2 bg-black/60 text-turmeric-300 text-xs font-mono px-2 py-0.5 rounded-lg">
-            {p.property_id}
-          </span>
-        )}
-        {p.road_access && (
-          <span className="absolute top-2 right-2 bg-paddy-700/80 text-white text-xs px-2 py-0.5 rounded-lg">🛣️ Road</span>
+        <div className="absolute top-2 left-2 flex gap-1.5">
+          {p.property_id && (
+            <span className="bg-black/60 text-turmeric-300 text-xs font-mono px-2 py-0.5 rounded-lg">
+              {p.property_id}
+            </span>
+          )}
+        </div>
+        <div className="absolute top-2 right-2 flex gap-1.5">
+          {p.road_access && (
+            <span className="bg-paddy-700/80 text-white text-xs px-2 py-0.5 rounded-lg">🛣️ Road</span>
+          )}
+        </div>
+        {/* View count */}
+        {p.view_count > 0 && (
+          <div className="absolute bottom-2 right-2 bg-black/50 text-white/70 text-xs px-2 py-0.5 rounded-lg flex items-center gap-1">
+            <span>👁</span> {p.view_count}
+          </div>
         )}
       </div>
 
       {/* Details */}
       <div className="p-4">
         <p className="text-white font-semibold text-sm mb-0.5">
-          {[p.village, p.mandal].filter(Boolean).join(', ')}
+          {[p.village, p.mandal].filter(Boolean).join(', ') || p.district}
         </p>
         <p className="text-white/50 text-xs mb-3">{[p.district, p.state].filter(Boolean).join(', ')}</p>
         <div className="flex items-center justify-between text-sm">
@@ -87,31 +97,66 @@ export default function PropertiesClient({ properties }) {
     return true
   }), [properties, filterValues])
 
+  const hasActiveFilters = filterValues.state || filterValues.soil.length || filterValues.land_type ||
+    filterValues.acres.min || filterValues.acres.max || filterValues.price.max
+
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(160deg, #071709 0%, #0e2c13 50%, #071709 100%)' }}>
-      {/* Header */}
-      <div className="border-b border-white/8 px-4 sm:px-6 py-5">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between">
-            <div>
-              <Link href="/" className="text-white/50 hover:text-white/70 text-sm transition-colors">← SDV Farms</Link>
-              <h1 className="text-white font-display text-2xl font-bold mt-1">Browse Properties</h1>
-              <p className="text-white/50 text-sm">{filtered.length} listing{filtered.length !== 1 ? 's' : ''} available</p>
-            </div>
-            <button
-              className="sm:hidden bg-white/10 text-white text-sm px-3 py-2 rounded-xl"
-              onClick={() => setMobileFiltersOpen(o => !o)}
-            >
-              {mobileFiltersOpen ? 'Hide Filters' : 'Filters'}
-            </button>
+
+      {/* Hero banner */}
+      <div
+        className="relative overflow-hidden border-b border-white/8 px-4 sm:px-6 py-10 text-center"
+        style={{ background: 'linear-gradient(135deg, #0e2c13 0%, #1a4520 50%, #0e2c13 100%)' }}
+      >
+        <div
+          className="absolute inset-0 opacity-5 pointer-events-none"
+          style={{ backgroundImage: 'radial-gradient(circle, rgba(212,160,23,0.8) 1px, transparent 1px)', backgroundSize: '28px 28px' }}
+        />
+        <div className="relative max-w-6xl mx-auto">
+          <Link href="/" className="text-white/45 hover:text-white/70 text-sm transition-colors">← SDV Farms</Link>
+          <h1 className="text-white font-display text-3xl sm:text-4xl font-bold mt-3 mb-2">
+            Find Your Agricultural Land
+          </h1>
+          <p className="text-white/50 text-sm mb-5">
+            Browse verified listings across Telangana, Andhra Pradesh & Karnataka
+          </p>
+          <div className="flex items-center justify-center gap-4 text-xs text-white/40">
+            <span>✅ Clear title</span>
+            <span>·</span>
+            <span>📋 Documents verified</span>
+            <span>·</span>
+            <span>📅 Book site visit instantly</span>
           </div>
+
+          {/* Mobile filter toggle */}
+          <button
+            className="sm:hidden mt-5 bg-white/10 border border-white/15 text-white text-sm px-4 py-2 rounded-xl"
+            onClick={() => setMobileFiltersOpen(o => !o)}
+          >
+            {mobileFiltersOpen ? 'Hide Filters ↑' : `Filters ${hasActiveFilters ? '●' : '+'}`}
+          </button>
+        </div>
+      </div>
+
+      {/* Results count bar */}
+      <div className="border-b border-white/6 px-4 sm:px-6 py-3">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <p className="text-white/50 text-sm">
+            <span className="text-white font-semibold">{filtered.length}</span> listing{filtered.length !== 1 ? 's' : ''} found
+            {hasActiveFilters && <span className="text-turmeric-400/70"> (filtered)</span>}
+          </p>
+          {hasActiveFilters && (
+            <button onClick={handleReset} className="text-turmeric-400 hover:text-turmeric-300 text-xs transition-colors">
+              Clear all filters ×
+            </button>
+          )}
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-        <div className="flex gap-6">
-          {/* Filters sidebar */}
-          <div className={`${mobileFiltersOpen ? 'block' : 'hidden'} sm:block w-full sm:w-64 shrink-0`}>
+        <div className="flex gap-6 items-start">
+          {/* Filters sidebar — sticky on desktop */}
+          <div className={`${mobileFiltersOpen ? 'block' : 'hidden'} sm:block w-full sm:w-64 shrink-0 sm:sticky sm:top-20`}>
             <FilterPanel
               filters={filters}
               onChange={handleFilterChange}
@@ -121,16 +166,39 @@ export default function PropertiesClient({ properties }) {
 
           {/* Grid */}
           <div className="flex-1 min-w-0">
-            {filtered.length === 0 ? (
+            {filtered.length === 0 && properties.length === 0 ? (
+              /* No properties at all — invite sellers */
+              <div className="text-center py-20 border border-dashed border-white/15 rounded-2xl px-6">
+                <div className="text-5xl mb-4">🌾</div>
+                <h3 className="text-white font-semibold text-lg mb-2">No properties listed yet</h3>
+                <p className="text-white/50 text-sm mb-6 max-w-sm mx-auto">
+                  Be the first to list your agricultural land on SDV Farms. Free, fast, and government-verified.
+                </p>
+                <Link
+                  href="/auth/register"
+                  className="inline-block btn-gold px-6 py-2.5 text-sm rounded-xl"
+                >
+                  List Your Land →
+                </Link>
+                <div className="mt-4">
+                  <Link href="/buyer-request" className="text-white/35 hover:text-white/55 text-sm transition-colors">
+                    Or post a land request →
+                  </Link>
+                </div>
+              </div>
+            ) : filtered.length === 0 ? (
+              /* Has properties but filter returns 0 */
               <div className="text-center py-20 border border-dashed border-white/15 rounded-2xl">
                 <div className="text-4xl mb-3">🔍</div>
-                <p className="text-white/60 mb-2">No properties match your filters</p>
-                <button onClick={handleReset} className="text-turmeric-400 hover:text-turmeric-300 text-sm transition-colors">
-                  Reset filters
+                <p className="text-white/60 mb-1 font-medium">No properties match your filters</p>
+                <p className="text-white/35 text-sm mb-4">Try removing some filters to see more results</p>
+                <button onClick={handleReset} className="text-turmeric-400 hover:text-turmeric-300 text-sm font-medium transition-colors">
+                  Reset all filters
                 </button>
-                <div className="mt-6">
-                  <Link href="/buyer-request" className="text-white/40 hover:text-white/60 text-sm transition-colors">
-                    Can't find what you need? Post a land request →
+                <div className="mt-6 border-t border-white/8 pt-6">
+                  <p className="text-white/35 text-sm mb-2">Can't find what you're looking for?</p>
+                  <Link href="/buyer-request" className="text-white/50 hover:text-white/70 text-sm transition-colors font-medium">
+                    Post a Land Request →
                   </Link>
                 </div>
               </div>

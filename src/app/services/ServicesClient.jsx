@@ -10,38 +10,48 @@ const PHASE2_SERVICES = [
     titleKey: 'fencingTitle',
     descKey: 'fencingDesc',
     tag: 'One-time',
+    accent: 'from-paddy-800/40 to-paddy-900/40',
+    tagColor: 'bg-paddy-500/20 text-paddy-300 border-paddy-500/20',
   },
   {
     icon: '⚡',
     titleKey: 'electricityTitle',
     descKey: 'electricityDesc',
     tag: 'On-demand',
+    accent: 'from-turmeric-900/30 to-paddy-900/40',
+    tagColor: 'bg-turmeric-500/20 text-turmeric-300 border-turmeric-500/20',
   },
   {
     icon: '💧',
     titleKey: 'dripTitle',
     descKey: 'dripDesc',
     tag: 'Subsidy available',
+    accent: 'from-blue-900/30 to-paddy-900/40',
+    tagColor: 'bg-blue-500/20 text-blue-300 border-blue-500/20',
   },
   {
     icon: '🌱',
     titleKey: 'farmingPlanTitle',
     descKey: 'farmingPlanDesc',
     tag: 'Customised',
+    accent: 'from-green-900/30 to-paddy-900/40',
+    tagColor: 'bg-green-500/20 text-green-300 border-green-500/20',
   },
   {
     icon: '🌳',
     titleKey: 'plantsTitle',
     descKey: 'plantsDesc',
-    tag: '1-year replacement',
+    tag: '1-yr replacement',
+    accent: 'from-emerald-900/30 to-paddy-900/40',
+    tagColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/20',
   },
 ]
 
 const PHASE3_ITEMS = [
-  { icon: '🛡️', key: 'securityTitle' },
-  { icon: '🏠', key: 'farmhouseTitle' },
-  { icon: '🌾', key: 'cropTitle' },
-  { icon: '📈', key: 'marketingTitle' },
+  { icon: '🛡️', key: 'securityTitle',  desc: 'Physical security & farm monitoring' },
+  { icon: '🏠', key: 'farmhouseTitle', desc: 'Design & build your dream farmhouse' },
+  { icon: '🌾', key: 'cropTitle',       desc: 'End-to-end crop maintenance plans' },
+  { icon: '📈', key: 'marketingTitle',  desc: 'Market your produce at best prices' },
 ]
 
 export default function ServicesPage() {
@@ -75,28 +85,49 @@ export default function ServicesPage() {
           <div className="flex-1 h-px bg-white/10" />
         </div>
 
+        {/* Pricing note */}
+        <div className="flex items-center gap-3 mb-6 p-4 rounded-xl bg-turmeric-500/8 border border-turmeric-400/15">
+          <span className="text-turmeric-400 text-lg">💰</span>
+          <p className="text-white/65 text-sm">
+            All services are <strong className="text-white/85">priced on enquiry</strong> — no hidden charges. Call{' '}
+            <a href="tel:7780312525" className="text-turmeric-400 hover:text-turmeric-300 font-semibold">7780312525</a>{' '}
+            for a customised quote.
+          </p>
+        </div>
+
         {/* Services grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-16">
           {PHASE2_SERVICES.map((svc) => (
-            <div key={svc.titleKey} className="bg-white/5 border border-white/10 hover:border-turmeric-400/20 rounded-2xl p-6 transition-all group">
-              <div className="text-4xl mb-4 group-hover:scale-110 transition-transform">{svc.icon}</div>
+            <div
+              key={svc.titleKey}
+              className={`relative bg-gradient-to-br ${svc.accent} border border-white/10 hover:border-turmeric-400/30 rounded-2xl p-6 transition-all group flex flex-col`}
+            >
+              {/* Icon */}
+              <div className="w-14 h-14 rounded-2xl bg-white/8 border border-white/10 flex items-center justify-center text-3xl mb-4 group-hover:scale-105 transition-transform">
+                {svc.icon}
+              </div>
+
               <div className="flex items-start justify-between gap-2 mb-2">
-                <h3 className={`text-white font-semibold text-base ${lang === 'te' ? 'telugu' : ''}`}>
+                <h3 className={`text-white font-semibold text-base leading-snug ${lang === 'te' ? 'telugu' : ''}`}>
                   {t[svc.titleKey]}
                 </h3>
-                <span className="shrink-0 text-xs text-paddy-400/70 bg-paddy-500/10 px-2 py-0.5 rounded-full whitespace-nowrap">
-                  {svc.tag}
-                </span>
               </div>
-              <p className={`text-white/55 text-sm leading-relaxed mb-5 ${lang === 'te' ? 'telugu' : ''}`}>
+
+              <p className={`text-white/55 text-sm leading-relaxed mb-4 flex-1 ${lang === 'te' ? 'telugu' : ''}`}>
                 {t[svc.descKey]}
               </p>
-              <Link
-                href="/#contact"
-                className="block text-center bg-white/10 hover:bg-turmeric-500/20 hover:border-turmeric-400/40 border border-white/10 text-white text-sm font-medium py-2.5 rounded-xl transition-all"
-              >
-                Book Enquiry →
-              </Link>
+
+              <div className="flex items-center justify-between gap-2 mt-auto">
+                <span className={`text-xs border px-2.5 py-1 rounded-full font-medium ${svc.tagColor}`}>
+                  {svc.tag}
+                </span>
+                <Link
+                  href="/#contact"
+                  className="text-xs bg-white/10 hover:bg-turmeric-500/20 hover:border-turmeric-400/30 border border-white/10 text-white/80 hover:text-white font-medium py-1.5 px-3 rounded-xl transition-all"
+                >
+                  Enquire →
+                </Link>
+              </div>
             </div>
           ))}
         </div>
@@ -122,9 +153,16 @@ export default function ServicesPage() {
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
               {PHASE3_ITEMS.map(item => (
-                <div key={item.key} className="bg-white/5 border border-white/8 rounded-xl p-3 text-center">
-                  <div className="text-2xl mb-1.5">{item.icon}</div>
-                  <p className={`text-white/60 text-xs ${lang === 'te' ? 'telugu' : ''}`}>{t[item.key]}</p>
+                <div key={item.key} className="relative bg-white/5 border border-white/8 hover:border-white/15 rounded-xl p-4 text-center transition-all group overflow-hidden">
+                  {/* Coming soon ribbon */}
+                  <div className="absolute -top-0.5 -right-0.5">
+                    <span className="bg-white/15 text-white/50 text-[9px] font-semibold px-2 py-0.5 rounded-bl-lg rounded-tr-xl border-l border-b border-white/10">
+                      Soon
+                    </span>
+                  </div>
+                  <div className="text-2xl mb-2 group-hover:scale-110 transition-transform">{item.icon}</div>
+                  <p className={`text-white/70 text-xs font-medium mb-1 ${lang === 'te' ? 'telugu' : ''}`}>{t[item.key]}</p>
+                  <p className="text-white/30 text-[10px] leading-snug hidden sm:block">{item.desc}</p>
                 </div>
               ))}
             </div>

@@ -2,60 +2,185 @@
 
 import { useChat } from '@ai-sdk/react'
 import { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { MessageCircle, X, Send, User } from 'lucide-react'
 
 const QUICK_QUESTIONS = [
-  { en: 'What is SDV Farms?',         te: 'SDV ఫామ్స్ అంటే ఏమిటి?' },
-  { en: 'How to book a site visit?',  te: 'సైట్ విజిట్ ఎలా బుక్ చేయాలి?' },
-  { en: 'Where is it located?',       te: 'ఇది ఎక్కడ ఉంది?' },
+  { en: 'Browse Properties',       te: 'ప్రాపర్టీలు చూడండి', link: '/properties' },
+  { en: 'How to sell my land?',    te: 'నా భూమి ఎలా అమ్మాలి?' },
+  { en: 'Contact & Call',          te: 'సంప్రదించండి & కాల్' },
+  { en: 'Available services',      te: 'అందుబాటులో ఉన్న సేవలు' },
   { en: 'Is it government approved?', te: 'ఇది ప్రభుత్వ ఆమోదం పొందిందా?' },
 ]
 
 const WELCOME = {
-  en: "👋 Hi! I'm the SDV Farms assistant. Ask me anything about our agricultural land project near Hyderabad — plots, pricing, legal process, or how to book a visit!",
-  te: "👋 నమస్కారం! నేను SDV ఫామ్స్ అసిస్టెంట్. హైదరాబాద్ సమీపంలోని మా వ్యవసాయ భూమి ప్రాజెక్ట్ గురించి ఏదైనా అడగండి!",
+  en: "👋 Hi! I'm the SDV Farms assistant. Ask me anything about our agricultural land marketplace — buying, selling, services, pricing, or how to book a visit!",
+  te: "👋 నమస్కారం! నేను SDV ఫామ్స్ అసిస్టెంట్. మా వ్యవసాయ భూమి మార్కెట్‌ప్లేస్ గురించి ఏదైనా అడగండి!",
+}
+
+// Instant FAQ replies — no AI call needed
+const FAQ_RULES = [
+  {
+    match: /\b(how many|propert|listing|available land|browse)\b/i,
+    reply: (count) =>
+      `🌾 We have **${count} approved properties** listed across Telangana, Andhra Pradesh & Karnataka.\n\nBrowse and filter by state, soil type, area or price at [/properties](/properties) — no login needed!`,
+  },
+  {
+    match: /\b(sell|list my land|seller|post land|add property|how to list)\b/i,
+    reply: () =>
+      `🌾 To list your land on SDV Farms:\n\n1. Register as a **Seller** at [/auth/register](/auth/register)\n2. Pass a quick eligibility check (Government/Poramboke land is not allowed)\n3. Fill our 3-step form — location, land details, upload Pahani/ROR-1B\n\nOnce submitted, our team reviews and approves it within 24 hours. Free listing — no commission!`,
+  },
+  {
+    match: /\b(buy|purchase|buyer|looking for land|find land|invest)\b/i,
+    reply: () =>
+      `🏡 To buy agricultural land through SDV Farms:\n\n1. **Browse** listings at [/properties](/properties)\n2. **Filter** by state, soil type, area, or price\n3. **Book a site visit** directly on any property page\n4. Or submit a **land request** at [/buyer-request](/buyer-request) if you can't find what you need\n\nAll listings have clear title & government verification. Call **7780312525** for guidance.`,
+  },
+  {
+    match: /\b(service|fencing|borewell|drip|irrigation|farming plan|plant|crop|farmhouse)\b/i,
+    reply: () =>
+      `🛠️ **SDV Farms — Phase II Services** (for land owners):\n\n• 🔒 Compound Fencing\n• ⚡ Borewell & Electricity connection\n• 💧 Drip Irrigation setup\n• 🌱 Customised Farming Plan\n• 🌳 Quality Plants (1-year replacement)\n\nAll services are on-demand. Call **7780312525** or visit [/services](/services) for details.`,
+  },
+  {
+    match: /\b(contact|phone|call|whatsapp|email|reach|number|address|office)\b/i,
+    reply: () =>
+      `📞 **SDV Farms Contact Details:**\n\n• **Phone/WhatsApp:** 7780312525\n• **Email:** info@sdvfarms.in\n• **Office:** Hyderabad, Telangana\n• **Hours:** Mon–Sat, 9 AM – 6 PM\n\nOr fill the enquiry form on our home page — we'll call you back within 2 hours!`,
+  },
+  {
+    match: /\b(price|cost|rate|per acre|how much|charge|fee|rupee|lakh|crore)\b/i,
+    reply: () =>
+      `💰 **Pricing at SDV Farms:**\n\nPrices vary by location, soil type, and land area. Each listing on [/properties](/properties) shows the price per acre and total cost.\n\nFor a personalised quote, call **7780312525** — we'll match you with the best options for your budget.`,
+  },
+  {
+    match: /\b(location|where|address|near|hyderabad|telangana|andhra|karnataka|state|district|mandal)\b/i,
+    reply: () =>
+      `📍 **SDV Farms Properties are across:**\n\n• **Telangana** — Nalgonda, Yadadri, Suryapet, and more districts\n• **Andhra Pradesh** — multiple districts\n• **Karnataka** — selected districts\n\nAll well-connected to Hyderabad. Exact coordinates and map are on our home page. WhatsApp **7780312525** for driving directions.`,
+  },
+  {
+    match: /\b(government|approved|legal|title|document|pahani|ror|adangal|rtc|verified)\b/i,
+    reply: () =>
+      `✅ **Yes — SDV Farms is 100% government-approved:**\n\n• Clear title with full legal verification\n• Registered sale deed directly in the buyer's name\n• All documents (Pahani/ROR-1B/Adangal/RTC) verified before listing\n• No hidden charges — transparent pricing\n\nCall **7780312525** to review documents before any commitment.`,
+  },
+]
+
+function matchFAQ(text, propertyCount) {
+  for (const rule of FAQ_RULES) {
+    if (rule.match.test(text)) {
+      return rule.reply(propertyCount)
+    }
+  }
+  return null
+}
+
+// Renders simple markdown: **bold**, [link](url), newlines
+function ChatText({ text }) {
+  if (!text) return null
+  const lines = text.split('\n')
+  return (
+    <div className="space-y-1">
+      {lines.map((line, li) => {
+        if (!line.trim()) return <div key={li} className="h-1" />
+        // Parse **bold** and [text](url) in a line
+        const parts = []
+        const re = /(\*\*(.+?)\*\*|\[(.+?)\]\((.+?)\))/g
+        let last = 0, match
+        while ((match = re.exec(line)) !== null) {
+          if (match.index > last) parts.push(line.slice(last, match.index))
+          if (match[0].startsWith('**')) {
+            parts.push(<strong key={match.index} className="font-semibold text-gray-900">{match[2]}</strong>)
+          } else {
+            parts.push(
+              <a key={match.index} href={match[4]}
+                className="text-paddy-600 underline underline-offset-2 hover:text-paddy-800"
+                onClick={e => { e.preventDefault(); window.location.href = match[4] }}
+              >{match[3]}</a>
+            )
+          }
+          last = match.index + match[0].length
+        }
+        if (last < line.length) parts.push(line.slice(last))
+        return <p key={li}>{parts}</p>
+      })}
+    </div>
+  )
 }
 
 export default function ChatBot() {
-  const [open, setOpen]   = useState(false)
-  const [lang, setLang]   = useState('en')
-  const [input, setInput] = useState('')
-  const messagesEndRef    = useRef(null)
-  const inputRef          = useRef(null)
+  const router = useRouter()
+  const [open, setOpen]               = useState(false)
+  const [lang, setLang]               = useState('en')
+  const [input, setInput]             = useState('')
+  const [propertyCount, setPropertyCount] = useState(0)
+  const [faqMessages, setFaqMessages] = useState([])
+  const messagesEndRef                = useRef(null)
+  const inputRef                      = useRef(null)
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages: aiMessages, sendMessage, status } = useChat({
     api: '/api/chat',
-    initialMessages: [
-      {
-        id: 'welcome',
-        role: 'assistant',
-        content: WELCOME[lang],
-        parts: [{ type: 'text', text: WELCOME[lang] }],
-      },
-    ],
+    initialMessages: [],
   })
 
   const isLoading = status === 'streaming' || status === 'submitted'
 
+  // Combine welcome + faq + ai messages for display
+  const welcomeMsg = {
+    id: 'welcome',
+    role: 'assistant',
+    parts: [{ type: 'text', text: WELCOME[lang] }],
+    content: WELCOME[lang],
+  }
+  const allMessages = [welcomeMsg, ...faqMessages, ...aiMessages]
+
+  // Fetch approved property count once on open
+  useEffect(() => {
+    if (!open || propertyCount > 0) return
+    fetch('/api/property-count')
+      .then(r => r.json())
+      .then(d => setPropertyCount(d.count ?? 0))
+      .catch(() => setPropertyCount(0))
+  }, [open, propertyCount])
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+  }, [allMessages])
 
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 100)
   }, [open])
 
+  function injectFaqReply(userText, replyText) {
+    const now = Date.now()
+    setFaqMessages(prev => [
+      ...prev,
+      { id: `u-${now}`, role: 'user',      content: userText,  parts: [{ type: 'text', text: userText }] },
+      { id: `a-${now}`, role: 'assistant', content: replyText, parts: [{ type: 'text', text: replyText }] },
+    ])
+  }
+
   const handleSubmit = e => {
     e.preventDefault()
     const text = input?.trim()
     if (!text || isLoading) return
-    sendMessage({ text })
     setInput('')
+    const faq = matchFAQ(text, propertyCount)
+    if (faq) {
+      injectFaqReply(text, faq)
+    } else {
+      sendMessage({ text })
+    }
   }
 
   const handleQuickQuestion = q => {
+    if (q.link) {
+      router.push(q.link)
+      return
+    }
     const text = lang === 'en' ? q.en : q.te
-    sendMessage({ text })
+    const faq = matchFAQ(text, propertyCount)
+    if (faq) {
+      injectFaqReply(text, faq)
+    } else {
+      sendMessage({ text })
+    }
   }
 
   return (
@@ -98,7 +223,7 @@ export default function ChatBot() {
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto bg-cream px-4 py-3 space-y-3 min-h-0">
-            {messages.map((m, i) => (
+            {allMessages.map((m, i) => (
               <div key={m.id ?? i} className={`flex gap-2 ${m.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
                   m.role === 'user' ? 'bg-paddy-600' : 'bg-turmeric-100 border border-turmeric-200'
@@ -112,9 +237,7 @@ export default function ChatBot() {
                     ? 'bg-paddy-700 text-white rounded-tr-sm'
                     : 'bg-white border border-turmeric-100 text-gray-800 rounded-tl-sm shadow-sm'
                 }`}>
-                  {m.parts
-                    ? m.parts.filter(p => p.type === 'text').map(p => p.text).join('')
-                    : m.content}
+                  <ChatText text={m.parts ? m.parts.filter(p => p.type === 'text').map(p => p.text).join('') : m.content} />
                 </div>
               </div>
             ))}
@@ -137,7 +260,7 @@ export default function ChatBot() {
             )}
 
             {/* Quick questions — only at the start */}
-            {messages.length <= 1 && !isLoading && (
+            {allMessages.length <= 1 && !isLoading && (
               <div className="pt-1">
                 <p className="text-xs text-gray-400 mb-2 text-center">Quick questions</p>
                 <div className="flex flex-wrap gap-2">
@@ -145,7 +268,11 @@ export default function ChatBot() {
                     <button
                       key={i}
                       onClick={() => handleQuickQuestion(q)}
-                      className="text-xs bg-white border border-turmeric-200 text-paddy-700 rounded-full px-3 py-1.5 hover:bg-turmeric-50 hover:border-turmeric-400 transition-colors"
+                      className={`text-xs border rounded-full px-3 py-1.5 transition-colors ${
+                        q.link
+                          ? 'bg-turmeric-50 border-turmeric-300 text-turmeric-700 hover:bg-turmeric-100'
+                          : 'bg-white border-turmeric-200 text-paddy-700 hover:bg-turmeric-50 hover:border-turmeric-400'
+                      }`}
                     >
                       {lang === 'en' ? q.en : q.te}
                     </button>

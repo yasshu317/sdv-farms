@@ -40,7 +40,8 @@ test.describe('Services Page', () => {
   })
 
   test('each service has an enquiry link', async ({ page }) => {
-    const enquiryLinks = page.getByRole('link', { name: /Book Enquiry/i })
+    // Button text changed from "Book Enquiry →" to "Enquire →" in services polish
+    const enquiryLinks = page.getByRole('link', { name: /Enquire/i })
     await expect(enquiryLinks.first()).toBeVisible()
     const count = await enquiryLinks.count()
     expect(count).toBe(5)
