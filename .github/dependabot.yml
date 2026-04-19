@@ -16,8 +16,6 @@ updates:
         update-types:
           - minor
           - patch
-    # Always open separate PRs for major version bumps (breaking changes)
-    ignore: []
     labels:
       - dependencies
       - automated
