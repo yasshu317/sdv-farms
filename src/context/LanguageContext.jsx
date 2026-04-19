@@ -1,7 +1,7 @@
 'use client'
 import { createContext, useContext, useState } from 'react'
 
-const LanguageContext = createContext()
+const LanguageContext = createContext({ lang: 'en', toggle: () => {} })
 
 export function LanguageProvider({ children }) {
   const [lang, setLang] = useState('en')
