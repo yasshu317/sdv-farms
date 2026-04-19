@@ -6,12 +6,17 @@ test.describe('Properties Browse Page', () => {
   })
 
   test('loads with Browse Properties heading', async ({ page }) => {
-    await expect(page.getByRole('heading', { name: 'Browse Properties' })).toBeVisible()
+    // Heading was updated to "Find Your Agricultural Land" with hero banner polish
+    await expect(page.getByRole('heading', { name: 'Find Your Agricultural Land' })).toBeVisible()
   })
 
   test('shows listings count', async ({ page }) => {
-    // Should show "X listing(s) available"
-    await expect(page.getByText(/listing/i)).toBeVisible()
+    // Results bar shows "X listing(s) found" — or empty state shows "No properties listed yet"
+    const countBar  = page.getByText(/listings? found/i)
+    const emptyState = page.getByText(/no properties/i)
+    const hasEither = await countBar.isVisible().catch(() => false) ||
+                      await emptyState.isVisible().catch(() => false)
+    expect(hasEither).toBe(true)
   })
 
   test('filter panel is visible on desktop', async ({ page }) => {

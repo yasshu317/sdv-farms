@@ -11,8 +11,10 @@ test.describe('Homepage', () => {
   })
 
   test('navbar has Properties and Services links', async ({ page }) => {
-    await expect(page.getByRole('link', { name: 'Properties' })).toBeVisible()
-    await expect(page.getByRole('link', { name: 'Services' })).toBeVisible()
+    // Scope to the <nav> element to avoid matching "Browse Properties →" in HowItWorks
+    const nav = page.locator('nav').first()
+    await expect(nav.getByRole('link', { name: 'Properties', exact: true })).toBeVisible()
+    await expect(nav.getByRole('link', { name: 'Services', exact: true })).toBeVisible()
   })
 
   test('navbar has Sign in link', async ({ page }) => {
@@ -20,12 +22,12 @@ test.describe('Homepage', () => {
   })
 
   test('Properties nav link navigates to /properties', async ({ page }) => {
-    await page.getByRole('link', { name: 'Properties' }).first().click()
+    await page.locator('nav').first().getByRole('link', { name: 'Properties', exact: true }).click()
     await expect(page).toHaveURL(/\/properties/)
   })
 
   test('Services nav link navigates to /services', async ({ page }) => {
-    await page.getByRole('link', { name: 'Services' }).first().click()
+    await page.locator('nav').first().getByRole('link', { name: 'Services', exact: true }).click()
     await expect(page).toHaveURL(/\/services/)
   })
 
