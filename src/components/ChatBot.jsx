@@ -21,7 +21,7 @@ const WELCOME = {
 // Instant FAQ replies — no AI call needed
 const FAQ_RULES = [
   {
-    match: /\b(how many|propert|listing|available land|browse)\b/i,
+    match: /\b(how many|propert|listings?|available land|browse)\b/i,
     reply: (count) =>
       `🌾 We have **${count} approved properties** listed across Telangana, Andhra Pradesh & Karnataka.\n\nBrowse and filter by state, soil type, area or price at [/properties](/properties) — no login needed!`,
   },
@@ -51,7 +51,7 @@ const FAQ_RULES = [
       `💰 **Pricing at SDV Farms:**\n\nPrices vary by location, soil type, and land area. Each listing on [/properties](/properties) shows the price per acre and total cost.\n\nFor a personalised quote, call **7780312525** — we'll match you with the best options for your budget.`,
   },
   {
-    match: /\b(location|where|address|near|hyderabad|telangana|andhra|karnataka|state|district|mandal)\b/i,
+    match: /\b(location|where|address|near|hyderabad|telangana|andhra|karnataka|state|districts?|mandal)\b/i,
     reply: () =>
       `📍 **SDV Farms Properties are across:**\n\n• **Telangana** — Nalgonda, Yadadri, Suryapet, and more districts\n• **Andhra Pradesh** — multiple districts\n• **Karnataka** — selected districts\n\nAll well-connected to Hyderabad. Exact coordinates and map are on our home page. WhatsApp **7780312525** for driving directions.`,
   },
@@ -88,11 +88,16 @@ function ChatText({ text }) {
           if (match[0].startsWith('**')) {
             parts.push(<strong key={match.index} className="font-semibold text-gray-900">{match[2]}</strong>)
           } else {
+            // Capture href and label NOW so the closure doesn't reference the
+            // mutable `match` variable (which becomes null after the loop ends).
+            const href  = match[4]
+            const label = match[3]
+            const idx   = match.index
             parts.push(
-              <a key={match.index} href={match[4]}
+              <a key={idx} href={href}
                 className="text-paddy-600 underline underline-offset-2 hover:text-paddy-800"
-                onClick={e => { e.preventDefault(); window.location.href = match[4] }}
-              >{match[3]}</a>
+                onClick={e => { e.preventDefault(); window.location.href = href }}
+              >{label}</a>
             )
           }
           last = match.index + match[0].length
