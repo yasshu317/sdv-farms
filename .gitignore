@@ -1,6 +1,10 @@
 # Dependencies – NEVER upload this folder
 node_modules/
 
+# Playwright
+playwright-report/
+test-results/
+
 # Build output – generated automatically, don't upload
 dist/
 dist-ssr/
