@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '../../lib/supabase'
 import { LogOut, Home, FileText, MapPin, Phone, CheckCircle, Clock, XCircle } from 'lucide-react'
+import EmailVerificationBanner from '../../components/EmailVerificationBanner'
 
 const STATUS_BADGE = {
   pending:   { label: 'Pending',   color: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
@@ -62,8 +63,10 @@ export default function DashboardClient({ user, enquiries, interests }) {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+        <EmailVerificationBanner user={user} />
+
         {/* Welcome */}
-        <div className="mb-8">
+        <div className="mb-8 mt-4">
           <h1 className="font-display text-2xl sm:text-3xl font-bold text-paddy-900">
             Welcome back, {name.split(' ')[0]}! 👋
           </h1>

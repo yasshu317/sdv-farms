@@ -3,7 +3,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '../../lib/supabase'
 import { sendNotification } from '../../lib/notify'
-import { LogOut, Users, FileText, MapPin, RefreshCw, Home, Calendar, MessageSquare, ShieldCheck, Search } from 'lucide-react'
+import { LogOut, Users, FileText, MapPin, RefreshCw, Home, Calendar, MessageSquare, ShieldCheck, Search, Plus } from 'lucide-react'
+import NextLink from 'next/link'
 import StatusBadge from '../../components/ui/StatusBadge'
 
 const ENQUIRY_STATUSES = ['pending', 'contacted', 'visited', 'booked', 'closed']
@@ -33,10 +34,12 @@ export default function AdminClient({ enquiries: initial, profiles, plots: initi
   const [appointments, setAppointments]   = useState(initialAppts)
   const [buyerRequests, setBuyerRequests] = useState(initialRequests)
   const [saving, setSaving]               = useState(null)
-  const [allUsers, setAllUsers]           = useState(null)   // null = not loaded yet
+  const [allUsers, setAllUsers]           = useState(null)
   const [usersLoading, setUsersLoading]   = useState(false)
   const [userSearch, setUserSearch]       = useState('')
   const [roleFilter, setRoleFilter]       = useState('all')
+  const [serviceBookings, setServiceBookings] = useState(null)
+  const [svcLoading, setSvcLoading]       = useState(false)
 
   async function handleLogout() {
     const supabase = createClient()
@@ -118,6 +121,26 @@ export default function AdminClient({ enquiries: initial, profiles, plots: initi
     }
   }
 
+  async function loadServiceBookings() {
+    if (svcLoading) return
+    setSvcLoading(true)
+    const supabase = createClient()
+    const { data } = await supabase
+      .from('service_bookings')
+      .select('*')
+      .order('created_at', { ascending: false })
+    setServiceBookings(data ?? [])
+    setSvcLoading(false)
+  }
+
+  async function updateServiceStatus(id, status) {
+    setSaving(id)
+    const supabase = createClient()
+    await supabase.from('service_bookings').update({ status }).eq('id', id)
+    setServiceBookings(prev => prev.map(s => s.id === id ? { ...s, status } : s))
+    setSaving(null)
+  }
+
   async function updateRequestStatus(id, status) {
     setSaving(id)
     const supabase = createClient()
@@ -192,12 +215,14 @@ export default function AdminClient({ enquiries: initial, profiles, plots: initi
             ['properties',  'Properties',  Home],
             ['appointments','Appointments',Calendar],
             ['requests',    'Requests',    MessageSquare],
+            ['services',    'Services',    Users],
           ].map(([id, label, Icon]) => (
             <button
               key={id}
               onClick={() => {
                 setTab(id)
                 if (id === 'users' && allUsers === null) loadUsers()
+                if (id === 'services' && serviceBookings === null) loadServiceBookings()
               }}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all ${tab === id ? 'bg-white shadow-sm text-paddy-900' : 'text-gray-500 hover:text-gray-700'}`}
             >
@@ -479,9 +504,17 @@ export default function AdminClient({ enquiries: initial, profiles, plots: initi
         {/* Seller Properties */}
         {tab === 'properties' && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
-              <h2 className="font-semibold text-gray-800">Seller Properties ({properties.length})</h2>
-              <span className="text-xs text-gray-400">{stats.propPending} pending review</span>
+            <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between gap-4 flex-wrap">
+              <div>
+                <h2 className="font-semibold text-gray-800">Seller Properties ({properties.length})</h2>
+                <p className="text-xs text-gray-400 mt-0.5">{stats.propPending} pending review</p>
+              </div>
+              <NextLink
+                href="/admin/property/new"
+                className="flex items-center gap-1.5 bg-paddy-700 hover:bg-paddy-800 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors"
+              >
+                <Plus size={14} /> Add Property
+              </NextLink>
             </div>
             {properties.length === 0 ? (
               <p className="text-center py-12 text-gray-400 text-sm">No seller properties submitted yet</p>
@@ -640,6 +673,81 @@ export default function AdminClient({ enquiries: initial, profiles, plots: initi
                             className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-600 focus:outline-none focus:border-paddy-400 bg-white"
                           >
                             {REQUEST_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+        {/* Service Bookings */}
+        {tab === 'services' && (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
+              <div>
+                <h2 className="font-semibold text-gray-800">
+                  Service Enquiries {serviceBookings && <span className="text-gray-400 font-normal text-sm">({serviceBookings.length})</span>}
+                </h2>
+                <p className="text-xs text-gray-400 mt-0.5">Phase II service booking requests from customers</p>
+              </div>
+              <button onClick={loadServiceBookings} disabled={svcLoading}
+                className="text-xs border border-gray-200 text-gray-500 hover:text-paddy-700 hover:border-paddy-300 rounded-lg px-3 py-1.5 transition-colors flex items-center gap-1">
+                <RefreshCw size={12} className={svcLoading ? 'animate-spin' : ''} /> Refresh
+              </button>
+            </div>
+
+            {svcLoading && !serviceBookings ? (
+              <div className="text-center py-12">
+                <RefreshCw size={20} className="animate-spin text-paddy-400 mx-auto mb-2" />
+                <p className="text-gray-400 text-sm">Loading…</p>
+              </div>
+            ) : !serviceBookings || serviceBookings.length === 0 ? (
+              <p className="text-center py-12 text-gray-400 text-sm">No service enquiries yet</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
+                    <tr>
+                      {['Name', 'Phone', 'Email', 'Service', 'Location', 'Area', 'Notes', 'Date', 'Status', 'Update'].map(h => (
+                        <th key={h} className="px-4 py-3 text-left font-medium whitespace-nowrap">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {serviceBookings.map(s => (
+                      <tr key={s.id} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="px-4 py-3.5 font-medium text-gray-800 whitespace-nowrap">{s.full_name}</td>
+                        <td className="px-4 py-3.5 text-gray-500 whitespace-nowrap">
+                          <a href={`tel:${s.phone}`} className="hover:text-paddy-600">{s.phone}</a>
+                        </td>
+                        <td className="px-4 py-3.5 text-gray-500 max-w-[160px] truncate">{s.email}</td>
+                        <td className="px-4 py-3.5">
+                          <span className="bg-turmeric-50 text-turmeric-700 border border-turmeric-100 text-xs px-2 py-0.5 rounded-full font-medium capitalize whitespace-nowrap">
+                            {s.service_type?.replace('_', ' ')}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3.5 text-gray-500 text-xs max-w-[140px] truncate">{s.property_location || '—'}</td>
+                        <td className="px-4 py-3.5 text-gray-500 text-xs whitespace-nowrap">{s.area_acres ? `${s.area_acres} ac` : '—'}</td>
+                        <td className="px-4 py-3.5 text-gray-400 text-xs max-w-[160px] truncate">{s.notes || '—'}</td>
+                        <td className="px-4 py-3.5 text-gray-400 text-xs whitespace-nowrap">
+                          {new Date(s.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <StatusBadge status={s.status} />
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <select
+                            value={s.status}
+                            onChange={e => updateServiceStatus(s.id, e.target.value)}
+                            disabled={saving === s.id}
+                            className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-600 focus:outline-none focus:border-paddy-400 bg-white disabled:opacity-50"
+                          >
+                            {['pending', 'contacted', 'in_progress', 'completed', 'cancelled'].map(st => (
+                              <option key={st} value={st}>{st}</option>
+                            ))}
                           </select>
                         </td>
                       </tr>
