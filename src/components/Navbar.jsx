@@ -100,6 +100,20 @@ export default function Navbar() {
               {lang === 'en' ? 'తెలుగు' : 'English'}
             </button>
 
+            {/* Properties & Services links */}
+            <NextLink
+              href="/properties"
+              className={`text-sm font-medium transition-colors hover:text-turmeric-500 ${scrolled ? 'text-gray-700' : 'text-white/85'} ${lang === 'te' ? 'telugu text-xs' : ''}`}
+            >
+              {t.properties}
+            </NextLink>
+            <NextLink
+              href="/services"
+              className={`text-sm font-medium transition-colors hover:text-turmeric-500 ${scrolled ? 'text-gray-700' : 'text-white/85'} ${lang === 'te' ? 'telugu text-xs' : ''}`}
+            >
+              {t.services}
+            </NextLink>
+
             {user ? (
               <div className="relative">
                 <button
@@ -114,12 +128,16 @@ export default function Navbar() {
                 {userMenu && (
                   <div className="absolute right-0 top-10 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 w-48 z-50">
                     <NextLink
-                      href={user.user_metadata?.role === 'admin' ? '/admin' : '/dashboard'}
+                      href={
+                        user.user_metadata?.role === 'admin' ? '/admin' :
+                        user.user_metadata?.role === 'seller' ? '/seller' : '/dashboard'
+                      }
                       onClick={() => setUserMenu(false)}
                       className={`flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors ${lang === 'te' ? 'telugu' : ''}`}
                     >
                       <LayoutDashboard size={14} />
-                      {user.user_metadata?.role === 'admin' ? t.adminPanel : t.myDashboard}
+                      {user.user_metadata?.role === 'admin' ? t.adminPanel :
+                       user.user_metadata?.role === 'seller' ? t.myListings : t.myDashboard}
                     </NextLink>
                     <button
                       onClick={handleLogout}
@@ -188,15 +206,33 @@ export default function Navbar() {
               {l.label}
             </Link>
           ))}
+          <NextLink
+            href="/properties"
+            onClick={() => setOpen(false)}
+            className={`block py-3 text-paddy-800 font-medium border-b border-gray-50 hover:text-turmeric-600 transition-colors ${lang === 'te' ? 'telugu' : ''}`}
+          >
+            {t.properties}
+          </NextLink>
+          <NextLink
+            href="/services"
+            onClick={() => setOpen(false)}
+            className={`block py-3 text-paddy-800 font-medium border-b border-gray-50 hover:text-turmeric-600 transition-colors ${lang === 'te' ? 'telugu' : ''}`}
+          >
+            {t.services}
+          </NextLink>
           {user ? (
             <div className="mt-4 space-y-2">
               <NextLink
-                href={user.user_metadata?.role === 'admin' ? '/admin' : '/dashboard'}
+                href={
+                  user.user_metadata?.role === 'admin' ? '/admin' :
+                  user.user_metadata?.role === 'seller' ? '/seller' : '/dashboard'
+                }
                 onClick={() => setOpen(false)}
                 className={`flex items-center gap-2 py-2.5 px-4 rounded-xl bg-paddy-50 text-paddy-800 font-medium text-sm ${lang === 'te' ? 'telugu' : ''}`}
               >
                 <LayoutDashboard size={14} />
-                {user.user_metadata?.role === 'admin' ? t.adminPanel : t.myDashboard}
+                {user.user_metadata?.role === 'admin' ? t.adminPanel :
+                 user.user_metadata?.role === 'seller' ? t.myListings : t.myDashboard}
               </NextLink>
               <button onClick={handleLogout} className={`w-full flex items-center gap-2 py-2.5 px-4 rounded-xl bg-red-50 text-red-600 font-medium text-sm ${lang === 'te' ? 'telugu' : ''}`}>
                 <LogOut size={14} /> {t.signOut}
