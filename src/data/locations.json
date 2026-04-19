@@ -1,0 +1,41 @@
+{
+  "Telangana": {
+    "Hyderabad": ["Secunderabad", "LB Nagar", "Uppal", "Kukatpally", "Charminar", "Begumpet"],
+    "Rangareddy": ["Shamshabad", "Rajendranagar", "Maheshwaram", "Ibrahimpatnam", "Chevella", "Tandur"],
+    "Medchal-Malkajgiri": ["Medchal", "Quthbullapur", "Keesara", "Malkajgiri", "Ghatkesar"],
+    "Nalgonda": ["Nalgonda", "Miryalaguda", "Suryapet", "Bhongir", "Devarakonda"],
+    "Warangal": ["Warangal", "Hanamkonda", "Kazipet", "Parkal", "Narsampet"],
+    "Karimnagar": ["Karimnagar", "Huzurabad", "Jagtial", "Peddapalli", "Ramagundam"],
+    "Khammam": ["Khammam", "Kothagudem", "Bhadrachalam", "Palvancha"],
+    "Nizamabad": ["Nizamabad", "Armoor", "Bodhan", "Kamareddy"],
+    "Mahabubnagar": ["Mahabubnagar", "Wanaparthy", "Narayanpet", "Nagarkurnool"],
+    "Adilabad": ["Adilabad", "Mancherial", "Nirmal", "Asifabad"]
+  },
+  "Andhra Pradesh": {
+    "Krishna": ["Vijayawada", "Machilipatnam", "Nuzvid", "Gudivada", "Tiruvuru"],
+    "Guntur": ["Guntur", "Tenali", "Narasaraopet", "Ponnur", "Sattenapalle"],
+    "West Godavari": ["Eluru", "Bhimavaram", "Tadepalligudem", "Narsapuram", "Palacole"],
+    "East Godavari": ["Rajahmundry", "Kakinada", "Amalapuram", "Samalkot", "Ramachandrapuram"],
+    "Nellore": ["Nellore", "Kavali", "Gudur", "Sullurpeta", "Atmakur"],
+    "Prakasam": ["Ongole", "Markapur", "Chirala", "Giddalur", "Kandukur"],
+    "Kurnool": ["Kurnool", "Adoni", "Nandyal", "Yemmiganur", "Dhone"],
+    "Kadapa": ["Kadapa", "Proddatur", "Nandyal", "Rajampet", "Badvel"],
+    "Anantapur": ["Anantapur", "Guntakal", "Dharmavaram", "Tadipatri", "Hindupur"],
+    "Chittoor": ["Chittoor", "Tirupati", "Madanapalle", "Srikalahasti", "Puttur"],
+    "Visakhapatnam": ["Visakhapatnam", "Bheemunipatnam", "Paderu", "Anakapalle"],
+    "Vizianagaram": ["Vizianagaram", "Bobbili", "Parvathipuram"],
+    "Srikakulam": ["Srikakulam", "Narasannapeta", "Tekkali", "Palasa"]
+  },
+  "Karnataka": {
+    "Bangalore Rural": ["Devanahalli", "Doddaballapur", "Hosakote", "Nelamangala"],
+    "Tumkur": ["Tumkur", "Sira", "Madhugiri", "Tiptur", "Chikkanayakanahalli"],
+    "Ramanagara": ["Ramanagara", "Channapatna", "Kanakapura", "Magadi"],
+    "Kolar": ["Kolar", "KGF", "Mulbagal", "Srinivaspur", "Malur"],
+    "Chikkaballapur": ["Chikkaballapur", "Chickballapur", "Bagepalli", "Gudibanda"],
+    "Hassan": ["Hassan", "Belur", "Arsikere", "Sakleshpur", "Channarayapatna"],
+    "Mysuru": ["Mysuru", "Nanjangud", "T.Narasipura", "Hunsur", "Periyapatna"],
+    "Mandya": ["Mandya", "Maddur", "Malavalli", "Srirangapatna", "Nagamangala"],
+    "Davangere": ["Davangere", "Harihar", "Channagiri", "Jagalur"],
+    "Haveri": ["Haveri", "Ranebennur", "Byadagi", "Savanur"]
+  }
+}

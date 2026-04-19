@@ -37,9 +37,19 @@ export async function middleware(request) {
     }
   }
 
+  // Protect /seller — must be logged in with seller or admin role
+  if (pathname.startsWith('/seller')) {
+    if (!user) return NextResponse.redirect(new URL('/auth/login', request.url))
+    const role = user.user_metadata?.role
+    if (role !== 'seller' && role !== 'admin') {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+  }
+
   // Redirect logged-in users away from auth pages
   if (user && (pathname.startsWith('/auth/login') || pathname.startsWith('/auth/register'))) {
-    const dest = user.user_metadata?.role === 'admin' ? '/admin' : '/dashboard'
+    const role = user.user_metadata?.role
+    const dest = role === 'admin' ? '/admin' : role === 'seller' ? '/seller' : '/dashboard'
     return NextResponse.redirect(new URL(dest, request.url))
   }
 
@@ -47,5 +57,5 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/admin/:path*', '/auth/login', '/auth/register'],
+  matcher: ['/dashboard/:path*', '/admin/:path*', '/seller/:path*', '/auth/login', '/auth/register'],
 }

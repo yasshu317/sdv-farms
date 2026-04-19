@@ -11,10 +11,20 @@ export default async function AdminPage() {
 
   if (!user || user.user_metadata?.role !== 'admin') redirect('/dashboard')
 
-  const [{ data: enquiries }, { data: profiles }, { data: plots }] = await Promise.all([
+  const [
+    { data: enquiries },
+    { data: profiles },
+    { data: plots },
+    { data: sellerProperties },
+    { data: appointments },
+    { data: buyerRequests },
+  ] = await Promise.all([
     supabase.from('enquiries').select('*').order('created_at', { ascending: false }),
     supabase.from('profiles').select('*').order('created_at', { ascending: false }),
     supabase.from('plots').select('*').order('plot_number'),
+    supabase.from('seller_properties').select('*').order('created_at', { ascending: false }),
+    supabase.from('appointments').select('*').order('appointment_date', { ascending: true }),
+    supabase.from('buyer_requests').select('*').order('created_at', { ascending: false }),
   ])
 
   return (
@@ -22,6 +32,9 @@ export default async function AdminPage() {
       enquiries={enquiries ?? []}
       profiles={profiles ?? []}
       plots={plots ?? []}
+      sellerProperties={sellerProperties ?? []}
+      appointments={appointments ?? []}
+      buyerRequests={buyerRequests ?? []}
     />
   )
 }
