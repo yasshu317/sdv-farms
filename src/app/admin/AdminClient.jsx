@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '../../lib/supabase'
 import { sendNotification } from '../../lib/notify'
-import { LogOut, Users, FileText, MapPin, RefreshCw, Home, Calendar, MessageSquare } from 'lucide-react'
+import { LogOut, Users, FileText, MapPin, RefreshCw, Home, Calendar, MessageSquare, ShieldCheck, Search } from 'lucide-react'
 import StatusBadge from '../../components/ui/StatusBadge'
 
 const ENQUIRY_STATUSES = ['pending', 'contacted', 'visited', 'booked', 'closed']
@@ -33,6 +33,10 @@ export default function AdminClient({ enquiries: initial, profiles, plots: initi
   const [appointments, setAppointments]   = useState(initialAppts)
   const [buyerRequests, setBuyerRequests] = useState(initialRequests)
   const [saving, setSaving]               = useState(null)
+  const [allUsers, setAllUsers]           = useState(null)   // null = not loaded yet
+  const [usersLoading, setUsersLoading]   = useState(false)
+  const [userSearch, setUserSearch]       = useState('')
+  const [roleFilter, setRoleFilter]       = useState('all')
 
   async function handleLogout() {
     const supabase = createClient()
@@ -84,6 +88,34 @@ export default function AdminClient({ enquiries: initial, profiles, plots: initi
     await supabase.from('appointments').update({ status }).eq('id', id)
     setAppointments(prev => prev.map(a => a.id === id ? { ...a, status } : a))
     setSaving(null)
+  }
+
+  async function loadUsers() {
+    if (usersLoading) return
+    setUsersLoading(true)
+    try {
+      const res = await fetch('/api/admin/users')
+      const data = await res.json()
+      setAllUsers(data.users ?? [])
+    } catch {
+      setAllUsers([])
+    } finally {
+      setUsersLoading(false)
+    }
+  }
+
+  async function changeUserRole(userId, newRole) {
+    setSaving(userId)
+    try {
+      await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, role: newRole }),
+      })
+      setAllUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u))
+    } finally {
+      setSaving(null)
+    }
   }
 
   async function updateRequestStatus(id, status) {
@@ -155,14 +187,18 @@ export default function AdminClient({ enquiries: initial, profiles, plots: initi
         <div className="flex flex-wrap gap-1 bg-gray-100 p-1 rounded-2xl w-fit mb-6">
           {[
             ['enquiries',   'Enquiries',   FileText],
-            ['buyers',      'Buyers',      Users],
+            ['users',       'Users',       ShieldCheck],
             ['plots',       'Plots',       MapPin],
             ['properties',  'Properties',  Home],
             ['appointments','Appointments',Calendar],
             ['requests',    'Requests',    MessageSquare],
           ].map(([id, label, Icon]) => (
             <button
-              key={id} onClick={() => setTab(id)}
+              key={id}
+              onClick={() => {
+                setTab(id)
+                if (id === 'users' && allUsers === null) loadUsers()
+              }}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all ${tab === id ? 'bg-white shadow-sm text-paddy-900' : 'text-gray-500 hover:text-gray-700'}`}
             >
               <Icon size={14} />{label}
@@ -233,39 +269,155 @@ export default function AdminClient({ enquiries: initial, profiles, plots: initi
           </div>
         )}
 
-        {/* Buyers */}
-        {tab === 'buyers' && (
+        {/* Users & Permissions */}
+        {tab === 'users' && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-50">
-              <h2 className="font-semibold text-gray-800">Registered Buyers ({profiles.length})</h2>
+            {/* Toolbar */}
+            <div className="px-6 py-4 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="flex-1">
+                <h2 className="font-semibold text-gray-800">
+                  All Users & Permissions
+                  {allUsers && <span className="text-gray-400 font-normal text-sm ml-2">({allUsers.length} total)</span>}
+                </h2>
+                <p className="text-xs text-gray-400 mt-0.5">Change roles using the dropdown. Takes effect on next login.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                {/* Role filter */}
+                <select
+                  value={roleFilter}
+                  onChange={e => setRoleFilter(e.target.value)}
+                  className="text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 text-gray-600 focus:outline-none focus:border-paddy-400 bg-white"
+                >
+                  <option value="all">All roles</option>
+                  <option value="buyer">Buyers</option>
+                  <option value="seller">Sellers</option>
+                  <option value="admin">Admins</option>
+                </select>
+                {/* Search */}
+                <div className="relative">
+                  <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    value={userSearch}
+                    onChange={e => setUserSearch(e.target.value)}
+                    placeholder="Search name / email…"
+                    className="text-xs border border-gray-200 rounded-lg pl-7 pr-3 py-1.5 text-gray-600 focus:outline-none focus:border-paddy-400 w-44"
+                  />
+                </div>
+                <button
+                  onClick={loadUsers}
+                  disabled={usersLoading}
+                  className="text-xs border border-gray-200 text-gray-500 hover:text-paddy-700 hover:border-paddy-300 rounded-lg px-3 py-1.5 transition-colors flex items-center gap-1"
+                >
+                  <RefreshCw size={12} className={usersLoading ? 'animate-spin' : ''} />
+                  Refresh
+                </button>
+              </div>
             </div>
-            {profiles.length === 0 ? (
-              <p className="text-center py-12 text-gray-400 text-sm">No buyers registered yet</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
-                    <tr>
-                      {['Name','Email','Phone','Joined'].map(h => (
-                        <th key={h} className="px-5 py-3 text-left font-medium">{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {profiles.map(p => (
-                      <tr key={p.id} className="hover:bg-gray-50/50 transition-colors">
-                        <td className="px-5 py-4 font-medium text-gray-800">{p.full_name || '—'}</td>
-                        <td className="px-5 py-4 text-gray-500">{p.email}</td>
-                        <td className="px-5 py-4 text-gray-500">{p.phone || '—'}</td>
-                        <td className="px-5 py-4 text-gray-400">
-                          {new Date(p.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+
+            {/* Role summary pills */}
+            {allUsers && (
+              <div className="px-6 py-3 border-b border-gray-50 flex gap-3 flex-wrap">
+                {[
+                  { role: 'buyer',  label: 'Buyers',  color: 'bg-blue-50 text-blue-600 border-blue-100' },
+                  { role: 'seller', label: 'Sellers', color: 'bg-green-50 text-green-600 border-green-100' },
+                  { role: 'admin',  label: 'Admins',  color: 'bg-purple-50 text-purple-600 border-purple-100' },
+                ].map(({ role, label, color }) => (
+                  <span key={role} className={`text-xs font-semibold px-3 py-1 rounded-full border ${color}`}>
+                    {allUsers.filter(u => u.role === role).length} {label}
+                  </span>
+                ))}
+                <span className="text-xs font-semibold px-3 py-1 rounded-full border bg-gray-50 text-gray-500 border-gray-100">
+                  {allUsers.filter(u => !u.confirmed).length} Unverified email
+                </span>
               </div>
             )}
+
+            {/* Table */}
+            {usersLoading && allUsers === null ? (
+              <div className="text-center py-16">
+                <RefreshCw size={24} className="animate-spin text-paddy-400 mx-auto mb-3" />
+                <p className="text-gray-400 text-sm">Loading users…</p>
+              </div>
+            ) : !allUsers ? (
+              <div className="text-center py-16 px-6">
+                <ShieldCheck size={32} className="text-gray-200 mx-auto mb-3" />
+                <p className="text-gray-500 text-sm font-medium mb-1">Service role key required</p>
+                <p className="text-gray-400 text-xs max-w-sm mx-auto">
+                  Add <code className="bg-gray-100 px-1 rounded">SUPABASE_SERVICE_ROLE_KEY</code> to your
+                  Vercel environment variables. Find it in:<br />
+                  <strong>Supabase Dashboard → Project Settings → API → service_role key</strong>
+                </p>
+              </div>
+            ) : (() => {
+              const q = userSearch.toLowerCase()
+              const filtered = allUsers.filter(u =>
+                (roleFilter === 'all' || u.role === roleFilter) &&
+                (!q || u.email?.toLowerCase().includes(q) || u.full_name?.toLowerCase().includes(q))
+              )
+              return filtered.length === 0 ? (
+                <p className="text-center py-12 text-gray-400 text-sm">No users match your search</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
+                      <tr>
+                        {['Name', 'Email', 'Phone', 'Role', 'Seller Type', 'Email Verified', 'Last Login', 'Joined', 'Change Role'].map(h => (
+                          <th key={h} className="px-4 py-3 text-left font-medium whitespace-nowrap">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                      {filtered.map(u => (
+                        <tr key={u.id} className="hover:bg-gray-50/50 transition-colors">
+                          <td className="px-4 py-3.5 font-medium text-gray-800 whitespace-nowrap">{u.full_name}</td>
+                          <td className="px-4 py-3.5 text-gray-500 max-w-[180px] truncate">{u.email}</td>
+                          <td className="px-4 py-3.5 text-gray-500 whitespace-nowrap">
+                            {u.phone !== '—' ? <a href={`tel:${u.phone}`} className="hover:text-paddy-600">{u.phone}</a> : '—'}
+                          </td>
+                          <td className="px-4 py-3.5">
+                            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+                              u.role === 'admin'  ? 'bg-purple-100 text-purple-700' :
+                              u.role === 'seller' ? 'bg-green-100 text-green-700'  :
+                                                    'bg-blue-100 text-blue-700'
+                            }`}>
+                              {u.role}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3.5 text-gray-400 text-xs">
+                            {u.seller_type ?? '—'}
+                          </td>
+                          <td className="px-4 py-3.5 text-center">
+                            {u.confirmed
+                              ? <span className="text-green-500 text-base" title="Email verified">✓</span>
+                              : <span className="text-yellow-400 text-base" title="Not verified">⚠</span>}
+                          </td>
+                          <td className="px-4 py-3.5 text-gray-400 text-xs whitespace-nowrap">
+                            {u.last_sign_in
+                              ? new Date(u.last_sign_in).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+                              : 'Never'}
+                          </td>
+                          <td className="px-4 py-3.5 text-gray-400 text-xs whitespace-nowrap">
+                            {new Date(u.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </td>
+                          <td className="px-4 py-3.5">
+                            <select
+                              value={u.role}
+                              onChange={e => changeUserRole(u.id, e.target.value)}
+                              disabled={saving === u.id}
+                              className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-600 focus:outline-none focus:border-paddy-400 bg-white disabled:opacity-50"
+                            >
+                              <option value="buyer">buyer</option>
+                              <option value="seller">seller</option>
+                              <option value="admin">admin</option>
+                            </select>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )
+            })()}
           </div>
         )}
 
