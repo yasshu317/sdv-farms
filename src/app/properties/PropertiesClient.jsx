@@ -3,9 +3,11 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import FilterPanel from '../../components/ui/FilterPanel'
+import locations from '../../data/locations.json'
 
 const SOIL_TYPES  = ['Black', 'Red', 'Sandy', 'Mixed']
 const LAND_TYPES  = ['Agriculture', 'Estate Agriculture', 'Industrial', 'Commercial', 'Residential']
+const ALL_STATES  = Object.keys(locations)
 
 function PropertyCard({ p }) {
   const photo = p.photo_urls?.[0]
@@ -53,11 +55,10 @@ export default function PropertiesClient({ properties }) {
   })
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
 
-  const states = useMemo(() => [...new Set(properties.map(p => p.state).filter(Boolean))], [properties])
-
+  // Always show all states from locations.json — not just states that have listings
   const filters = [
     { id: 'state', label: 'State', type: 'select', value: filterValues.state,
-      options: states.map(s => ({ value: s, label: s })) },
+      options: ALL_STATES.map(s => ({ value: s, label: s })) },
     { id: 'soil', label: 'Soil Type', type: 'checkboxes', value: filterValues.soil,
       options: SOIL_TYPES.map(s => ({ value: s, label: s })) },
     { id: 'land_type', label: 'Land Type', type: 'select', value: filterValues.land_type,
