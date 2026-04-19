@@ -16,6 +16,16 @@ updates:
         update-types:
           - minor
           - patch
+    # Block major version bumps that require full migration work
+    ignore:
+      - dependency-name: tailwindcss
+        update-types: ["version-update:semver-major"]
+      - dependency-name: lucide-react
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@eslint/js"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: eslint
+        update-types: ["version-update:semver-major"]
     labels:
       - dependencies
       - automated
