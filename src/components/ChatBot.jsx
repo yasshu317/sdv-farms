@@ -104,15 +104,28 @@ function ChatText({ text }) {
   )
 }
 
+// Quick action menu items shown before the full chat opens
+const MENU_ACTIONS = [
+  { icon: '🏡', en: 'Browse Properties',    te: 'ప్రాపర్టీలు చూడండి',       link: '/properties' },
+  { icon: '🌾', en: 'Sell My Land',         te: 'నా భూమి అమ్మాలి',           link: '/auth/register' },
+  { icon: '📅', en: 'Book a Site Visit',    te: 'సైట్ విజిట్ బుక్ చేయండి',   link: '/#contact' },
+  { icon: '🛠️', en: 'Our Services',         te: 'మా సేవలు',                  link: '/services' },
+  { icon: '📞', en: 'Call / WhatsApp',      te: 'కాల్ / వాట్సాప్',            link: 'tel:7780312525' },
+  { icon: '💬', en: 'Chat with Assistant',  te: 'అసిస్టెంట్‌తో చాట్ చేయండి', action: 'chat' },
+]
+
 export default function ChatBot() {
   const router = useRouter()
-  const [open, setOpen]               = useState(false)
+  // mode: 'closed' | 'menu' | 'chat'
+  const [mode, setMode]               = useState('closed')
   const [lang, setLang]               = useState('en')
   const [input, setInput]             = useState('')
   const [propertyCount, setPropertyCount] = useState(0)
   const [faqMessages, setFaqMessages] = useState([])
   const messagesEndRef                = useRef(null)
   const inputRef                      = useRef(null)
+
+  const open = mode === 'chat'
 
   const { messages: aiMessages, sendMessage, status } = useChat({
     api: '/api/chat',
@@ -130,9 +143,9 @@ export default function ChatBot() {
   }
   const allMessages = [welcomeMsg, ...faqMessages, ...aiMessages]
 
-  // Fetch approved property count once on open
+  // Fetch approved property count once when menu or chat first opens
   useEffect(() => {
-    if (!open || propertyCount > 0) return
+    if (mode === 'closed' || propertyCount > 0) return
     fetch('/api/property-count')
       .then(r => r.json())
       .then(d => setPropertyCount(d.count ?? 0))
@@ -144,8 +157,8 @@ export default function ChatBot() {
   }, [allMessages])
 
   useEffect(() => {
-    if (open) setTimeout(() => inputRef.current?.focus(), 100)
-  }, [open])
+    if (mode === 'chat') setTimeout(() => inputRef.current?.focus(), 100)
+  }, [mode])
 
   function injectFaqReply(userText, replyText) {
     const now = Date.now()
@@ -215,7 +228,14 @@ export default function ChatBot() {
               >
                 {lang === 'en' ? 'తెలుగు' : 'EN'}
               </button>
-              <button onClick={() => setOpen(false)} className="text-white/70 hover:text-white transition-colors">
+              <button
+                onClick={() => setMode('menu')}
+                title="Back to menu"
+                className="text-white/70 hover:text-white transition-colors px-1"
+              >
+                ‹
+              </button>
+              <button onClick={() => setMode('closed')} className="text-white/70 hover:text-white transition-colors">
                 <X size={20} />
               </button>
             </div>
@@ -307,14 +327,82 @@ export default function ChatBot() {
         </div>
       )}
 
-      {/* Floating toggle button */}
+      {/* ── Quick action launcher menu ── */}
+      {mode === 'menu' && (
+        <div className="fixed bottom-24 left-6 z-50 w-72 max-w-[calc(100vw-3rem)]">
+          {/* Header card */}
+          <div
+            className="rounded-2xl shadow-xl overflow-hidden mb-2 border border-white/10"
+            style={{ background: 'linear-gradient(135deg, #1a4520 0%, #286d2f 100%)' }}
+          >
+            <div className="flex items-center justify-between px-4 py-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🌾</span>
+                <div>
+                  <p className="text-white font-semibold text-sm leading-tight">SDV Farms</p>
+                  <p className="text-paddy-300 text-xs">How can we help?</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setMode('closed')}
+                className="text-white/60 hover:text-white transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 divide-y divide-gray-50">
+            {MENU_ACTIONS.map((item, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  if (item.action === 'chat') {
+                    setMode('chat')
+                  } else if (item.link?.startsWith('tel:')) {
+                    window.location.href = item.link
+                  } else if (item.link?.startsWith('/#')) {
+                    setMode('closed')
+                    router.push(item.link)
+                  } else {
+                    setMode('closed')
+                    router.push(item.link)
+                  }
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-turmeric-50 active:bg-turmeric-100 transition-colors group"
+              >
+                <span className="text-xl w-8 text-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                  {item.icon}
+                </span>
+                <span className={`text-gray-800 text-sm font-medium flex-1 ${lang === 'te' ? 'telugu' : ''}`}>
+                  {lang === 'en' ? item.en : item.te}
+                </span>
+                <span className="text-gray-300 group-hover:text-turmeric-400 transition-colors text-base">›</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Language toggle */}
+          <div className="mt-2 flex justify-center">
+            <button
+              onClick={() => setLang(l => l === 'en' ? 'te' : 'en')}
+              className="text-xs text-white/70 bg-paddy-800/60 border border-white/20 rounded-full px-3 py-1 hover:bg-paddy-700/80 transition-colors"
+            >
+              {lang === 'en' ? 'తెలుగులో చూడండి' : 'View in English'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Floating toggle button ── */}
       <button
-        onClick={() => setOpen(o => !o)}
-        aria-label="Open chat assistant"
+        onClick={() => setMode(m => m === 'closed' ? 'menu' : 'closed')}
+        aria-label="Open SDV Farms assistant"
         className="fixed bottom-6 left-6 z-50 w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
         style={{ background: 'linear-gradient(135deg, #1a4520 0%, #286d2f 100%)' }}
       >
-        {open ? (
+        {mode !== 'closed' ? (
           <X size={22} className="text-white" />
         ) : (
           <div className="relative">
