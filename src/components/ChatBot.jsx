@@ -223,6 +223,7 @@ export default function ChatBot() {
       {/* Chat window */}
       {open && (
         <div
+          data-testid="chat-window"
           className="fixed bottom-24 left-6 z-50 w-[360px] max-w-[calc(100vw-2rem)] flex flex-col rounded-3xl shadow-2xl overflow-hidden border border-paddy-100"
           style={{ height: '520px' }}
         >
@@ -333,6 +334,7 @@ export default function ChatBot() {
           >
             <input
               ref={inputRef}
+              data-testid="chat-input"
               value={input}
               onChange={e => setInput(e.target.value)}
               placeholder={lang === 'en' ? 'Ask anything about SDV Farms…' : 'SDV ఫామ్స్ గురించి అడగండి…'}
@@ -351,7 +353,7 @@ export default function ChatBot() {
 
       {/* ── Quick action launcher menu ── */}
       {mode === 'menu' && (
-        <div className="fixed bottom-24 left-6 z-50 w-72 max-w-[calc(100vw-3rem)]">
+        <div data-testid="chat-menu" className="fixed bottom-24 left-6 z-50 w-72 max-w-[calc(100vw-3rem)]">
           {/* Header card */}
           <div
             className="rounded-2xl shadow-xl overflow-hidden mb-2 border border-white/10"
@@ -379,6 +381,7 @@ export default function ChatBot() {
             {MENU_ACTIONS.map((item, i) => (
               <button
                 key={i}
+                data-testid={`menu-action-${item.action ?? item.link?.replace(/[^a-z]/gi, '-') ?? i}`}
                 onClick={() => {
                   if (item.action === 'chat') {
                     setMode('chat')
@@ -421,6 +424,7 @@ export default function ChatBot() {
       <button
         onClick={() => setMode(m => m === 'closed' ? 'menu' : 'closed')}
         aria-label="Open SDV Farms assistant"
+        data-testid="chat-launcher"
         className="fixed bottom-6 left-6 z-50 w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
         style={{ background: 'linear-gradient(135deg, #1a4520 0%, #286d2f 100%)' }}
       >
