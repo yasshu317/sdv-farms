@@ -136,6 +136,16 @@ export default function SellerClient({ user, properties, appointments }) {
                         {p.land_soil_type} soil · {p.land_used_type} · {p.road_access ? '🛣️ Road access' : 'No road access'}
                       </p>
                     )}
+                    {p.status === 'pending' && (
+                      <div className="mt-4 pt-3 border-t border-white/10">
+                        <Link
+                          href={`/seller/property/${p.id}/edit`}
+                          className="inline-flex text-sm font-medium text-turmeric-400 hover:text-turmeric-300 transition-colors"
+                        >
+                          Edit listing →
+                        </Link>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

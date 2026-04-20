@@ -1,18 +1,40 @@
 'use client'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 const MAX_SIZE_MB = 10
 const ALLOWED_TYPES = {
   docs: ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'],
   photos: ['image/jpeg', 'image/png', 'image/webp'],
 }
 
-export default function FileUpload({ bucket, folder, accept = 'docs', maxFiles = 5, onUpload, label, hint }) {
+export default function FileUpload({
+  bucket,
+  folder,
+  accept = 'docs',
+  maxFiles = 5,
+  onUpload,
+  label,
+  hint,
+  /** Existing uploads: { name?, url }[] — shown until removed; seeded once when first provided */
+  initialItems,
+}) {
   const [files, setFiles] = useState([])
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const inputRef = useRef()
+  const seededRef = useRef(false)
 
   const allowedTypes = ALLOWED_TYPES[accept] ?? ALLOWED_TYPES.docs
+
+  useEffect(() => {
+    if (seededRef.current || !initialItems?.length) return
+    setFiles(
+      initialItems.map((it, i) => ({
+        name: typeof it === 'string' ? `File ${i + 1}` : it.name || `File ${i + 1}`,
+        url: typeof it === 'string' ? it : it.url,
+      }))
+    )
+    seededRef.current = true
+  }, [initialItems])
 
   async function handleFiles(e) {
     setError('')
