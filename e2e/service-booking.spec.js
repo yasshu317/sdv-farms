@@ -1,10 +1,15 @@
 // @ts-check
 import { test, expect } from '@playwright/test'
 
+// Scope all modal assertions to this container to avoid matching Phase III email input
+const MODAL = 'div.fixed:has-text("Book Service Enquiry")'
+
 test.describe('Service Booking Modal', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/services')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
+    // Wait for the Phase II service cards to render
+    await page.getByRole('heading', { name: 'Quality Fencing' }).waitFor({ state: 'visible', timeout: 15000 })
   })
 
   test('services page loads with Phase II heading', async ({ page }) => {
@@ -20,39 +25,46 @@ test.describe('Service Booking Modal', () => {
     await expect(page.getByRole('heading', { name: 'Quality Plants' })).toBeVisible()
   })
 
-  test('shows all 5 Phase II Enquire buttons', async ({ page }) => {
+  test('shows at least 5 Phase II Enquire buttons', async ({ page }) => {
     const enquireBtns = page.getByRole('button', { name: /Enquire/i })
     await expect(enquireBtns.first()).toBeVisible()
-    const count = await enquireBtns.count()
-    expect(count).toBeGreaterThanOrEqual(5)
+    expect(await enquireBtns.count()).toBeGreaterThanOrEqual(5)
   })
 
-  test('clicking Enquire opens booking modal', async ({ page }) => {
+  test('clicking Enquire opens booking modal with form fields', async ({ page }) => {
     await page.getByRole('button', { name: /Enquire/i }).first().click()
-    await expect(page.getByText('Book Service Enquiry')).toBeVisible()
-    // Labels don't have htmlFor — locate inputs by placeholder or order
-    await expect(page.locator('input[type="text"], input:not([type])').first()).toBeVisible()
-    await expect(page.locator('input[type="tel"]')).toBeVisible()
-    await expect(page.locator('input[type="email"]')).toBeVisible()
+
+    const modal = page.locator(MODAL)
+    await expect(modal).toBeVisible({ timeout: 5000 })
+    await expect(modal.getByText('Book Service Enquiry')).toBeVisible()
+    await expect(modal.getByText(/we.ll call you within 24 hours/i)).toBeVisible()
+
+    // Scoped to modal — avoids matching Phase III email input
+    await expect(modal.locator('input[type="tel"]')).toBeVisible()
+    await expect(modal.locator('input[type="email"]')).toBeVisible()
+    await expect(modal.getByRole('button', { name: /Submit Enquiry/i })).toBeVisible()
   })
 
   test('closes modal when X button is clicked', async ({ page }) => {
     await page.getByRole('button', { name: /Enquire/i }).first().click()
-    await expect(page.getByText('Book Service Enquiry')).toBeVisible()
-    await page.getByText('✕').click()
-    await expect(page.getByText('Book Service Enquiry')).not.toBeVisible()
+    const modal = page.locator(MODAL)
+    await expect(modal).toBeVisible({ timeout: 5000 })
+
+    // X button inside the modal header
+    await modal.getByText('✕').click()
+    await expect(modal).not.toBeVisible({ timeout: 3000 })
   })
 
-  test('submit button is present in open modal', async ({ page }) => {
-    await page.getByRole('button', { name: /Enquire/i }).first().click()
-    await expect(page.getByRole('button', { name: /Submit Enquiry/i })).toBeVisible()
-  })
+  test('second and third Enquire buttons also open modal', async ({ page }) => {
+    const btns = page.getByRole('button', { name: /Enquire/i })
+    // Click second button
+    await btns.nth(1).click()
+    await expect(page.locator(MODAL)).toBeVisible({ timeout: 5000 })
+    await page.locator(MODAL).getByText('✕').click()
 
-  test('modal shows service type in subtitle', async ({ page }) => {
-    await page.getByRole('button', { name: /Enquire/i }).first().click()
-    await expect(page.getByText('Book Service Enquiry')).toBeVisible()
-    // Subtitle mentions the service type
-    await expect(page.getByText(/we.ll call you within 24 hours/i)).toBeVisible()
+    // Click third button
+    await btns.nth(2).click()
+    await expect(page.locator(MODAL)).toBeVisible({ timeout: 5000 })
   })
 
   test('Phase III shows coming soon section', async ({ page }) => {
