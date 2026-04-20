@@ -1,6 +1,7 @@
 'use client'
 import { useState, useRef } from 'react'
 import { createClient } from '../../lib/supabase'
+import { sanitizeStorageFileName } from '../../lib/storageFilename'
 
 const MAX_SIZE_MB = 10
 const ALLOWED_TYPES = {
@@ -41,7 +42,7 @@ export default function FileUpload({ bucket, folder, accept = 'docs', maxFiles =
     const urls = []
 
     for (const file of selected) {
-      const path = `${folder}/${Date.now()}-${file.name.replace(/\s+/g, '-')}`
+      const path = `${folder}/${Date.now()}-${sanitizeStorageFileName(file.name)}`
       const { error: uploadErr } = await supabase.storage.from(bucket).upload(path, file)
       if (uploadErr) { setError(uploadErr.message); setUploading(false); return }
       const { data } = supabase.storage.from(bucket).getPublicUrl(path)
