@@ -548,27 +548,34 @@ export default function AdminClient({ enquiries: initial, profiles, plots: initi
                           <StatusBadge status={p.status} />
                         </td>
                         <td className="px-5 py-4">
-                          {p.status === 'pending' && (
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => approveProperty(p)}
-                                disabled={saving === p.id}
-                                className="bg-paddy-600 hover:bg-paddy-700 disabled:opacity-50 text-white text-xs px-3 py-1.5 rounded-lg transition-colors"
-                              >
-                                {saving === p.id ? '…' : 'Approve'}
-                              </button>
-                              <button
-                                onClick={() => rejectProperty(p.id)}
-                                disabled={saving === p.id}
-                                className="bg-red-100 hover:bg-red-200 text-red-600 text-xs px-3 py-1.5 rounded-lg transition-colors"
-                              >
-                                Reject
-                              </button>
-                            </div>
-                          )}
-                          {p.status !== 'pending' && (
-                            <span className="text-gray-300 text-xs italic">No action</span>
-                          )}
+                          <div className="flex flex-wrap items-center gap-2">
+                            <NextLink
+                              href={`/admin/property/${p.id}/edit`}
+                              className="text-paddy-700 hover:text-paddy-900 text-xs font-medium underline-offset-2 hover:underline"
+                            >
+                              Edit
+                            </NextLink>
+                            {p.status === 'pending' && (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => approveProperty(p)}
+                                  disabled={saving === p.id}
+                                  className="bg-paddy-600 hover:bg-paddy-700 disabled:opacity-50 text-white text-xs px-3 py-1.5 rounded-lg transition-colors"
+                                >
+                                  {saving === p.id ? '…' : 'Approve'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => rejectProperty(p.id)}
+                                  disabled={saving === p.id}
+                                  className="bg-red-100 hover:bg-red-200 text-red-600 text-xs px-3 py-1.5 rounded-lg transition-colors"
+                                >
+                                  Reject
+                                </button>
+                              </>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}

@@ -5,7 +5,8 @@ import DashboardClient from './DashboardClient'
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'My Dashboard — SDV Farms' }
 
-export default async function DashboardPage() {
+export default async function DashboardPage(props) {
+  const searchParams = await props.searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
@@ -24,11 +25,21 @@ export default async function DashboardPage() {
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
+  const { data: landRequests } = await supabase
+    .from('buyer_requests')
+    .select('*')
+    .eq('buyer_id', user.id)
+    .order('created_at', { ascending: false })
+
+  const initialTab = searchParams?.tab === 'land-requests' ? 'land-requests' : 'overview'
+
   return (
     <DashboardClient
       user={{ id: user.id, email: user.email, ...user.user_metadata }}
       enquiries={enquiries ?? []}
       interests={interests ?? []}
+      landRequests={landRequests ?? []}
+      initialTab={initialTab}
     />
   )
 }
