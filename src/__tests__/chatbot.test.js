@@ -13,6 +13,8 @@ const FAQ_RULES = [
   { match: /\b(price|cost|rate|per acre|how much|charge|fee|rupee|lakh|crore)\b/i, tag: 'price' },
   { match: /\b(location|where|address|near|hyderabad|telangana|andhra|karnataka|state|districts?|mandal)\b/i, tag: 'location' },
   { match: /\b(government|approved|legal|title|document|pahani|ror|adangal|rtc|verified)\b/i, tag: 'legal' },
+  { match: /^(\?+|help|hi|hello|hey|namaste|నమస్కారం|హలో|ఏమి చేయగలరు)$/i, tag: 'help' },
+  { match: /\b(appointment|site visit|visit|book|slot|schedule)\b/i, tag: 'appointment' },
 ]
 
 function matchFAQTag(text) {
@@ -101,10 +103,27 @@ describe('matchFAQ — legal queries', () => {
   it('matches "verified"', () => expect(matchFAQTag('is it verified?')).toBe('legal'))
 })
 
+describe('matchFAQ — help / greeting queries', () => {
+  it('matches "help"', () => expect(matchFAQTag('help')).toBe('help'))
+  it('matches "?"', () => expect(matchFAQTag('?')).toBe('help'))
+  it('matches "hi"', () => expect(matchFAQTag('hi')).toBe('help'))
+  it('matches "hello"', () => expect(matchFAQTag('hello')).toBe('help'))
+  it('matches "hey"', () => expect(matchFAQTag('hey')).toBe('help'))
+  it('does NOT match "hello there" (has extra words)', () => expect(matchFAQTag('hello there')).toBeNull())
+})
+
+describe('matchFAQ — appointment queries', () => {
+  it('matches "book"', () => expect(matchFAQTag('I want to book a visit')).toBe('appointment'))
+  it('matches "site visit"', () => expect(matchFAQTag('how to do site visit?')).toBe('appointment'))
+  it('matches "slot"', () => expect(matchFAQTag('available slot?')).toBe('appointment'))
+  it('matches "schedule"', () => expect(matchFAQTag('can I schedule a tour?')).toBe('appointment'))
+  it('matches "appointment"', () => expect(matchFAQTag('book an appointment')).toBe('appointment'))
+})
+
 describe('matchFAQ — no match', () => {
-  it('returns null for unrelated text', () => expect(matchFAQTag('hello there')).toBeNull())
   it('returns null for empty string', () => expect(matchFAQTag('')).toBeNull())
   it('returns null for random words', () => expect(matchFAQTag('weather today')).toBeNull())
+  it('returns null for unrelated sentence', () => expect(matchFAQTag('I like cricket')).toBeNull())
 })
 
 // ── Link-extraction (the fixed bug) ──────────────────────────────────────────

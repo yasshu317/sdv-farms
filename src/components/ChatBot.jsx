@@ -6,10 +6,11 @@ import { useRouter } from 'next/navigation'
 import { MessageCircle, X, Send, User } from 'lucide-react'
 
 const QUICK_QUESTIONS = [
-  { en: 'Browse Properties',       te: 'ప్రాపర్టీలు చూడండి', link: '/properties' },
-  { en: 'How to sell my land?',    te: 'నా భూమి ఎలా అమ్మాలి?' },
-  { en: 'Contact & Call',          te: 'సంప్రదించండి & కాల్' },
-  { en: 'Available services',      te: 'అందుబాటులో ఉన్న సేవలు' },
+  { en: 'Browse Properties',          te: 'ప్రాపర్టీలు చూడండి', link: '/properties' },
+  { en: 'How to sell my land?',       te: 'నా భూమి ఎలా అమ్మాలి?' },
+  { en: 'Book a site visit',          te: 'సైట్ విజిట్ బుక్ చేయండి' },
+  { en: 'Contact & Call',             te: 'సంప్రదించండి & కాల్' },
+  { en: 'Available services',         te: 'అందుబాటులో ఉన్న సేవలు' },
   { en: 'Is it government approved?', te: 'ఇది ప్రభుత్వ ఆమోదం పొందిందా?' },
 ]
 
@@ -59,6 +60,16 @@ const FAQ_RULES = [
     match: /\b(government|approved|legal|title|document|pahani|ror|adangal|rtc|verified)\b/i,
     reply: () =>
       `✅ **Yes — SDV Farms is 100% government-approved:**\n\n• Clear title with full legal verification\n• Registered sale deed directly in the buyer's name\n• All documents (Pahani/ROR-1B/Adangal/RTC) verified before listing\n• No hidden charges — transparent pricing\n\nCall **7780312525** to review documents before any commitment.`,
+  },
+  {
+    match: /^(\?+|help|hi|hello|hey|namaste|నమస్కారం|హలో|ఏమి చేయగలరు)$/i,
+    reply: () =>
+      `👋 **Hi! Here's what I can help you with:**\n\n🏡 [Browse Properties](/properties) — filter by state, soil, area\n🌾 **Sell land** — register as a seller, free listing\n📅 **Book a site visit** — pick a date & slot on any property page\n🛠️ [Services](/services) — fencing, borewell, drip irrigation & more\n📞 **Call us** — 7780312525 (Mon–Sat, 9AM–6PM)\n\nJust type your question or tap one of the quick options below!`,
+  },
+  {
+    match: /\b(appointment|site visit|visit|book|slot|schedule)\b/i,
+    reply: () =>
+      `📅 **Booking a site visit is easy:**\n\n1. Go to [/properties](/properties) and open any listing\n2. Click **"Book Site Visit"** on the property detail page\n3. Pick a date (within next 7 days) and time slot\n4. Pay ₹500 refundable token to confirm your slot\n\nOur team will call you before the visit. For immediate booking call **7780312525**.`,
   },
 ]
 
@@ -132,9 +143,15 @@ export default function ChatBot() {
 
   const open = mode === 'chat'
 
-  const { messages: aiMessages, sendMessage, status } = useChat({
+  const { messages: aiMessages, sendMessage, status, error: aiError } = useChat({
     api: '/api/chat',
     initialMessages: [],
+    onError: () => {
+      injectFaqReply(
+        '…',
+        `⚠️ **AI assistant is temporarily unavailable** (quota limit reached).\n\nFor instant answers try the quick buttons below, or call us directly:\n📞 **7780312525** · Mon–Sat 9AM–6PM`,
+      )
+    },
   })
 
   const isLoading = status === 'streaming' || status === 'submitted'
