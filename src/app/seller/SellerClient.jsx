@@ -22,6 +22,20 @@ export default function SellerClient({ user, properties, appointments }) {
 
   const tabs = ['listings', 'appointments']
 
+  function fmt(v) {
+    if (v === null || v === undefined || v === '') return '—'
+    return String(v)
+  }
+
+  function fileLabel(url, i) {
+    try {
+      const seg = decodeURIComponent(String(url).split('/').pop() || '')
+      return seg.length > 36 ? `${seg.slice(0, 33)}…` : seg || `File ${i + 1}`
+    } catch {
+      return `File ${i + 1}`
+    }
+  }
+
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(160deg, #071709 0%, #0e2c13 50%, #071709 100%)' }}>
       {/* Header */}
@@ -101,53 +115,120 @@ export default function SellerClient({ user, properties, appointments }) {
               </div>
             ) : (
               <div className="space-y-4">
-                {properties.map(p => (
-                  <div key={p.id} className="bg-white/5 border border-white/10 rounded-2xl p-5">
-                    <div className="flex items-start justify-between gap-3 mb-3">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          {p.property_id
-                            ? <span className="text-turmeric-400 font-mono text-sm font-bold">{p.property_id}</span>
-                            : <span className="text-white/30 text-xs italic">Awaiting Property ID</span>
-                          }
-                          <StatusBadge status={p.status} />
+                {properties.map(p => {
+                  const docs = Array.isArray(p.doc_urls) ? p.doc_urls : []
+                  const photos = Array.isArray(p.photo_urls) ? p.photo_urls : []
+                  const created = p.created_at
+                    ? new Date(p.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
+                    : '—'
+                  const updated = p.updated_at
+                    ? new Date(p.updated_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
+                    : '—'
+
+                  return (
+                    <div key={p.id} className="bg-white/5 border border-white/10 rounded-2xl p-5">
+                      <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            {p.property_id
+                              ? <span className="text-turmeric-400 font-mono text-sm font-bold">{p.property_id}</span>
+                              : <span className="text-white/30 text-xs italic">Awaiting Property ID</span>
+                            }
+                            <StatusBadge status={p.status} />
+                          </div>
+                          <p className="text-white/35 text-[11px] font-mono">Listing ID: {p.id}</p>
                         </div>
-                        <p className="text-white font-medium">
-                          {[p.village, p.mandal, p.district, p.state].filter(Boolean).join(', ')}
-                        </p>
+                        {p.status === 'pending' && (
+                          <Link
+                            href={`/seller/property/${p.id}/edit`}
+                            className="text-sm font-medium text-turmeric-400 hover:text-turmeric-300 transition-colors shrink-0"
+                          >
+                            Edit listing →
+                          </Link>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-3 text-center sm:text-center mb-5">
+                        <div className="bg-white/5 rounded-xl py-2 px-1">
+                          <p className="text-white font-semibold">{fmt(p.area_acres)}</p>
+                          <p className="text-white/40 text-xs">Acres</p>
+                        </div>
+                        <div className="bg-white/5 rounded-xl py-2 px-1">
+                          <p className="text-white font-semibold">₹{p.expected_price != null ? Number(p.expected_price).toLocaleString('en-IN') : '—'}</p>
+                          <p className="text-white/40 text-xs">Per acre (₹)</p>
+                        </div>
+                        <div className="bg-white/5 rounded-xl py-2 px-1">
+                          <p className="text-white font-semibold">{p.views ?? 0}</p>
+                          <p className="text-white/40 text-xs">Views</p>
+                        </div>
+                      </div>
+
+                      <div className="border-t border-white/10 pt-4 space-y-4">
+                        <div>
+                          <p className="text-white/45 text-[10px] uppercase tracking-wider mb-2">Location</p>
+                          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-sm">
+                            <div className="flex justify-between gap-2 sm:block"><dt className="text-white/40 shrink-0">State</dt><dd className="text-white/90 text-right sm:text-left">{fmt(p.state)}</dd></div>
+                            <div className="flex justify-between gap-2 sm:block"><dt className="text-white/40 shrink-0">District</dt><dd className="text-white/90 text-right sm:text-left">{fmt(p.district)}</dd></div>
+                            <div className="flex justify-between gap-2 sm:block"><dt className="text-white/40 shrink-0">Mandal</dt><dd className="text-white/90 text-right sm:text-left">{fmt(p.mandal)}</dd></div>
+                            <div className="flex justify-between gap-2 sm:block"><dt className="text-white/40 shrink-0">Village / area</dt><dd className="text-white/90 text-right sm:text-left">{fmt(p.village)}</dd></div>
+                            <div className="flex justify-between gap-2 sm:block"><dt className="text-white/40 shrink-0">PIN / Zip</dt><dd className="text-white/90 text-right sm:text-left">{fmt(p.zip_code)}</dd></div>
+                            <div className="flex justify-between gap-2 sm:block"><dt className="text-white/40 shrink-0">Farmer name</dt><dd className="text-white/90 text-right sm:text-left">{fmt(p.farmer_name)}</dd></div>
+                          </dl>
+                        </div>
+
+                        <div>
+                          <p className="text-white/45 text-[10px] uppercase tracking-wider mb-2">Land</p>
+                          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-sm">
+                            <div className="flex justify-between gap-2 sm:block"><dt className="text-white/40 shrink-0">Land use</dt><dd className="text-white/90 text-right sm:text-left">{fmt(p.land_used_type)}</dd></div>
+                            <div className="flex justify-between gap-2 sm:block"><dt className="text-white/40 shrink-0">Soil</dt><dd className="text-white/90 text-right sm:text-left">{fmt(p.land_soil_type)}</dd></div>
+                            <div className="sm:col-span-2 flex justify-between gap-2 sm:block"><dt className="text-white/40 shrink-0">Document type</dt><dd className="text-white/90 text-right sm:text-left break-words">{fmt(p.land_doc_type)}</dd></div>
+                            <div className="sm:col-span-2 flex justify-between gap-2 sm:block"><dt className="text-white/40 shrink-0">Road / bata access</dt><dd className="text-white/90 text-right sm:text-left">{p.road_access ? 'Yes' : 'No'}</dd></div>
+                          </dl>
+                        </div>
+
+                        <div>
+                          <p className="text-white/45 text-[10px] uppercase tracking-wider mb-2">Uploads</p>
+                          <p className="text-white/70 text-sm mb-1">
+                            Land documents ({docs.length}) · Property photos ({photos.length})
+                          </p>
+                          {docs.length > 0 && (
+                            <ul className="text-xs space-y-1 mb-2">
+                              {docs.map((url, i) => (
+                                <li key={`d-${i}`}>
+                                  <a href={url} target="_blank" rel="noopener noreferrer" className="text-turmeric-400/90 hover:text-turmeric-300 underline underline-offset-2 break-all">
+                                    {fileLabel(url, i)}
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          {photos.length > 0 && (
+                            <ul className="text-xs space-y-1">
+                              {photos.map((url, i) => (
+                                <li key={`ph-${i}`}>
+                                  <a href={url} target="_blank" rel="noopener noreferrer" className="text-turmeric-400/90 hover:text-turmeric-300 underline underline-offset-2 break-all">
+                                    Photo {i + 1} — {fileLabel(url, i)}
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          {docs.length === 0 && photos.length === 0 && (
+                            <p className="text-white/35 text-xs">No files uploaded yet.</p>
+                          )}
+                        </div>
+
+                        <div>
+                          <p className="text-white/45 text-[10px] uppercase tracking-wider mb-2">Record</p>
+                          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-xs text-white/55">
+                            <div><dt className="text-white/35 inline">Submitted</dt> <dd className="inline text-white/70">{created}</dd></div>
+                            <div><dt className="text-white/35 inline">Last updated</dt> <dd className="inline text-white/70">{updated}</dd></div>
+                          </dl>
+                        </div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-3 gap-3 text-center mt-4">
-                      <div className="bg-white/5 rounded-xl py-2">
-                        <p className="text-white font-semibold">{p.area_acres}</p>
-                        <p className="text-white/40 text-xs">Acres</p>
-                      </div>
-                      <div className="bg-white/5 rounded-xl py-2">
-                        <p className="text-white font-semibold">₹{Number(p.expected_price).toLocaleString('en-IN')}</p>
-                        <p className="text-white/40 text-xs">Per Acre</p>
-                      </div>
-                      <div className="bg-white/5 rounded-xl py-2">
-                        <p className="text-white font-semibold">{p.views || 0}</p>
-                        <p className="text-white/40 text-xs">Views</p>
-                      </div>
-                    </div>
-                    {p.land_soil_type && (
-                      <p className="text-white/40 text-xs mt-3">
-                        {p.land_soil_type} soil · {p.land_used_type} · {p.road_access ? '🛣️ Road access' : 'No road access'}
-                      </p>
-                    )}
-                    {p.status === 'pending' && (
-                      <div className="mt-4 pt-3 border-t border-white/10">
-                        <Link
-                          href={`/seller/property/${p.id}/edit`}
-                          className="inline-flex text-sm font-medium text-turmeric-400 hover:text-turmeric-300 transition-colors"
-                        >
-                          Edit listing →
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
