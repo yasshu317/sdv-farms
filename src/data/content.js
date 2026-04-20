@@ -135,6 +135,62 @@ export const content = {
       phone: '7780312525',
       email: 'info@sdvfarms.in',
     },
+    chatbot: {
+      assistantTitle: 'SDV Farms Assistant',
+      online: 'Online',
+      backToMenuTitle: 'Back to menu',
+      quickQuestionsLabel: 'Quick questions',
+      inputPlaceholder: 'Ask anything about SDV Farms…',
+      menuBrand: 'SDV Farms',
+      menuHelpSubtitle: 'How can we help?',
+      launcherAria: 'Open SDV Farms assistant',
+      toggleToTelugu: 'తెలుగు',
+      toggleToEnglish: 'EN',
+      menuViewTelugu: 'తెలుగులో చూడండి',
+      menuViewEnglish: 'View in English',
+      welcome:
+        "👋 Hi! I'm the SDV Farms assistant. Tap a quick question below or type yours — answers are instant (no AI). We cover buying, selling, services, pricing, and site visits.",
+      fallback:
+        "I don’t have a saved answer for that yet. Try the **quick buttons** above, browse [/properties](/properties), or call **7780312525** · Mon–Sat 9AM–6PM.",
+      quickQuestions: [
+        { label: 'Browse Properties', link: '/properties' },
+        { label: 'How to sell my land?' },
+        { label: 'Book a site visit' },
+        { label: 'Contact & Call' },
+        { label: 'Available services' },
+        { label: 'Is it government approved?' },
+      ],
+      menuActions: [
+        { icon: '🏡', label: 'Browse Properties', link: '/properties' },
+        { icon: '🌾', label: 'Sell My Land', link: '/auth/register' },
+        { icon: '📅', label: 'Book a Site Visit', link: '/#contact' },
+        { icon: '🛠️', label: 'Our Services', link: '/services' },
+        { icon: '📞', label: 'Call / WhatsApp', link: 'tel:7780312525' },
+        { icon: '💬', label: 'FAQ & quick answers', action: 'chat' },
+      ],
+      faq: {
+        properties: (count) =>
+          `🌾 We have **${count} approved properties** listed across Telangana, Andhra Pradesh & Karnataka.\n\nBrowse and filter by state, soil type, area or price at [/properties](/properties) — no login needed!`,
+        sell: () =>
+          `🌾 To list your land on SDV Farms:\n\n1. Register as a **Seller** at [/auth/register](/auth/register)\n2. Pass a quick eligibility check (Government/Poramboke land is not allowed)\n3. Fill our 3-step form — location, land details, upload Pahani/ROR-1B\n\nOnce submitted, our team reviews and approves it within 24 hours. Free listing — no commission!`,
+        buy: () =>
+          `🏡 To buy agricultural land through SDV Farms:\n\n1. **Browse** listings at [/properties](/properties)\n2. **Filter** by state, soil type, area, or price\n3. **Book a site visit** directly on any property page\n4. Or submit a **land request** at [/buyer-request](/buyer-request) if you can't find what you need\n\nAll listings have clear title & government verification. Call **7780312525** for guidance.`,
+        services: () =>
+          `🛠️ **SDV Farms — Phase II Services** (for land owners):\n\n• 🔒 Compound Fencing\n• ⚡ Borewell & Electricity connection\n• 💧 Drip Irrigation setup\n• 🌱 Customised Farming Plan\n• 🌳 Quality Plants (1-year replacement)\n\nAll services are on-demand. Call **7780312525** or visit [/services](/services) for details.`,
+        contact: () =>
+          `📞 **SDV Farms Contact Details:**\n\n• **Phone/WhatsApp:** 7780312525\n• **Email:** info@sdvfarms.in\n• **Office:** Hyderabad, Telangana\n• **Hours:** Mon–Sat, 9 AM – 6 PM\n\nOr fill the enquiry form on our home page — we'll call you back within 2 hours!`,
+        price: () =>
+          `💰 **Pricing at SDV Farms:**\n\nPrices vary by location, soil type, and land area. Each listing on [/properties](/properties) shows the price per acre and total cost.\n\nFor a personalised quote, call **7780312525** — we'll match you with the best options for your budget.`,
+        location: () =>
+          `📍 **SDV Farms Properties are across:**\n\n• **Telangana** — Nalgonda, Yadadri, Suryapet, and more districts\n• **Andhra Pradesh** — multiple districts\n• **Karnataka** — selected districts\n\nAll well-connected to Hyderabad. Exact coordinates and map are on our home page. WhatsApp **7780312525** for driving directions.`,
+        legal: () =>
+          `✅ **Yes — SDV Farms is 100% government-approved:**\n\n• Clear title with full legal verification\n• Registered sale deed directly in the buyer's name\n• All documents (Pahani/ROR-1B/Adangal/RTC) verified before listing\n• No hidden charges — transparent pricing\n\nCall **7780312525** to review documents before any commitment.`,
+        help: () =>
+          `👋 **Hi! Here's what I can help you with:**\n\n🏡 [Browse Properties](/properties) — filter by state, soil, area\n🌾 **Sell land** — register as a seller, free listing\n📅 **Book a site visit** — pick a date & slot on any property page\n🛠️ [Services](/services) — fencing, borewell, drip irrigation & more\n📞 **Call us** — 7780312525 (Mon–Sat, 9AM–6PM)\n\nJust type your question or tap one of the quick options below!`,
+        appointment: () =>
+          `📅 **Booking a site visit is easy:**\n\n1. Go to [/properties](/properties) and open any listing\n2. Click **"Book Site Visit"** on the property detail page\n3. Pick a date (within next 7 days) and time slot\n4. Pay ₹500 refundable token to confirm your slot\n\nOur team will call you before the visit. For immediate booking call **7780312525**.`,
+      },
+    },
     footer: {
       tagline: 'Invest in Land Today. Harvest Returns Tomorrow. Build Wealth for Generations.',
       rights: '© 2025 SDV Farms. All rights reserved.',
@@ -278,6 +334,62 @@ export const content = {
       address: 'SDV ఫామ్స్, హైదరాబాద్ శివారులు, తెలంగాణ, భారతదేశం',
       phone: '7780312525',
       email: 'info@sdvfarms.in',
+    },
+    chatbot: {
+      assistantTitle: 'SDV ఫామ్స్ సహాయకుడు',
+      online: 'ఆన్‌లైన్',
+      backToMenuTitle: 'మెనూకు వెనక్కి',
+      quickQuestionsLabel: 'త్వరిత ప్రశ్నలు',
+      inputPlaceholder: 'SDV ఫామ్స్ గురించి అడగండి…',
+      menuBrand: 'SDV ఫామ్స్',
+      menuHelpSubtitle: 'మేము ఎలా సహాయం చేయగలం?',
+      launcherAria: 'SDV ఫామ్స్ సహాయకుడిని తెరవండి',
+      toggleToTelugu: 'తెలుగు',
+      toggleToEnglish: 'EN',
+      menuViewTelugu: 'తెలుగులో చూడండి',
+      menuViewEnglish: 'ఆంగ్లంలో చూడండి',
+      welcome:
+        '👋 నమస్కారం! నేను SDV ఫామ్స్ సహాయకుడు. క్రింద త్వరిత ప్రశ్నలు ట్యాప్ చేయండి లేదా మీ ప్రశ్న టైప్ చేయండి — సమాధానాలు తక్షణమే (బాహ్య AI లేదు). కొనుగోలు, అమ్మకం, సేవలు, ధరలు, సందర్శనల గురించి సహాయం చేస్తాను.',
+      fallback:
+        'దానికి ఇంకా సిద్ధమైన సమాధానం లేదు. పైన **త్వరిత బటన్లు** ప్రయత్నించండి, [/properties](/properties) చూడండి, లేదా **7780312525** కి కాల్ చేయండి · సోమ–శని 9–6.',
+      quickQuestions: [
+        { label: 'ప్రాపర్టీలు చూడండి', link: '/properties' },
+        { label: 'నా భూమి ఎలా అమ్మాలి?' },
+        { label: 'సైట్ విజిట్ బుక్ చేయండి' },
+        { label: 'సంప్రదించండి & కాల్' },
+        { label: 'అందుబాటులో ఉన్న సేవలు' },
+        { label: 'ఇది ప్రభుత్వ ఆమోదం పొందిందా?' },
+      ],
+      menuActions: [
+        { icon: '🏡', label: 'ప్రాపర్టీలు చూడండి', link: '/properties' },
+        { icon: '🌾', label: 'నా భూమి అమ్మాలి', link: '/auth/register' },
+        { icon: '📅', label: 'సైట్ విజిట్ బుక్ చేయండి', link: '/#contact' },
+        { icon: '🛠️', label: 'మా సేవలు', link: '/services' },
+        { icon: '📞', label: 'కాల్ / వాట్సాప్', link: 'tel:7780312525' },
+        { icon: '💬', label: 'త్వరిత సమాధానాలు', action: 'chat' },
+      ],
+      faq: {
+        properties: (count) =>
+          `🌾 తెలంగాణ, ఆంధ్రప్రదేశ్ & కర్ణాటకలో **${count} ఆమోదిత ఆస్తులు** జాబితా చేయబడ్డాయి.\n\nరాష్ట్రం, నేల రకం, విస్తీర్ణం లేదా ధర ప్రకారం [/properties](/properties) వద్ద ఫిల్టర్ చేయండి — లాగిన్ అవసరం లేదు!`,
+        sell: () =>
+          `🌾 SDV ఫామ్స్‌లో మీ భూమిని జాబితా చేయడం:\n\n1. [/auth/register](/auth/register) వద్ద **విక్రేత**గా నమోదు చేయండి\n2. త్వరిత అర్హత తనిఖీ (ప్రభుత్వ/పోరంబోకే భూమి అనుమతి లేదు)\n3. 3-దశల ఫారమ్ — స్థానం, భూమి వివరాలు, పహానీ/ROR-1B అప్‌లోడ్\n\nసమర్పించిన తర్వాత మా టీమ్ 24 గంటల్లోపు సమీక్షిస్తుంది. ఉచిత జాబితా — కమిషన్ లేదు!`,
+        buy: () =>
+          `🏡 SDV ఫామ్స్ ద్వారా వ్యవసాయ భూమి కొనుగోలు:\n\n1. [/properties](/properties) వద్ద జాబితాలు **బ్రౌజ్** చేయండి\n2. రాష్ట్రం, నేల, విస్తీర్ణం, ధర ప్రకారం **ఫిల్టర్** చేయండి\n3. ఏదైనా ఆస్తి పేజీలో నేరుగా **సైట్ విజిట్ బుక్** చేయండి\n4. అవసరమైతే [/buyer-request](/buyer-request) వద్ద **భూమి అభ్యర్థన** పంపండి\n\nఅన్ని జాబితాలకు స్పష్టమైన శీర్షిక & ప్రభుత్వ ధృవీకరణ. మార్గదర్శనానికి **7780312525** కి కాల్ చేయండి.`,
+        services: () =>
+          `🛠️ **SDV ఫామ్స్ — దశ II సేవలు** (భూమి యజమానులకు):\n\n• 🔒 కంపౌండ్ ఫెన్సింగ్\n• ⚡ బోర్వెల్ & విద్యుత్ కనెక్షన్\n• 💧 డ్రిప్ ఇరిగేషన్ సెటప్\n• 🌱 అనుకూల వ్యవసాయ ప్రణాళిక\n• 🌳 నాణ్యమైన మొక్కలు (1-సంవత్సరం రీప్లేస్‌మెంట్)\n\nఅన్నీ ఆన్-డిమాండ్. వివరాలకు **7780312525** లేదా [/services](/services) చూడండి.`,
+        contact: () =>
+          `📞 **SDV ఫామ్స్ సంప్రదింపు వివరాలు:**\n\n• **ఫోన్/వాట్సాప్:** 7780312525\n• **ఇమెయిల్:** info@sdvfarms.in\n• **కార్యాలయం:** హైదరాబాద్, తెలంగాణ\n• **సమయం:** సోమ–శని, ఉదయం 9 – సాయంత్రం 6\n\nలేదా మా హోమ్ పేజీలో విచారణ ఫారమ్ నింపండి — 2 గంటల్లోపు మీకు కాల్ చేస్తాము!`,
+        price: () =>
+          `💰 **ధరలు:**\n\nస్థానం, నేల రకం, విస్తీర్ణం ఆధారంగా మారుతాయి. [/properties](/properties)లో ప్రతి జాబితా ఎకరానికి ధర మరియు మొత్తం చూపిస్తుంది.\n\nవ్యక్తిగత కోట్ కోసం **7780312525** కి కాల్ చేయండి.`,
+        location: () =>
+          `📍 **SDV ఫామ్స్ ఆస్తులు:**\n\n• **తెలంగాణ** — నల్గొండ, యాడాద్రి, సూర్యపేట మరియు ఇతర జిల్లాలు\n• **ఆంధ్రప్రదేశ్** — అనేక జిల్లాలు\n• **కర్ణాటక** — ఎంపిక జిల్లాలు\n\nఅన్నీ హైదరాబాద్‌కు బాగా అనుసంధానమైనవి. మ్యాప్ హోమ్ పేజీలో. దారి కోసం వాట్సాప్ **7780312525**.`,
+        legal: () =>
+          `✅ **అవును — SDV ఫామ్స్ 100% ప్రభుత్వ ఆమోదితం:**\n\n• చట్టపరమైన ధృవీకరణతో స్పష్టమైన శీర్షిక\n• కొనుగోలుదారు పేరుపై నమోదు అమ్మకపు దస్తావేజు\n• జాబితా చేయడానికి ముందు పహానీ/ROR-1B/అడంగల్/RTC ధృవీకరణ\n• దాచిన ఛార్జీలు లేవు — పారదర్శక ధర\n\nనిర్ణయానికి ముందు పత్రాల కోసం **7780312525** కి కాల్ చేయండి.`,
+        help: () =>
+          `👋 **నేను ఇలా సహాయం చేయగలను:**\n\n🏡 [ఆస్తులు](/properties) — రాష్ట్రం, నేల, విస్తీర్ణం ప్రకారం ఫిల్టర్\n🌾 **భూమి అమ్మకం** — విక్రేతగా నమోదు, ఉచిత జాబితా\n📅 **సైట్ విజిట్** — ఏదైనా ఆస్తి పేజీలో తేదీ & స్లాట్ ఎంచుకోండి\n🛠️ [సేవలు](/services) — ఫెన్సింగ్, బోర్వెల్, డ్రిప్ & మరిన్ని\n📞 **కాల్** — 7780312525 (సోమ–శని, 9–6)\n\nమీ ప్రశ్న టైప్ చేయండి లేదా క్రింద త్వరిత ఎంపికలు ట్యాప్ చేయండి!`,
+        appointment: () =>
+          `📅 **సైట్ విజిట్ బుకింగ్ సులభం:**\n\n1. [/properties](/properties) వద్ద ఏదైనా జాబితా తెరవండి\n2. ఆస్తి వివరాల పేజీలో **"సైట్ విజిట్ బుక్"** నొక్కండి\n3. వచ్చే 7 రోజుల్లో తేదీ మరియు సమయ స్లాట్ ఎంచుకోండి\n4. స్లాట్ నిర్ధారణకు ₹500 తిరిగి చెల్లించదగిన టోకెన్ చెల్లించండి\n\nసందర్శనకు ముందు మా టీమ్ కాల్ చేస్తుంది. తక్షణ బుకింగ్ కోసం **7780312525**.`,
+      },
     },
     footer: {
       tagline: 'ఈరోజు భూమిలో పెట్టుబడి పెట్టండి. రేపు రాబడి కోయండి. తరతరాలకు సంపద నిర్మించండి.',
