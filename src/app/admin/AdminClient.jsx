@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, Fragment } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '../../lib/supabase'
 import { sendNotification } from '../../lib/notify'
@@ -25,6 +25,20 @@ const PLOT_COLORS = {
   sold:      'bg-red-400',
 }
 
+function adminField(v) {
+  if (v === null || v === undefined || v === '') return '—'
+  return String(v)
+}
+
+function storageLinkLabel(url, i) {
+  try {
+    const seg = decodeURIComponent(String(url).split('/').pop() || '')
+    return seg.length > 52 ? `${seg.slice(0, 49)}…` : seg || `File ${i + 1}`
+  } catch {
+    return `File ${i + 1}`
+  }
+}
+
 export default function AdminClient({ enquiries: initial, profiles, plots: initialPlots, sellerProperties: initialProps, appointments: initialAppts, buyerRequests: initialRequests }) {
   const router = useRouter()
   const [tab, setTab]                     = useState('enquiries')
@@ -33,6 +47,7 @@ export default function AdminClient({ enquiries: initial, profiles, plots: initi
   const [properties, setProperties]       = useState(initialProps)
   const [appointments, setAppointments]   = useState(initialAppts)
   const [buyerRequests, setBuyerRequests] = useState(initialRequests)
+  const [expandedPropId, setExpandedPropId] = useState(null)
   const [saving, setSaving]               = useState(null)
   const [allUsers, setAllUsers]           = useState(null)
   const [usersLoading, setUsersLoading]   = useState(false)
@@ -529,56 +544,138 @@ export default function AdminClient({ enquiries: initial, profiles, plots: initi
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
-                    {properties.map(p => (
-                      <tr key={p.id} className="hover:bg-gray-50/50 transition-colors">
-                        <td className="px-5 py-4 font-mono text-xs text-paddy-700 font-bold">
-                          {p.property_id || <span className="text-gray-300 italic">Pending</span>}
-                        </td>
-                        <td className="px-5 py-4 text-gray-700">
-                          <div>{p.village}, {p.mandal}</div>
-                          <div className="text-xs text-gray-400">{p.district}, {p.state}</div>
-                        </td>
-                        <td className="px-5 py-4 text-gray-500">
-                          <div>{p.land_soil_type} soil</div>
-                          <div className="text-xs">{p.land_used_type}</div>
-                        </td>
-                        <td className="px-5 py-4 text-gray-600">{p.area_acres}</td>
-                        <td className="px-5 py-4 text-gray-600">₹{Number(p.expected_price).toLocaleString('en-IN')}</td>
-                        <td className="px-5 py-4">
-                          <StatusBadge status={p.status} />
-                        </td>
-                        <td className="px-5 py-4">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <NextLink
-                              href={`/admin/property/${p.id}/edit`}
-                              className="text-paddy-700 hover:text-paddy-900 text-xs font-medium underline-offset-2 hover:underline"
-                            >
-                              Edit
-                            </NextLink>
-                            {p.status === 'pending' && (
-                              <>
+                    {properties.map(p => {
+                      const docs = Array.isArray(p.doc_urls) ? p.doc_urls : []
+                      const photos = Array.isArray(p.photo_urls) ? p.photo_urls : []
+                      const open = expandedPropId === p.id
+                      return (
+                        <Fragment key={p.id}>
+                          <tr className="hover:bg-gray-50/50 transition-colors">
+                            <td className="px-5 py-4 font-mono text-xs text-paddy-700 font-bold">
+                              {p.property_id || <span className="text-gray-300 italic">Pending</span>}
+                            </td>
+                            <td className="px-5 py-4 text-gray-700">
+                              <div>{p.village}, {p.mandal}</div>
+                              <div className="text-xs text-gray-400">{p.district}, {p.state}</div>
+                            </td>
+                            <td className="px-5 py-4 text-gray-500">
+                              <div>{p.land_soil_type} soil</div>
+                              <div className="text-xs">{p.land_used_type}</div>
+                            </td>
+                            <td className="px-5 py-4 text-gray-600">{p.area_acres}</td>
+                            <td className="px-5 py-4 text-gray-600">₹{Number(p.expected_price).toLocaleString('en-IN')}</td>
+                            <td className="px-5 py-4">
+                              <StatusBadge status={p.status} />
+                            </td>
+                            <td className="px-5 py-4">
+                              <div className="flex flex-wrap items-center gap-2">
                                 <button
                                   type="button"
-                                  onClick={() => approveProperty(p)}
-                                  disabled={saving === p.id}
-                                  className="bg-paddy-600 hover:bg-paddy-700 disabled:opacity-50 text-white text-xs px-3 py-1.5 rounded-lg transition-colors"
+                                  onClick={() => setExpandedPropId(open ? null : p.id)}
+                                  className="text-gray-500 hover:text-gray-800 text-xs font-medium"
                                 >
-                                  {saving === p.id ? '…' : 'Approve'}
+                                  {open ? 'Hide details' : 'All details'}
                                 </button>
-                                <button
-                                  type="button"
-                                  onClick={() => rejectProperty(p.id)}
-                                  disabled={saving === p.id}
-                                  className="bg-red-100 hover:bg-red-200 text-red-600 text-xs px-3 py-1.5 rounded-lg transition-colors"
+                                <NextLink
+                                  href={`/admin/property/${p.id}/edit`}
+                                  className="text-paddy-700 hover:text-paddy-900 text-xs font-medium underline-offset-2 hover:underline"
                                 >
-                                  Reject
-                                </button>
-                              </>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                                  Edit
+                                </NextLink>
+                                {p.status === 'pending' && (
+                                  <>
+                                    <button
+                                      type="button"
+                                      onClick={() => approveProperty(p)}
+                                      disabled={saving === p.id}
+                                      className="bg-paddy-600 hover:bg-paddy-700 disabled:opacity-50 text-white text-xs px-3 py-1.5 rounded-lg transition-colors"
+                                    >
+                                      {saving === p.id ? '…' : 'Approve'}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => rejectProperty(p.id)}
+                                      disabled={saving === p.id}
+                                      className="bg-red-100 hover:bg-red-200 text-red-600 text-xs px-3 py-1.5 rounded-lg transition-colors"
+                                    >
+                                      Reject
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                          {open && (
+                            <tr className="bg-slate-50/90">
+                              <td colSpan={7} className="px-5 py-4 text-xs text-gray-600 border-t border-gray-100">
+                                <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mb-3">Full listing data</p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3">
+                                  <div>
+                                    <p className="text-gray-400 mb-1">IDs</p>
+                                    <p><span className="text-gray-500">Row ID:</span> <span className="font-mono text-[11px] break-all">{p.id}</span></p>
+                                    <p className="mt-1"><span className="text-gray-500">Seller ID:</span> <span className="font-mono text-[11px] break-all">{adminField(p.seller_id)}</span></p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-400 mb-1">Location</p>
+                                    <p>State: {adminField(p.state)}</p>
+                                    <p>District: {adminField(p.district)}</p>
+                                    <p>Mandal: {adminField(p.mandal)}</p>
+                                    <p>Village: {adminField(p.village)}</p>
+                                    <p>PIN: {adminField(p.zip_code)}</p>
+                                    <p>Farmer: {adminField(p.farmer_name)}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-400 mb-1">Land & docs</p>
+                                    <p>Doc type: {adminField(p.land_doc_type)}</p>
+                                    <p>Road access: {p.road_access ? 'Yes' : 'No'}</p>
+                                    <p>Views: {p.views ?? 0}</p>
+                                  </div>
+                                </div>
+                                <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                  <div>
+                                    <p className="text-gray-400 mb-1">Land documents ({docs.length})</p>
+                                    {docs.length === 0 ? (
+                                      <p className="text-gray-400">None</p>
+                                    ) : (
+                                      <ul className="space-y-1">
+                                        {docs.map((url, i) => (
+                                          <li key={`d-${p.id}-${i}`}>
+                                            <a href={url} target="_blank" rel="noopener noreferrer" className="text-paddy-700 hover:underline break-all">
+                                              {storageLinkLabel(url, i)}
+                                            </a>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    )}
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-400 mb-1">Photos ({photos.length})</p>
+                                    {photos.length === 0 ? (
+                                      <p className="text-gray-400">None</p>
+                                    ) : (
+                                      <ul className="space-y-1">
+                                        {photos.map((url, i) => (
+                                          <li key={`ph-${p.id}-${i}`}>
+                                            <a href={url} target="_blank" rel="noopener noreferrer" className="text-paddy-700 hover:underline break-all">
+                                              {storageLinkLabel(url, i)}
+                                            </a>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    )}
+                                  </div>
+                                </div>
+                                <p className="mt-3 text-gray-400">
+                                  Submitted {p.created_at ? new Date(p.created_at).toLocaleString('en-IN') : '—'}
+                                  {' · '}
+                                  Updated {p.updated_at ? new Date(p.updated_at).toLocaleString('en-IN') : '—'}
+                                </p>
+                              </td>
+                            </tr>
+                          )}
+                        </Fragment>
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>
