@@ -1,5 +1,5 @@
 // @ts-check
-const { test, expect } = require('@playwright/test')
+import { test, expect } from '@playwright/test'
 
 test.describe('Admin Add Property Page', () => {
   test('redirects unauthenticated users away from /admin/property/new', async ({ page }) => {
