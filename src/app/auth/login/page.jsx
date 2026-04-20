@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '../../../lib/supabase'
+import { homePathForRole } from '../../../lib/authRedirects'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -19,8 +20,8 @@ export default function LoginPage() {
     const { data, error: err } = await supabase.auth.signInWithPassword({ email, password })
     setLoading(false)
     if (err) { setError(err.message); return }
-    const isAdmin = data.user?.user_metadata?.role === 'admin'
-    router.push(isAdmin ? '/admin' : '/dashboard')
+    const role = data.user?.user_metadata?.role
+    router.push(homePathForRole(role))
     router.refresh()
   }
 

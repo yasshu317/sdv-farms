@@ -23,9 +23,24 @@ function StatusBadge({ status }) {
   )
 }
 
-export default function DashboardClient({ user, enquiries, interests }) {
+const LAND_REQ_STATUS = {
+  open: { label: 'Open', color: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
+  matched: { label: 'Matched', color: 'bg-green-100 text-green-700 border-green-200' },
+  closed: { label: 'Closed', color: 'bg-gray-100 text-gray-600 border-gray-200' },
+}
+
+function LandRequestBadge({ status }) {
+  const s = LAND_REQ_STATUS[status] ?? LAND_REQ_STATUS.open
+  return (
+    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${s.color}`}>
+      {s.label}
+    </span>
+  )
+}
+
+export default function DashboardClient({ user, enquiries, interests, landRequests = [], initialTab = 'overview' }) {
   const router = useRouter()
-  const [tab, setTab] = useState('overview')
+  const [tab, setTab] = useState(initialTab)
 
   async function handleLogout() {
     const supabase = createClient()
@@ -92,8 +107,13 @@ export default function DashboardClient({ user, enquiries, interests }) {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-gray-100 p-1 rounded-2xl w-fit mb-6">
-          {[['overview', 'Overview'], ['enquiries', 'Enquiries'], ['interests', 'Plot Interests']].map(([id, label]) => (
+        <div className="flex flex-wrap gap-1 bg-gray-100 p-1 rounded-2xl w-fit mb-6">
+          {[
+            ['overview', 'Overview'],
+            ['enquiries', 'Enquiries'],
+            ['interests', 'Plot Interests'],
+            ['land-requests', 'Land requests'],
+          ].map(([id, label]) => (
             <button
               key={id} onClick={() => setTab(id)}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${tab === id ? 'bg-white shadow-sm text-paddy-900' : 'text-gray-500 hover:text-gray-700'}`}
@@ -132,6 +152,13 @@ export default function DashboardClient({ user, enquiries, interests }) {
                   <div>
                     <p className="text-sm font-medium text-turmeric-800">Book a site visit</p>
                     <p className="text-xs text-turmeric-600">Fill the enquiry form</p>
+                  </div>
+                </Link>
+                <Link href="/buyer-request" className="flex items-center gap-3 p-3 rounded-xl bg-blue-50 hover:bg-blue-100 transition-colors">
+                  <MapPin size={16} className="text-blue-600" />
+                  <div>
+                    <p className="text-sm font-medium text-blue-800">Post a land request</p>
+                    <p className="text-xs text-blue-600">Tell us what you&apos;re looking for</p>
                   </div>
                 </Link>
               </div>
@@ -228,6 +255,58 @@ export default function DashboardClient({ user, enquiries, interests }) {
                         </p>
                       </div>
                       <StatusBadge status={pi.status ?? 'pending'} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Land requests tab */}
+        {tab === 'land-requests' && (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            {landRequests.length === 0 ? (
+              <div className="text-center py-16 text-gray-400">
+                <MapPin size={32} className="mx-auto mb-3 opacity-40" />
+                <p className="font-medium">No land requests yet</p>
+                <p className="text-sm mt-1">Tell us what kind of land you&apos;re looking for</p>
+                <Link
+                  href="/buyer-request"
+                  className="inline-block mt-4 text-sm text-turmeric-600 hover:underline font-medium"
+                >
+                  Post a land request →
+                </Link>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-50">
+                {landRequests.map(r => (
+                  <div key={r.id} className="p-5 hover:bg-gray-50/50 transition-colors">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="font-medium text-gray-800 text-sm">
+                          {[r.state, r.district].filter(Boolean).join(' · ') || 'Any location'}
+                        </p>
+                        {r.notes && <p className="text-xs text-gray-500 mt-1 line-clamp-2">{r.notes}</p>}
+                        <p className="text-xs text-gray-400 mt-1">
+                          {new Date(r.created_at).toLocaleDateString('en-IN', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                          })}
+                        </p>
+                      </div>
+                      <div className="flex flex-col items-end gap-2 shrink-0">
+                        <LandRequestBadge status={r.status} />
+                        {r.status === 'open' && (
+                          <Link
+                            href={`/buyer-request/${r.id}/edit`}
+                            className="text-xs font-medium text-turmeric-600 hover:text-turmeric-700"
+                          >
+                            Edit →
+                          </Link>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}

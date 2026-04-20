@@ -1,20 +1,40 @@
 'use client'
-import { useState, useRef } from 'react'
-import { createClient } from '../../lib/supabase'
-
+import { useState, useRef, useEffect } from 'react'
 const MAX_SIZE_MB = 10
 const ALLOWED_TYPES = {
   docs: ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'],
   photos: ['image/jpeg', 'image/png', 'image/webp'],
 }
 
-export default function FileUpload({ bucket, folder, accept = 'docs', maxFiles = 5, onUpload, label, hint }) {
+export default function FileUpload({
+  bucket,
+  folder,
+  accept = 'docs',
+  maxFiles = 5,
+  onUpload,
+  label,
+  hint,
+  /** Existing uploads: { name?, url }[] — shown until removed; seeded once when first provided */
+  initialItems,
+}) {
   const [files, setFiles] = useState([])
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const inputRef = useRef()
+  const seededRef = useRef(false)
 
   const allowedTypes = ALLOWED_TYPES[accept] ?? ALLOWED_TYPES.docs
+
+  useEffect(() => {
+    if (seededRef.current || !initialItems?.length) return
+    setFiles(
+      initialItems.map((it, i) => ({
+        name: typeof it === 'string' ? `File ${i + 1}` : it.name || `File ${i + 1}`,
+        url: typeof it === 'string' ? it : it.url,
+      }))
+    )
+    seededRef.current = true
+  }, [initialItems])
 
   async function handleFiles(e) {
     setError('')
@@ -37,15 +57,27 @@ export default function FileUpload({ bucket, folder, accept = 'docs', maxFiles =
     }
 
     setUploading(true)
-    const supabase = createClient()
     const urls = []
 
     for (const file of selected) {
-      const path = `${folder}/${Date.now()}-${file.name.replace(/\s+/g, '-')}`
-      const { error: uploadErr } = await supabase.storage.from(bucket).upload(path, file)
-      if (uploadErr) { setError(uploadErr.message); setUploading(false); return }
-      const { data } = supabase.storage.from(bucket).getPublicUrl(path)
-      urls.push(data.publicUrl)
+      const form = new FormData()
+      form.append('file', file)
+      form.append('bucket', bucket)
+      form.append('prefix', folder)
+
+      const res = await fetch('/api/storage/upload', { method: 'POST', body: form })
+      const payload = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setError(payload.error || `Upload failed (${res.status})`)
+        setUploading(false)
+        return
+      }
+      if (!payload.url) {
+        setError('Upload failed: no URL returned')
+        setUploading(false)
+        return
+      }
+      urls.push(payload.url)
     }
 
     const newFiles = [...files, ...selected.map((f, i) => ({ name: f.name, url: urls[i] }))]
