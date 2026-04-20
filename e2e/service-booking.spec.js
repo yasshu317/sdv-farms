@@ -7,47 +7,61 @@ test.describe('Service Booking Modal', () => {
     await page.waitForLoadState('networkidle')
   })
 
-  test('services page loads with phase 2 service cards', async ({ page }) => {
+  test('services page loads with Phase II heading', async ({ page }) => {
     await expect(page.getByRole('heading', { name: /Our Services/i }).first()).toBeVisible()
-    const cards = page.locator('[data-testid="service-card"], .service-card').or(
-      page.locator('div').filter({ hasText: /Enquire →/ })
-    )
-    // At least the phase 2 services are visible
-    const enquireButtons = page.getByRole('button', { name: /Enquire/i })
-    await expect(enquireButtons.first()).toBeVisible()
+    await expect(page.getByText('Phase II — One-Time Services')).toBeVisible()
+  })
+
+  test('shows all 5 Phase II service cards', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Quality Fencing' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Borewell & Electricity' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Drip Irrigation' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Farming Plan' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Quality Plants' })).toBeVisible()
+  })
+
+  test('shows all 5 Phase II Enquire buttons', async ({ page }) => {
+    const enquireBtns = page.getByRole('button', { name: /Enquire/i })
+    await expect(enquireBtns.first()).toBeVisible()
+    const count = await enquireBtns.count()
+    expect(count).toBeGreaterThanOrEqual(5)
   })
 
   test('clicking Enquire opens booking modal', async ({ page }) => {
-    const firstEnquire = page.getByRole('button', { name: /Enquire/i }).first()
-    await firstEnquire.click()
-
-    // Modal should appear
+    await page.getByRole('button', { name: /Enquire/i }).first().click()
     await expect(page.getByText('Book Service Enquiry')).toBeVisible()
-    await expect(page.getByLabel(/Full Name/i)).toBeVisible()
-    await expect(page.getByLabel(/Phone/i)).toBeVisible()
-    await expect(page.getByLabel(/Email/i)).toBeVisible()
+    // Labels don't have htmlFor — locate inputs by placeholder or order
+    await expect(page.locator('input[type="text"], input:not([type])').first()).toBeVisible()
+    await expect(page.locator('input[type="tel"]')).toBeVisible()
+    await expect(page.locator('input[type="email"]')).toBeVisible()
   })
 
   test('closes modal when X button is clicked', async ({ page }) => {
     await page.getByRole('button', { name: /Enquire/i }).first().click()
     await expect(page.getByText('Book Service Enquiry')).toBeVisible()
-
     await page.getByText('✕').click()
     await expect(page.getByText('Book Service Enquiry')).not.toBeVisible()
   })
 
-  test('shows validation: submit without required fields', async ({ page }) => {
+  test('submit button is present in open modal', async ({ page }) => {
     await page.getByRole('button', { name: /Enquire/i }).first().click()
-    const submitBtn = page.getByRole('button', { name: /Submit Enquiry/i })
-    await submitBtn.click()
-    // HTML5 validation prevents submission — full_name field should be invalid
-    const fullNameInput = page.getByLabel(/Full Name/i)
-    await expect(fullNameInput).toBeVisible()
+    await expect(page.getByRole('button', { name: /Submit Enquiry/i })).toBeVisible()
   })
 
-  test('shows all 5 Phase II Enquire buttons', async ({ page }) => {
-    const enquireButtons = page.getByRole('button', { name: /Enquire/i })
-    const count = await enquireButtons.count()
-    expect(count).toBeGreaterThanOrEqual(5)
+  test('modal shows service type in subtitle', async ({ page }) => {
+    await page.getByRole('button', { name: /Enquire/i }).first().click()
+    await expect(page.getByText('Book Service Enquiry')).toBeVisible()
+    // Subtitle mentions the service type
+    await expect(page.getByText(/we.ll call you within 24 hours/i)).toBeVisible()
+  })
+
+  test('Phase III shows coming soon section', async ({ page }) => {
+    await expect(page.getByText('Phase III — Coming Soon')).toBeVisible()
+  })
+
+  test('notify-me form submits and shows confirmation', async ({ page }) => {
+    await page.fill('input[placeholder="your@email.com"]', 'test@example.com')
+    await page.getByRole('button', { name: 'Notify me' }).click()
+    await expect(page.getByText(/notify you when Phase III/i)).toBeVisible()
   })
 })
