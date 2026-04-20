@@ -6,6 +6,7 @@ import { sendNotification } from '../../lib/notify'
 import { LogOut, Users, FileText, MapPin, RefreshCw, Home, Calendar, MessageSquare, ShieldCheck, Search, Plus } from 'lucide-react'
 import NextLink from 'next/link'
 import StatusBadge from '../../components/ui/StatusBadge'
+import { adminField, storageLinkLabel } from '../../lib/adminDisplay'
 
 const ENQUIRY_STATUSES = ['pending', 'contacted', 'visited', 'booked', 'closed']
 const PLOT_STATUSES    = ['available', 'reserved', 'sold']
@@ -23,20 +24,6 @@ const PLOT_COLORS = {
   available: 'bg-green-500',
   reserved:  'bg-yellow-400',
   sold:      'bg-red-400',
-}
-
-function adminField(v) {
-  if (v === null || v === undefined || v === '') return '—'
-  return String(v)
-}
-
-function storageLinkLabel(url, i) {
-  try {
-    const seg = decodeURIComponent(String(url).split('/').pop() || '')
-    return seg.length > 52 ? `${seg.slice(0, 49)}…` : seg || `File ${i + 1}`
-  } catch {
-    return `File ${i + 1}`
-  }
 }
 
 export default function AdminClient({ enquiries: initial, profiles, plots: initialPlots, sellerProperties: initialProps, appointments: initialAppts, buyerRequests: initialRequests }) {
