@@ -180,17 +180,18 @@ export default function SellerPropertyForm({ variant, propertyId, initialForm })
           <h2 className="text-white font-display text-2xl font-bold mb-3">
             {isEdit ? 'Changes saved' : 'Listing Submitted!'}
           </h2>
-          <p className="text-white/60 mb-2">
-            {isEdit
-              ? 'Your updated details have been saved. SDV Farms will review any changes.'
-              : 'Your property is under review by the SDV Farms team.'}
-          </p>
-          {!isEdit && (
-            <p className="text-white/40 text-sm mb-6">
-              We&apos;ll email you once it&apos;s approved and live on the marketplace.
+          <div className="mb-6 space-y-2">
+            <p className="text-white/60">
+              {isEdit
+                ? 'Your updated details have been saved. SDV Farms will review any changes.'
+                : 'Your property is under review by the SDV Farms team.'}
             </p>
-          )}
-          {isEdit && <p className="text-white/40 text-sm mb-6" />}
+            {!isEdit && (
+              <p className="text-white/40 text-sm">
+                We&apos;ll email you once it&apos;s approved and live on the marketplace.
+              </p>
+            )}
+          </div>
           <Link
             href="/seller"
             className="inline-block bg-turmeric-500 hover:bg-turmeric-600 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
