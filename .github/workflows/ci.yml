@@ -60,7 +60,6 @@ jobs:
       NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
       NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
       NEXT_PUBLIC_APP_VERSION: 0.0.0
-      GOOGLE_GENERATIVE_AI_API_KEY: placeholder-gemini-key
       RESEND_API_KEY: re_placeholder
       CI: true
     steps:
@@ -106,7 +105,6 @@ jobs:
       # Dummy values so Next.js build doesn't fail on missing env vars
       NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
       NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
-      GOOGLE_GENERATIVE_AI_API_KEY: placeholder-gemini-key
       RESEND_API_KEY: re_placeholder
 
     steps:

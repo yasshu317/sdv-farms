@@ -104,6 +104,19 @@ test.describe('ChatBot Widget', () => {
     ).toBeVisible({ timeout: 10000 })
   })
 
+  test('typing unrelated text gets static fallback with phone number', async ({ page }) => {
+    await gotoHome(page)
+    await openChat(page)
+    await page.locator(CHAT_INPUT).fill('random gibberish query xyz')
+    await page.locator(CHAT_INPUT).press('Enter')
+    await expect(
+      page.locator(CHAT_WINDOW).getByText(/7780312525/).first()
+    ).toBeVisible({ timeout: 10000 })
+    await expect(
+      page.locator(CHAT_WINDOW).getByText(/saved answer|quick buttons/i).first()
+    ).toBeVisible({ timeout: 5000 })
+  })
+
   test('FAQ replies contain no null JS errors', async ({ page }) => {
     const errors = []
     page.on('pageerror', err => errors.push(err.message))

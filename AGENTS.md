@@ -7,7 +7,7 @@ This file is read by Claude, OpenAI Codex, GitHub Copilot, Cursor, and all AI co
 SDV Farms is a **bilingual (English + Telugu) agricultural land marketplace** with a two-sided model — sellers post verified land listings, buyers browse/filter/wishlist/book, and admins manage approvals.
 
 - **Live URL:** https://sdv-farms.vercel.app
-- **Stack:** Next.js 16 (App Router) · Tailwind CSS · Supabase · Vercel AI SDK · Resend · Playwright
+- **Stack:** Next.js 16 (App Router) · Tailwind CSS · Supabase · Resend · Playwright
 - **Language:** JavaScript (JSX) only — never TypeScript
 
 ---
@@ -20,7 +20,7 @@ SDV Farms is a **bilingual (English + Telugu) agricultural land marketplace** wi
 | Styling | Tailwind CSS | Custom `paddy-*`, `turmeric-*`, `marigold-*`, `terracotta-*` palette |
 | Database + Auth | Supabase (`@supabase/ssr`) | Browser: `src/lib/supabase.js`, Server: `src/lib/supabase-server.js` |
 | Storage | Supabase Storage | Buckets: `property-docs`, `property-photos` (both public) |
-| AI Chatbot | Vercel AI SDK v6 + Google Gemini 2.0 Flash | `src/app/api/chat/route.js` |
+| Chat widget | Static FAQ + quick replies (client-side, no external AI) | `src/components/ChatBot.jsx` |
 | Email | Resend | `src/app/api/send-enquiry/route.js` + `src/app/api/notify/route.js` |
 | Unit tests | Jest + React Testing Library | `src/__tests__/` |
 | E2E tests | Playwright | `e2e/` · config in `playwright.config.js` |
@@ -39,7 +39,6 @@ src/
 │   ├── page.jsx              # Home page
 │   ├── layout.jsx            # Root layout + PWA meta
 │   ├── api/
-│   │   ├── chat/route.js     # AI chatbot (Gemini streamText)
 │   │   ├── send-enquiry/route.js  # Enquiry email
 │   │   ├── notify/route.js   # General notification email
 │   │   └── icon/route.js     # Dynamic PWA PNG icons
@@ -205,10 +204,9 @@ update auth.users set raw_user_meta_data = raw_user_meta_data || '{"role":"admin
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Client | `supabase.js`, `supabase-server.js` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Client | `supabase.js`, `supabase-server.js` |
-| `GOOGLE_GENERATIVE_AI_API_KEY` | Server | `api/chat/route.js` |
 | `RESEND_API_KEY` | Server | `api/send-enquiry/route.js`, `api/notify/route.js` |
 
-Never put `RESEND_API_KEY` or `GOOGLE_GENERATIVE_AI_API_KEY` in `NEXT_PUBLIC_` variables.
+Never put `RESEND_API_KEY` in `NEXT_PUBLIC_` variables.
 
 ---
 
@@ -237,7 +235,7 @@ CI runs: **Jest → Playwright → Build → Auto-tag** in that order.
 ❌ DON'T:
 - Don't use TypeScript
 - Don't add `Math.random()` or `Date.now()` in JSX render (hydration errors)
-- Don't expose `RESEND_API_KEY` or `GOOGLE_GENERATIVE_AI_API_KEY` to the client
+- Don't expose `RESEND_API_KEY` to the client
 - Don't hardcode English/Telugu text outside `content.js`
 - Don't call Resend directly from components — always go through `notify.js`
 - Don't put `'use client'` in a page file that needs `export const dynamic`

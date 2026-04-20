@@ -7,11 +7,11 @@ alwaysApply: true
 # SDV Farms Cursor Rules
 
 ## Tech Stack
-- Next.js 15, App Router — files in `src/app/`
+- Next.js 16, App Router — files in `src/app/`
 - Tailwind CSS with custom palette: `paddy-*`, `turmeric-*`, `marigold-*`, `terracotta-*`, `cream`
 - JavaScript + JSX (no TypeScript)
 - Supabase for auth + database
-- Vercel AI SDK v6 with Google Gemini 2.0 Flash
+- Chat widget: static FAQ + quick replies in `src/components/ChatBot.jsx` (no external AI API)
 
 ## Components
 - Add `'use client'` to any component using hooks, event handlers, or browser APIs
@@ -52,21 +52,8 @@ export async function POST(req) {
 }
 ```
 
-## AI Chatbot (Vercel AI SDK v6)
-```js
-import { streamText, convertToModelMessages } from 'ai'
-import { google } from '@ai-sdk/google'
-
-const result = streamText({
-  model: google('gemini-2.0-flash'),
-  messages: convertToModelMessages(messages),
-  system: '...',
-})
-return result.toUIMessageStreamResponse()
-```
-
 ## Do Not
 - No TypeScript
 - No hardcoded English/Telugu strings outside `content.js`
 - No `Math.random()` in render
-- No client-side exposure of `RESEND_API_KEY` or `GOOGLE_GENERATIVE_AI_API_KEY`
+- No client-side exposure of `RESEND_API_KEY`

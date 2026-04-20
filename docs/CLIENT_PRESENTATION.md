@@ -100,7 +100,7 @@ The platform is:
 - ✅ Bilingual home page (English / Telugu)
 - ✅ Hero section with agricultural illustrations
 - ✅ Enquiry form → Supabase + Resend email
-- ✅ AI Chatbot (Google Gemini) — answers FAQs about SDV Farms
+- ✅ Chat widget — instant FAQ answers + quick question buttons (no external AI)
 - ✅ WhatsApp quick-chat button
 - ✅ Google Maps embedded
 - ✅ Buyer registration + login
@@ -133,7 +133,7 @@ The platform is:
 | Authentication | Supabase Auth (email/password) |
 | File Storage | Supabase Storage (free 1GB) |
 | Email | Resend (free 100 emails/day) |
-| AI Chatbot | Google Gemini 2.0 Flash (free tier) |
+| Chat widget | Built-in FAQ + quick replies (no AI API cost) |
 | Hosting | Vercel (free tier) |
 | Monthly cost | **₹0** — all free tiers |
 | Tests | 39 unit tests + 47 E2E browser tests |

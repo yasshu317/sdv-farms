@@ -14,7 +14,7 @@ A bilingual (English + Telugu) agricultural land investment platform with a two-
 | Bilingual UI | English ↔ Telugu toggle throughout |
 | Hero section | Animated paddy, mangoes, coconut trees, bullock cart |
 | Enquiry form | Saves to Supabase + email via Resend |
-| AI Chatbot | Google Gemini 2.0 Flash — answers SDV Farms questions |
+| Chat widget | FAQ + quick replies (instant, no external AI) |
 | WhatsApp button | Click-to-chat with pre-filled message |
 | Google Maps | Embedded location |
 | Mobile & PWA | Responsive layout; installable app; offline shell |
@@ -45,7 +45,7 @@ A bilingual (English + Telugu) agricultural land investment platform with a two-
 | Styling | Tailwind CSS (custom `paddy-*`, `turmeric-*`, `marigold-*` palette) |
 | Database + Auth | Supabase (free tier) — PostgreSQL + Row Level Security |
 | Storage | Supabase Storage (`property-docs`, `property-photos`) |
-| AI Chatbot | Vercel AI SDK + Google Gemini 2.0 Flash (free tier) |
+| Chat widget | Client-side FAQ rules + quick question chips |
 | Email | Resend (free tier) |
 | Hosting | Vercel (free tier) |
 | Testing | Jest + React Testing Library (unit) · Playwright (E2E) |
@@ -71,9 +71,6 @@ Create `.env.local` in the project root:
 # Supabase — https://supabase.com → Project Settings → API
 NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGci...
-
-# Google Gemini — https://aistudio.google.com/apikey
-GOOGLE_GENERATIVE_AI_API_KEY=AIza...
 
 # Resend — https://resend.com
 RESEND_API_KEY=re_...
@@ -325,9 +322,8 @@ src/
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anon/public key |
-| `GOOGLE_GENERATIVE_AI_API_KEY` | Yes | Gemini key from aistudio.google.com |
 | `RESEND_API_KEY` | Yes | Resend key — server-only, never expose to client |
 
 ---
 
-*Built with Next.js · Supabase · Tailwind CSS · Vercel AI SDK · Playwright*
+*Built with Next.js · Supabase · Tailwind CSS · Playwright*

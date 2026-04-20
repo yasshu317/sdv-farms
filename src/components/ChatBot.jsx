@@ -1,6 +1,5 @@
 'use client'
 
-import { useChat } from '@ai-sdk/react'
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { MessageCircle, X, Send, User } from 'lucide-react'
@@ -15,8 +14,13 @@ const QUICK_QUESTIONS = [
 ]
 
 const WELCOME = {
-  en: "👋 Hi! I'm the SDV Farms assistant. Ask me anything about our agricultural land marketplace — buying, selling, services, pricing, or how to book a visit!",
-  te: "👋 నమస్కారం! నేను SDV ఫామ్స్ అసిస్టెంట్. మా వ్యవసాయ భూమి మార్కెట్‌ప్లేస్ గురించి ఏదైనా అడగండి!",
+  en: "👋 Hi! I'm the SDV Farms assistant. Tap a quick question below or type yours — answers are instant (no AI). We cover buying, selling, services, pricing, and site visits.",
+  te: "👋 నమస్కారం! నేను SDV ఫామ్స్ అసిస్టెంట్. క్రింద త్వరిత ప్రశ్నలు ట్యాప్ చేయండి లేదా మీ ప్రశ్న టైప్ చేయండి — సమాధానాలు తక్షణమే (AI లేదు).",
+}
+
+const FALLBACK_REPLY = {
+  en: "I don’t have a saved answer for that yet. Try the **quick buttons** above, browse [/properties](/properties), or call **7780312525** · Mon–Sat 9AM–6PM.",
+  te: "దానికి ఇంకా సిద్ధమైన సమాధానం లేదు. పైన **త్వరిత బటన్లు** ప్రయత్నించండి, [/properties](/properties) చూడండి, లేదా **7780312525** కి కాల్ చేయండి · సోమ–శని 9–6.",
 }
 
 // Instant FAQ replies — no AI call needed
@@ -127,7 +131,7 @@ const MENU_ACTIONS = [
   { icon: '📅', en: 'Book a Site Visit',    te: 'సైట్ విజిట్ బుక్ చేయండి',   link: '/#contact' },
   { icon: '🛠️', en: 'Our Services',         te: 'మా సేవలు',                  link: '/services' },
   { icon: '📞', en: 'Call / WhatsApp',      te: 'కాల్ / వాట్సాప్',            link: 'tel:7780312525' },
-  { icon: '💬', en: 'Chat with Assistant',  te: 'అసిస్టెంట్‌తో చాట్ చేయండి', action: 'chat' },
+  { icon: '💬', en: 'FAQ & quick answers', te: 'త్వరిత సమాధానాలు', action: 'chat' },
 ]
 
 export default function ChatBot() {
@@ -141,33 +145,19 @@ export default function ChatBot() {
   useEffect(() => { setMounted(true) }, [])
   const [input, setInput]             = useState('')
   const [propertyCount, setPropertyCount] = useState(0)
-  const [faqMessages, setFaqMessages] = useState([])
-  const messagesEndRef                = useRef(null)
-  const inputRef                      = useRef(null)
+  const [threadMessages, setThreadMessages] = useState([])
+  const messagesEndRef                        = useRef(null)
+  const inputRef                            = useRef(null)
 
   const open = mode === 'chat'
 
-  const { messages: aiMessages, sendMessage, status, error: aiError } = useChat({
-    api: '/api/chat',
-    initialMessages: [],
-    onError: () => {
-      injectFaqReply(
-        '…',
-        `⚠️ **AI assistant is temporarily unavailable** (quota limit reached).\n\nFor instant answers try the quick buttons below, or call us directly:\n📞 **7780312525** · Mon–Sat 9AM–6PM`,
-      )
-    },
-  })
-
-  const isLoading = status === 'streaming' || status === 'submitted'
-
-  // Combine welcome + faq + ai messages for display
   const welcomeMsg = {
     id: 'welcome',
     role: 'assistant',
     parts: [{ type: 'text', text: WELCOME[lang] }],
     content: WELCOME[lang],
   }
-  const allMessages = [welcomeMsg, ...faqMessages, ...aiMessages]
+  const allMessages = [welcomeMsg, ...threadMessages]
 
   // Fetch approved property count once when menu or chat first opens
   useEffect(() => {
@@ -186,9 +176,9 @@ export default function ChatBot() {
     if (mode === 'chat') setTimeout(() => inputRef.current?.focus(), 100)
   }, [mode])
 
-  function injectFaqReply(userText, replyText) {
+  function injectReply(userText, replyText) {
     const now = Date.now()
-    setFaqMessages(prev => [
+    setThreadMessages(prev => [
       ...prev,
       { id: `u-${now}`, role: 'user',      content: userText,  parts: [{ type: 'text', text: userText }] },
       { id: `a-${now}`, role: 'assistant', content: replyText, parts: [{ type: 'text', text: replyText }] },
@@ -198,14 +188,10 @@ export default function ChatBot() {
   const handleSubmit = e => {
     e.preventDefault()
     const text = input?.trim()
-    if (!text || isLoading) return
+    if (!text) return
     setInput('')
     const faq = matchFAQ(text, propertyCount)
-    if (faq) {
-      injectFaqReply(text, faq)
-    } else {
-      sendMessage({ text })
-    }
+    injectReply(text, faq ?? FALLBACK_REPLY[lang])
   }
 
   const handleQuickQuestion = q => {
@@ -215,11 +201,7 @@ export default function ChatBot() {
     }
     const text = lang === 'en' ? q.en : q.te
     const faq = matchFAQ(text, propertyCount)
-    if (faq) {
-      injectFaqReply(text, faq)
-    } else {
-      sendMessage({ text })
-    }
+    injectReply(text, faq ?? FALLBACK_REPLY[lang])
   }
 
   return (
@@ -289,44 +271,26 @@ export default function ChatBot() {
               </div>
             ))}
 
-            {/* Typing indicator */}
-            {isLoading && (
-              <div className="flex gap-2 items-center">
-                <div className="w-7 h-7 rounded-full bg-turmeric-100 border border-turmeric-200 flex items-center justify-center flex-shrink-0">
-                  <span className="text-xs">🌾</span>
-                </div>
-                <div className="bg-white border border-turmeric-100 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
-                  <div className="flex gap-1 items-center">
-                    {[0, 1, 2].map(i => (
-                      <span key={i} className="w-1.5 h-1.5 bg-paddy-400 rounded-full animate-bounce"
-                        style={{ animationDelay: `${i * 0.15}s` }} />
-                    ))}
-                  </div>
-                </div>
+            {/* Quick questions — always visible in chat */}
+            <div className="pt-2 border-t border-turmeric-100/60 mt-2">
+              <p className="text-xs text-gray-400 mb-2 text-center">Quick questions</p>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {QUICK_QUESTIONS.map((q, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => handleQuickQuestion(q)}
+                    className={`text-xs border rounded-full px-3 py-1.5 transition-colors ${
+                      q.link
+                        ? 'bg-turmeric-50 border-turmeric-300 text-turmeric-700 hover:bg-turmeric-100'
+                        : 'bg-white border-turmeric-200 text-paddy-700 hover:bg-turmeric-50 hover:border-turmeric-400'
+                    }`}
+                  >
+                    {lang === 'en' ? q.en : q.te}
+                  </button>
+                ))}
               </div>
-            )}
-
-            {/* Quick questions — only at the start */}
-            {allMessages.length <= 1 && !isLoading && (
-              <div className="pt-1">
-                <p className="text-xs text-gray-400 mb-2 text-center">Quick questions</p>
-                <div className="flex flex-wrap gap-2">
-                  {QUICK_QUESTIONS.map((q, i) => (
-                    <button
-                      key={i}
-                      onClick={() => handleQuickQuestion(q)}
-                      className={`text-xs border rounded-full px-3 py-1.5 transition-colors ${
-                        q.link
-                          ? 'bg-turmeric-50 border-turmeric-300 text-turmeric-700 hover:bg-turmeric-100'
-                          : 'bg-white border-turmeric-200 text-paddy-700 hover:bg-turmeric-50 hover:border-turmeric-400'
-                      }`}
-                    >
-                      {lang === 'en' ? q.en : q.te}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+            </div>
 
             <div ref={messagesEndRef} />
           </div>
@@ -346,7 +310,7 @@ export default function ChatBot() {
             />
             <button
               type="submit"
-              disabled={!input?.trim() || isLoading}
+              disabled={!input?.trim()}
               className="w-9 h-9 bg-paddy-700 hover:bg-paddy-800 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-colors flex-shrink-0"
             >
               <Send size={15} />

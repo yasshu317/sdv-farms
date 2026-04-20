@@ -1,7 +1,7 @@
 # GitHub Copilot Instructions — SDV Farms
 
 ## Project
-Bilingual (English + Telugu) agricultural land investment site. Next.js 15, App Router, Tailwind, Supabase, Vercel AI SDK.
+Bilingual (English + Telugu) agricultural land investment site. Next.js 16, App Router, Tailwind, Supabase.
 
 ## Language Rules
 - JavaScript + JSX only — no TypeScript
@@ -40,7 +40,6 @@ export async function POST(req) {
 ```
 
 ## Environment Variables
-- `GOOGLE_GENERATIVE_AI_API_KEY` — Gemini chatbot (server only)
 - `RESEND_API_KEY` — email (server only)
 - `NEXT_PUBLIC_SUPABASE_URL` — Supabase
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase
