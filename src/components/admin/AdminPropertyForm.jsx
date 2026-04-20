@@ -278,6 +278,7 @@ export default function AdminPropertyForm({ mode, propertyId, initialForm }) {
     <div key="docs" className="space-y-6">
       <FileUpload
         key={`admin-docs-${propertyId || 'new'}`}
+        variant="light"
         label="Land Documents (Pahani / Adangal / RTC)"
         bucket="property-docs"
         folder="admin"
@@ -288,6 +289,7 @@ export default function AdminPropertyForm({ mode, propertyId, initialForm }) {
       />
       <FileUpload
         key={`admin-photos-${propertyId || 'new'}`}
+        variant="light"
         label="Property Photos"
         bucket="property-photos"
         folder="admin"
