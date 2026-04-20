@@ -196,14 +196,14 @@ export default function AdminNewPropertyPage() {
       <FileUpload
         label="Land Documents (Pahani / Adangal / RTC)"
         bucket="property-docs" folder="admin"
-        allowedTypes={['application/pdf', 'image/*']}
+        accept="docs"
         maxFiles={5}
         onUpload={urls => setForm(f => ({ ...f, doc_urls: urls }))}
       />
       <FileUpload
         label="Property Photos"
         bucket="property-photos" folder="admin"
-        allowedTypes={['image/*']}
+        accept="photos"
         maxFiles={10}
         onUpload={urls => setForm(f => ({ ...f, photo_urls: urls }))}
       />
