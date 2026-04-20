@@ -135,6 +135,10 @@ export default function ChatBot() {
   // mode: 'closed' | 'menu' | 'chat'
   const [mode, setMode]               = useState('closed')
   const [lang, setLang]               = useState('en')
+  // Only true after React hydration — used to gate data-testid so Playwright
+  // won't find/click the button before event handlers are attached
+  const [mounted, setMounted]         = useState(false)
+  useEffect(() => { setMounted(true) }, [])
   const [input, setInput]             = useState('')
   const [propertyCount, setPropertyCount] = useState(0)
   const [faqMessages, setFaqMessages] = useState([])
@@ -424,7 +428,7 @@ export default function ChatBot() {
       <button
         onClick={() => setMode(m => m === 'closed' ? 'menu' : 'closed')}
         aria-label="Open SDV Farms assistant"
-        data-testid="chat-launcher"
+        data-testid={mounted ? 'chat-launcher' : undefined}
         className="fixed bottom-6 left-6 z-50 w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
         style={{ background: 'linear-gradient(135deg, #1a4520 0%, #286d2f 100%)' }}
       >
