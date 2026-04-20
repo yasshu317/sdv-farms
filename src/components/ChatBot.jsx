@@ -6,10 +6,11 @@ import { useRouter } from 'next/navigation'
 import { MessageCircle, X, Send, User } from 'lucide-react'
 
 const QUICK_QUESTIONS = [
-  { en: 'Browse Properties',       te: 'ప్రాపర్టీలు చూడండి', link: '/properties' },
-  { en: 'How to sell my land?',    te: 'నా భూమి ఎలా అమ్మాలి?' },
-  { en: 'Contact & Call',          te: 'సంప్రదించండి & కాల్' },
-  { en: 'Available services',      te: 'అందుబాటులో ఉన్న సేవలు' },
+  { en: 'Browse Properties',          te: 'ప్రాపర్టీలు చూడండి', link: '/properties' },
+  { en: 'How to sell my land?',       te: 'నా భూమి ఎలా అమ్మాలి?' },
+  { en: 'Book a site visit',          te: 'సైట్ విజిట్ బుక్ చేయండి' },
+  { en: 'Contact & Call',             te: 'సంప్రదించండి & కాల్' },
+  { en: 'Available services',         te: 'అందుబాటులో ఉన్న సేవలు' },
   { en: 'Is it government approved?', te: 'ఇది ప్రభుత్వ ఆమోదం పొందిందా?' },
 ]
 
@@ -21,7 +22,7 @@ const WELCOME = {
 // Instant FAQ replies — no AI call needed
 const FAQ_RULES = [
   {
-    match: /\b(how many|propert|listing|available land|browse)\b/i,
+    match: /\b(how many|propert|listings?|available land|browse)\b/i,
     reply: (count) =>
       `🌾 We have **${count} approved properties** listed across Telangana, Andhra Pradesh & Karnataka.\n\nBrowse and filter by state, soil type, area or price at [/properties](/properties) — no login needed!`,
   },
@@ -51,7 +52,7 @@ const FAQ_RULES = [
       `💰 **Pricing at SDV Farms:**\n\nPrices vary by location, soil type, and land area. Each listing on [/properties](/properties) shows the price per acre and total cost.\n\nFor a personalised quote, call **7780312525** — we'll match you with the best options for your budget.`,
   },
   {
-    match: /\b(location|where|address|near|hyderabad|telangana|andhra|karnataka|state|district|mandal)\b/i,
+    match: /\b(location|where|address|near|hyderabad|telangana|andhra|karnataka|state|districts?|mandal)\b/i,
     reply: () =>
       `📍 **SDV Farms Properties are across:**\n\n• **Telangana** — Nalgonda, Yadadri, Suryapet, and more districts\n• **Andhra Pradesh** — multiple districts\n• **Karnataka** — selected districts\n\nAll well-connected to Hyderabad. Exact coordinates and map are on our home page. WhatsApp **7780312525** for driving directions.`,
   },
@@ -59,6 +60,16 @@ const FAQ_RULES = [
     match: /\b(government|approved|legal|title|document|pahani|ror|adangal|rtc|verified)\b/i,
     reply: () =>
       `✅ **Yes — SDV Farms is 100% government-approved:**\n\n• Clear title with full legal verification\n• Registered sale deed directly in the buyer's name\n• All documents (Pahani/ROR-1B/Adangal/RTC) verified before listing\n• No hidden charges — transparent pricing\n\nCall **7780312525** to review documents before any commitment.`,
+  },
+  {
+    match: /^(\?+|help|hi|hello|hey|namaste|నమస్కారం|హలో|ఏమి చేయగలరు)$/i,
+    reply: () =>
+      `👋 **Hi! Here's what I can help you with:**\n\n🏡 [Browse Properties](/properties) — filter by state, soil, area\n🌾 **Sell land** — register as a seller, free listing\n📅 **Book a site visit** — pick a date & slot on any property page\n🛠️ [Services](/services) — fencing, borewell, drip irrigation & more\n📞 **Call us** — 7780312525 (Mon–Sat, 9AM–6PM)\n\nJust type your question or tap one of the quick options below!`,
+  },
+  {
+    match: /\b(appointment|site visit|visit|book|slot|schedule)\b/i,
+    reply: () =>
+      `📅 **Booking a site visit is easy:**\n\n1. Go to [/properties](/properties) and open any listing\n2. Click **"Book Site Visit"** on the property detail page\n3. Pick a date (within next 7 days) and time slot\n4. Pay ₹500 refundable token to confirm your slot\n\nOur team will call you before the visit. For immediate booking call **7780312525**.`,
   },
 ]
 
@@ -88,11 +99,16 @@ function ChatText({ text }) {
           if (match[0].startsWith('**')) {
             parts.push(<strong key={match.index} className="font-semibold text-gray-900">{match[2]}</strong>)
           } else {
+            // Capture href and label NOW so the closure doesn't reference the
+            // mutable `match` variable (which becomes null after the loop ends).
+            const href  = match[4]
+            const label = match[3]
+            const idx   = match.index
             parts.push(
-              <a key={match.index} href={match[4]}
+              <a key={idx} href={href}
                 className="text-paddy-600 underline underline-offset-2 hover:text-paddy-800"
-                onClick={e => { e.preventDefault(); window.location.href = match[4] }}
-              >{match[3]}</a>
+                onClick={e => { e.preventDefault(); window.location.href = href }}
+              >{label}</a>
             )
           }
           last = match.index + match[0].length
@@ -119,6 +135,10 @@ export default function ChatBot() {
   // mode: 'closed' | 'menu' | 'chat'
   const [mode, setMode]               = useState('closed')
   const [lang, setLang]               = useState('en')
+  // Only true after React hydration — used to gate data-testid so Playwright
+  // won't find/click the button before event handlers are attached
+  const [mounted, setMounted]         = useState(false)
+  useEffect(() => { setMounted(true) }, [])
   const [input, setInput]             = useState('')
   const [propertyCount, setPropertyCount] = useState(0)
   const [faqMessages, setFaqMessages] = useState([])
@@ -127,9 +147,15 @@ export default function ChatBot() {
 
   const open = mode === 'chat'
 
-  const { messages: aiMessages, sendMessage, status } = useChat({
+  const { messages: aiMessages, sendMessage, status, error: aiError } = useChat({
     api: '/api/chat',
     initialMessages: [],
+    onError: () => {
+      injectFaqReply(
+        '…',
+        `⚠️ **AI assistant is temporarily unavailable** (quota limit reached).\n\nFor instant answers try the quick buttons below, or call us directly:\n📞 **7780312525** · Mon–Sat 9AM–6PM`,
+      )
+    },
   })
 
   const isLoading = status === 'streaming' || status === 'submitted'
@@ -201,6 +227,7 @@ export default function ChatBot() {
       {/* Chat window */}
       {open && (
         <div
+          data-testid="chat-window"
           className="fixed bottom-24 left-6 z-50 w-[360px] max-w-[calc(100vw-2rem)] flex flex-col rounded-3xl shadow-2xl overflow-hidden border border-paddy-100"
           style={{ height: '520px' }}
         >
@@ -311,6 +338,7 @@ export default function ChatBot() {
           >
             <input
               ref={inputRef}
+              data-testid="chat-input"
               value={input}
               onChange={e => setInput(e.target.value)}
               placeholder={lang === 'en' ? 'Ask anything about SDV Farms…' : 'SDV ఫామ్స్ గురించి అడగండి…'}
@@ -329,7 +357,7 @@ export default function ChatBot() {
 
       {/* ── Quick action launcher menu ── */}
       {mode === 'menu' && (
-        <div className="fixed bottom-24 left-6 z-50 w-72 max-w-[calc(100vw-3rem)]">
+        <div data-testid="chat-menu" className="fixed bottom-24 left-6 z-50 w-72 max-w-[calc(100vw-3rem)]">
           {/* Header card */}
           <div
             className="rounded-2xl shadow-xl overflow-hidden mb-2 border border-white/10"
@@ -357,6 +385,7 @@ export default function ChatBot() {
             {MENU_ACTIONS.map((item, i) => (
               <button
                 key={i}
+                data-testid={`menu-action-${item.action ?? item.link?.replace(/[^a-z]/gi, '-') ?? i}`}
                 onClick={() => {
                   if (item.action === 'chat') {
                     setMode('chat')
@@ -399,6 +428,7 @@ export default function ChatBot() {
       <button
         onClick={() => setMode(m => m === 'closed' ? 'menu' : 'closed')}
         aria-label="Open SDV Farms assistant"
+        data-testid={mounted ? 'chat-launcher' : undefined}
         className="fixed bottom-6 left-6 z-50 w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center"
         style={{ background: 'linear-gradient(135deg, #1a4520 0%, #286d2f 100%)' }}
       >

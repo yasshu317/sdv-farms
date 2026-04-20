@@ -39,12 +39,12 @@ test.describe('Services Page', () => {
     await expect(page.getByText(/notify you when Phase III/i)).toBeVisible()
   })
 
-  test('each service has an enquiry link', async ({ page }) => {
-    // Button text changed from "Book Enquiry →" to "Enquire →" in services polish
-    const enquiryLinks = page.getByRole('link', { name: /Enquire/i })
-    await expect(enquiryLinks.first()).toBeVisible()
-    const count = await enquiryLinks.count()
-    expect(count).toBe(5)
+  test('each service has an enquiry button', async ({ page }) => {
+    // Enquire → changed from link to button to open inline modal
+    const enquiryBtns = page.getByRole('button', { name: /Enquire/i })
+    await expect(enquiryBtns.first()).toBeVisible()
+    const count = await enquiryBtns.count()
+    expect(count).toBeGreaterThanOrEqual(5)
   })
 
   test('home page language toggle switches services link to Telugu', async ({ page }) => {

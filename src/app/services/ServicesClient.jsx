@@ -54,15 +54,49 @@ const PHASE3_ITEMS = [
   { icon: '📈', key: 'marketingTitle',  desc: 'Market your produce at best prices' },
 ]
 
+const SERVICE_KEYS = ['fencing', 'borewell', 'drip', 'farming_plan', 'plants']
+
 export default function ServicesPage() {
   const { lang } = useLang()
   const t = content[lang].services
-  const [notifyEmail, setNotifyEmail] = useState('')
-  const [notifyDone, setNotifyDone]   = useState(false)
+  const [notifyEmail, setNotifyEmail]   = useState('')
+  const [notifyDone, setNotifyDone]     = useState(false)
+  const [bookingFor, setBookingFor]     = useState(null)  // service_type key or null
+  const [bookForm, setBookForm]         = useState({ full_name: '', email: '', phone: '', property_location: '', area_acres: '', notes: '' })
+  const [bookLoading, setBookLoading]   = useState(false)
+  const [bookSuccess, setBookSuccess]   = useState(false)
+  const [bookError, setBookError]       = useState('')
 
   function handleNotify(e) {
     e.preventDefault()
     setNotifyDone(true)
+  }
+
+  function openBooking(serviceKey) {
+    setBookingFor(serviceKey)
+    setBookForm({ full_name: '', email: '', phone: '', property_location: '', area_acres: '', notes: '' })
+    setBookSuccess(false)
+    setBookError('')
+  }
+
+  async function handleBookSubmit(e) {
+    e.preventDefault()
+    setBookLoading(true)
+    setBookError('')
+    try {
+      const res = await fetch('/api/service-booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...bookForm, service_type: bookingFor }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to submit')
+      setBookSuccess(true)
+    } catch (err) {
+      setBookError(err.message)
+    } finally {
+      setBookLoading(false)
+    }
   }
 
   return (
@@ -121,12 +155,12 @@ export default function ServicesPage() {
                 <span className={`text-xs border px-2.5 py-1 rounded-full font-medium ${svc.tagColor}`}>
                   {svc.tag}
                 </span>
-                <Link
-                  href="/#contact"
+                <button
+                  onClick={() => openBooking(SERVICE_KEYS[PHASE2_SERVICES.indexOf(svc)])}
                   className="text-xs bg-white/10 hover:bg-turmeric-500/20 hover:border-turmeric-400/30 border border-white/10 text-white/80 hover:text-white font-medium py-1.5 px-3 rounded-xl transition-all"
                 >
                   Enquire →
-                </Link>
+                </button>
               </div>
             </div>
           ))}
@@ -189,6 +223,88 @@ export default function ServicesPage() {
           </div>
         </div>
       </div>
+
+      {/* ── Service Booking Modal ── */}
+      {bookingFor && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden">
+            {/* Modal header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <div>
+                <h3 className="font-semibold text-gray-900 text-base">Book Service Enquiry</h3>
+                <p className="text-xs text-gray-400 mt-0.5 capitalize">
+                  {bookingFor.replace('_', ' ')} — we'll call you within 24 hours
+                </p>
+              </div>
+              <button onClick={() => setBookingFor(null)} className="text-gray-400 hover:text-gray-600 text-xl font-light">✕</button>
+            </div>
+
+            <div className="px-6 py-5">
+              {bookSuccess ? (
+                <div className="text-center py-6">
+                  <div className="text-4xl mb-3">✅</div>
+                  <p className="text-paddy-800 font-semibold mb-1">Enquiry submitted!</p>
+                  <p className="text-gray-500 text-sm mb-4">We'll call you within 24 hours to discuss details and pricing.</p>
+                  <button onClick={() => setBookingFor(null)}
+                    className="bg-paddy-700 text-white text-sm font-medium px-6 py-2.5 rounded-xl hover:bg-paddy-800 transition-colors">
+                    Close
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleBookSubmit} className="space-y-3">
+                  {bookError && (
+                    <div className="bg-red-50 border border-red-100 text-red-600 text-xs rounded-xl px-3 py-2">{bookError}</div>
+                  )}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="col-span-2">
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Full Name *</label>
+                      <input required value={bookForm.full_name}
+                        onChange={e => setBookForm(f => ({ ...f, full_name: e.target.value }))}
+                        className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-paddy-500" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Phone *</label>
+                      <input required type="tel" value={bookForm.phone}
+                        onChange={e => setBookForm(f => ({ ...f, phone: e.target.value }))}
+                        className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-paddy-500" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Email *</label>
+                      <input required type="email" value={bookForm.email}
+                        onChange={e => setBookForm(f => ({ ...f, email: e.target.value }))}
+                        className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-paddy-500" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Property Location</label>
+                      <input placeholder="Village, District" value={bookForm.property_location}
+                        onChange={e => setBookForm(f => ({ ...f, property_location: e.target.value }))}
+                        className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-paddy-500" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Area (Acres)</label>
+                      <input type="number" min="0.5" step="0.5" placeholder="e.g. 2.5" value={bookForm.area_acres}
+                        onChange={e => setBookForm(f => ({ ...f, area_acres: e.target.value }))}
+                        className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-paddy-500" />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-xs font-medium text-gray-600 mb-1">Notes (optional)</label>
+                      <textarea rows={2} value={bookForm.notes}
+                        onChange={e => setBookForm(f => ({ ...f, notes: e.target.value }))}
+                        placeholder="Any specific requirements…"
+                        className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-paddy-500 resize-none" />
+                    </div>
+                  </div>
+                  <button type="submit" disabled={bookLoading}
+                    className="w-full bg-paddy-700 hover:bg-paddy-800 disabled:opacity-50 text-white font-semibold py-2.5 rounded-xl transition-colors text-sm mt-1">
+                    {bookLoading ? 'Submitting…' : 'Submit Enquiry →'}
+                  </button>
+                  <p className="text-center text-xs text-gray-400">Free consultation — no commitment needed</p>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

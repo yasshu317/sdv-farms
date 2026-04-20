@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { createClient } from '../lib/supabase'
 import { sendNotification } from '../lib/notify'
+import PaymentButton from './PaymentButton'
 
 const SLOTS = [
   '9AM-10AM','10AM-11AM','11AM-12PM','12PM-1PM',
@@ -32,7 +33,10 @@ export default function AppointmentPicker({ propertyId, type = 'buyer', userEmai
   const [notes, setNotes]     = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState('')
-  const [done, setDone]       = useState(false)
+  const [done, setDone]         = useState(false)
+  const [pendingPay, setPendingPay] = useState(null)  // { appointmentId, date, slot }
+  const [payError, setPayError] = useState('')
+  const [payDone, setPayDone]   = useState(false)
 
   async function handleBook() {
     if (!date || !slot) { setError('Please select a date and time slot'); return }
@@ -43,14 +47,14 @@ export default function AppointmentPicker({ propertyId, type = 'buyer', userEmai
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { setError('Please sign in to book an appointment'); setLoading(false); return }
 
-    const { error: insertErr } = await supabase.from('appointments').insert({
+    const { data: apptData, error: insertErr } = await supabase.from('appointments').insert({
       user_id:          user.id,
       property_id:      propertyId || null,
       appointment_date: date,
       time_slot:        slot,
       appointment_type: type,
       notes,
-    })
+    }).select('id').single()
 
     if (insertErr) { setError(insertErr.message); setLoading(false); return }
 
@@ -62,15 +66,50 @@ export default function AppointmentPicker({ propertyId, type = 'buyer', userEmai
     })
 
     setLoading(false)
-    setDone(true)
-    onBooked?.({ date, slot })
+
+    // If Razorpay is configured, show payment step
+    if (process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID) {
+      setPendingPay({ appointmentId: apptData.id, date, slot })
+    } else {
+      setDone(true)
+      onBooked?.({ date, slot })
+    }
+  }
+
+  if (pendingPay && !payDone) {
+    return (
+      <div className="space-y-4">
+        <div className="text-center">
+          <div className="text-3xl mb-2">📅</div>
+          <h3 className="text-white font-semibold text-base mb-1">Appointment Confirmed!</h3>
+          <p className="text-white/60 text-sm">{pendingPay.date} · {pendingPay.slot}</p>
+          <p className="text-white/40 text-xs mt-2 mb-4">
+            Pay a refundable ₹500 token to confirm your site visit slot.
+          </p>
+        </div>
+        {payError && <p className="text-red-400 text-xs text-center">{payError}</p>}
+        <PaymentButton
+          appointmentId={pendingPay.appointmentId}
+          onSuccess={() => { setPayDone(true); setDone(true); onBooked?.(pendingPay) }}
+          onError={msg => setPayError(msg)}
+        />
+        <button
+          onClick={() => { setDone(true); onBooked?.(pendingPay) }}
+          className="w-full text-white/40 hover:text-white/60 text-xs py-2 transition-colors"
+        >
+          Skip payment for now →
+        </button>
+      </div>
+    )
   }
 
   if (done) {
     return (
       <div className="text-center py-6">
-        <div className="text-4xl mb-3">✅</div>
-        <h3 className="text-white font-semibold text-lg mb-1">Appointment Booked!</h3>
+        <div className="text-4xl mb-3">{payDone ? '🎉' : '✅'}</div>
+        <h3 className="text-white font-semibold text-lg mb-1">
+          {payDone ? 'Payment Received!' : 'Appointment Booked!'}
+        </h3>
         <p className="text-white/60 text-sm">
           {date} · {slot}
         </p>

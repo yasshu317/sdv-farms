@@ -5,6 +5,7 @@ import { createClient } from '../../lib/supabase'
 import { useRouter } from 'next/navigation'
 import StatusBadge from '../../components/ui/StatusBadge'
 import AppointmentPicker from '../../components/AppointmentPicker'
+import EmailVerificationBanner from '../../components/EmailVerificationBanner'
 
 export default function SellerClient({ user, properties, appointments }) {
   const router = useRouter()
@@ -37,6 +38,10 @@ export default function SellerClient({ user, properties, appointments }) {
             Sign out
           </button>
         </div>
+      </div>
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4">
+        <EmailVerificationBanner user={user} />
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
