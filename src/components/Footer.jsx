@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 import { Phone, Mail, MapPin } from 'lucide-react'
 import { useLang } from '../context/LanguageContext'
 import { content } from '../data/content'
@@ -38,7 +39,16 @@ export default function Footer() {
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-14">
         {/* Brand */}
         <div className="text-center">
-          <h3 className="font-display text-4xl font-bold text-turmeric-400 mb-1">SDV Farms</h3>
+          <h3 className="font-display text-4xl font-bold text-turmeric-400 mb-1">
+            <Link
+              href="/"
+              title="Home"
+              aria-label="SDV Farms — Home"
+              className="hover:text-turmeric-300 transition-colors"
+            >
+              SDV Farms
+            </Link>
+          </h3>
           <p className="text-paddy-400 text-sm tracking-[0.25em] uppercase font-medium">Phase 1</p>
         </div>
 
