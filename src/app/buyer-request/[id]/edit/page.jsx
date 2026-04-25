@@ -107,15 +107,6 @@ export default function EditBuyerRequestPage() {
     <div className="min-h-screen px-4 py-12" style={{ background: bg }}>
       <div className="max-w-lg mx-auto">
         <div className="text-center mb-8">
-          <Link
-            href="/"
-            title="Home"
-            aria-label="SDV Farms — Home"
-            className="inline-flex items-center justify-center gap-2 text-white/90 hover:text-white mb-4 transition-colors"
-          >
-            <span className="text-2xl" aria-hidden>🌾</span>
-            <span className="font-display font-bold text-lg">SDV Farms</span>
-          </Link>
           <Link href="/dashboard" className="text-white/50 hover:text-white/70 text-sm transition-colors">
             ← Dashboard
           </Link>

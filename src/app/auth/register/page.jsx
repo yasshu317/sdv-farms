@@ -144,13 +144,8 @@ export default function RegisterPage() {
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link
-            href="/"
-            title="Home"
-            aria-label="SDV Farms — Home"
-            className="inline-flex items-center gap-2 text-white hover:text-turmeric-300 transition-colors rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-turmeric-400/60"
-          >
-            <span className="text-3xl" aria-hidden>🌾</span>
+          <Link href="/" className="inline-flex items-center gap-2 text-white hover:text-turmeric-300 transition-colors">
+            <span className="text-3xl">🌾</span>
             <span className="font-display text-2xl font-bold">SDV Farms</span>
           </Link>
           <p className="text-white/50 text-sm mt-2">

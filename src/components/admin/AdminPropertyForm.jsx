@@ -304,12 +304,8 @@ export default function AdminPropertyForm({ mode, propertyId, initialForm }) {
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4">
       <div className="max-w-xl mx-auto">
-        <div className="mb-6 flex flex-wrap items-center gap-3 text-sm">
-          <Link href="/" className="text-paddy-700 hover:text-paddy-900 font-medium transition-colors" title="Home">
-            🌾 SDV Farms
-          </Link>
-          <span className="text-gray-300">·</span>
-          <Link href="/admin" className="text-gray-400 hover:text-gray-600 transition-colors">
+        <div className="mb-6 flex items-center gap-3">
+          <Link href="/admin" className="text-gray-400 hover:text-gray-600 text-sm transition-colors">
             ← Admin
           </Link>
           <span className="text-gray-300">/</span>
