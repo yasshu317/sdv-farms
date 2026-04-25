@@ -16,9 +16,12 @@ export default function PropertyDetailClient({ property: p, user, initialWishlis
 
   const photos = p.photo_urls?.filter(Boolean) || []
   const totalPrice = (p.area_acres * p.expected_price).toLocaleString('en-IN')
+  const accountRole = (user?.role || 'buyer').toLowerCase()
+  const isOwner     = user && p.seller_id === user.id
 
   async function handleWishlist() {
     if (!user) { router.push('/auth/login'); return }
+    if (isOwner) return
     setWishlistLoading(true)
     const supabase = createClient()
 
@@ -113,48 +116,84 @@ export default function PropertyDetailClient({ property: p, user, initialWishlis
           {/* Right — Pricing + Actions */}
           <div className="lg:col-span-2">
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6 sticky top-6">
+              {user && (
+                <p className="text-white/45 text-xs mb-4">
+                  <span className="text-white/60">You’re signed in</span>
+                  {' · '}
+                  <span className="text-turmeric-400/90 capitalize">{accountRole}</span>
+                  {isOwner && (
+                    <span className="block mt-1.5 text-turmeric-300/95 font-medium">This listing is yours (seller view)</span>
+                  )}
+                </p>
+              )}
+
               <div className="mb-5">
                 <p className="text-white/50 text-xs mb-1">Total Price</p>
                 <p className="text-turmeric-400 font-bold text-3xl">₹{totalPrice}</p>
                 <p className="text-white/40 text-sm mt-0.5">₹{Number(p.expected_price).toLocaleString('en-IN')} per acre</p>
               </div>
 
-              <div className="space-y-3">
-                <button
-                  onClick={() => { if (!user) router.push('/auth/login'); else setShowPicker(s => !s) }}
-                  className="w-full bg-turmeric-500 hover:bg-turmeric-600 text-white font-semibold py-3 rounded-xl transition-colors"
-                >
-                  📅 Book a Site Visit
-                </button>
-                <button
-                  onClick={handleWishlist}
-                  disabled={wishlistLoading}
-                  className={`w-full py-3 rounded-xl font-medium transition-all ${
-                    wishlisted
-                      ? 'bg-paddy-500/20 border border-paddy-400/40 text-paddy-300'
-                      : 'bg-white/10 hover:bg-white/15 text-white border border-white/15'
-                  }`}
-                >
-                  {wishlisted ? '♥ Saved' : '♡ Save Property'}
-                </button>
-              </div>
-
-              {!user && (
-                <p className="text-white/30 text-xs text-center mt-3">
-                  <Link href="/auth/login" className="text-turmeric-400 hover:text-turmeric-300">Sign in</Link> to save or book
-                </p>
-              )}
-
-              {showPicker && (
-                <div className="mt-5 pt-5 border-t border-white/10">
-                  <AppointmentPicker
-                    propertyId={p.id}
-                    type="buyer"
-                    userEmail={user?.email}
-                    onBooked={() => setShowPicker(false)}
-                    onCancel={() => setShowPicker(false)}
-                  />
+              {isOwner ? (
+                <div className="space-y-3">
+                  <p className="text-white/45 text-sm leading-relaxed">
+                    <strong className="text-white/80">Book a site visit</strong> is for <strong>buyers</strong> who want to see the land. Share this page with buyers, or open your listing to edit.
+                  </p>
+                  <Link
+                    href={`/seller/property/${p.id}/edit`}
+                    className="block w-full text-center bg-turmeric-500 hover:bg-turmeric-600 text-white font-semibold py-3 rounded-xl transition-colors"
+                  >
+                    Edit this listing
+                  </Link>
+                  <Link
+                    href="/seller"
+                    className="block w-full text-center bg-white/10 hover:bg-white/15 text-white font-medium py-3 rounded-xl border border-white/15 transition-colors"
+                  >
+                    Seller dashboard
+                  </Link>
                 </div>
+              ) : (
+                <>
+                  <p className="text-white/40 text-xs mb-3 leading-relaxed">
+                    <strong className="text-white/60">For buyers:</strong> book a time to visit this land. SDV Farms coordinates with the listing owner and confirms with you.
+                  </p>
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => { if (!user) router.push('/auth/login'); else setShowPicker(s => !s) }}
+                      className="w-full bg-turmeric-500 hover:bg-turmeric-600 text-white font-semibold py-3 rounded-xl transition-colors"
+                    >
+                      📅 Book a Site Visit
+                    </button>
+                    <button
+                      onClick={handleWishlist}
+                      disabled={wishlistLoading}
+                      className={`w-full py-3 rounded-xl font-medium transition-all ${
+                        wishlisted
+                          ? 'bg-paddy-500/20 border border-paddy-400/40 text-paddy-300'
+                          : 'bg-white/10 hover:bg-white/15 text-white border border-white/15'
+                      }`}
+                    >
+                      {wishlisted ? '♥ Saved' : '♡ Save Property'}
+                    </button>
+                  </div>
+
+                  {!user && (
+                    <p className="text-white/30 text-xs text-center mt-3">
+                      <Link href="/auth/login" className="text-turmeric-400 hover:text-turmeric-300">Sign in</Link> to save or book
+                    </p>
+                  )}
+
+                  {showPicker && user && (
+                    <div className="mt-5 pt-5 border-t border-white/10">
+                      <AppointmentPicker
+                        propertyId={p.id}
+                        type="buyer"
+                        userEmail={user?.email}
+                        onBooked={() => setShowPicker(false)}
+                        onCancel={() => setShowPicker(false)}
+                      />
+                    </div>
+                  )}
+                </>
               )}
 
               <div className="mt-5 pt-4 border-t border-white/8 text-center">
