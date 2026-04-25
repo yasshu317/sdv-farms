@@ -35,9 +35,10 @@ export default function Navbar() {
   }
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 80)
-    onScroll() // run once on mount in case page loads mid-scroll
-    window.addEventListener('scroll', onScroll)
+    // Solid bar as soon as user leaves the hero — avoids see-through "mud" over dark sections
+    const onScroll = () => setScrolled(window.scrollY > 32)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
@@ -54,8 +55,8 @@ export default function Navbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-white/96 backdrop-blur-md shadow-sm border-b border-turmeric-100'
-          : 'bg-gradient-to-b from-black/50 to-transparent backdrop-blur-none'
+          ? 'bg-cream border-b border-paddy-200/90 shadow-[0_4px_20px_rgba(10,30,10,0.12)]'
+          : 'bg-gradient-to-b from-black/50 to-transparent'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -67,7 +68,7 @@ export default function Navbar() {
             title="Home"
             className={`flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-opacity hover:opacity-90 ${
               scrolled
-                ? 'text-paddy-900 focus-visible:ring-paddy-500 focus-visible:ring-offset-white'
+                ? 'text-paddy-950 focus-visible:ring-paddy-500 focus-visible:ring-offset-cream'
                 : 'text-white focus-visible:ring-white/70 focus-visible:ring-offset-transparent'
             }`}
           >
@@ -84,8 +85,8 @@ export default function Navbar() {
                 smooth
                 duration={500}
                 offset={-64}
-                className={`cursor-pointer text-sm font-medium transition-colors hover:text-turmeric-500 ${
-                  scrolled ? 'text-gray-700' : 'text-white/85'
+                className={`cursor-pointer text-sm font-medium transition-colors hover:text-turmeric-600 ${
+                  scrolled ? 'text-paddy-900' : 'text-white/90'
                 } ${lang === 'te' ? 'telugu text-xs' : ''}`}
               >
                 {l.label}
@@ -95,9 +96,9 @@ export default function Navbar() {
             {/* Language toggle */}
             <button
               onClick={toggle}
-              className={`text-xs font-semibold border rounded-full px-3 py-1.5 transition-all ${
+              className={`text-xs font-semibold border-2 rounded-full px-3 py-1.5 transition-all ${
                 scrolled
-                  ? 'border-paddy-600 text-paddy-700 hover:bg-paddy-600 hover:text-white'
+                  ? 'border-paddy-600 bg-white text-paddy-800 shadow-sm hover:bg-paddy-700 hover:text-white hover:border-paddy-700'
                   : 'border-white/40 text-white/90 hover:bg-white/15'
               }`}
             >
@@ -107,13 +108,13 @@ export default function Navbar() {
             {/* Properties & Services links */}
             <NextLink
               href="/properties"
-              className={`text-sm font-medium transition-colors hover:text-turmeric-500 ${scrolled ? 'text-gray-700' : 'text-white/85'} ${lang === 'te' ? 'telugu text-xs' : ''}`}
+              className={`text-sm font-medium transition-colors hover:text-turmeric-600 ${scrolled ? 'text-paddy-900' : 'text-white/90'} ${lang === 'te' ? 'telugu text-xs' : ''}`}
             >
               {t.properties}
             </NextLink>
             <NextLink
               href="/services"
-              className={`text-sm font-medium transition-colors hover:text-turmeric-500 ${scrolled ? 'text-gray-700' : 'text-white/85'} ${lang === 'te' ? 'telugu text-xs' : ''}`}
+              className={`text-sm font-medium transition-colors hover:text-turmeric-600 ${scrolled ? 'text-paddy-900' : 'text-white/90'} ${lang === 'te' ? 'telugu text-xs' : ''}`}
             >
               {t.services}
             </NextLink>
@@ -123,7 +124,7 @@ export default function Navbar() {
                 <button
                   onClick={() => setUserMenu(m => !m)}
                   className={`flex items-center gap-2 text-sm font-medium border rounded-full px-3 py-1.5 transition-all ${
-                    scrolled ? 'border-paddy-300 text-paddy-800 hover:bg-paddy-50' : 'border-white/30 text-white hover:bg-white/10'
+                    scrolled ? 'border-paddy-400 bg-white text-paddy-900 shadow-sm hover:bg-paddy-50' : 'border-white/30 text-white hover:bg-white/10'
                   }`}
                 >
                   <User size={14} />
@@ -153,8 +154,8 @@ export default function Navbar() {
                 )}
               </div>
             ) : (
-              <NextLink href="/auth/login" className={`text-sm font-semibold border rounded-full px-3 py-1.5 transition-all ${
-                scrolled ? 'border-paddy-600 text-paddy-700 hover:bg-paddy-600 hover:text-white' : 'border-white/40 text-white/90 hover:bg-white/15'
+              <NextLink href="/auth/login" className={`text-sm font-semibold border-2 rounded-full px-3 py-1.5 transition-all ${
+                scrolled ? 'border-paddy-600 bg-white text-paddy-800 shadow-sm hover:bg-paddy-600 hover:text-white' : 'border-white/40 text-white/90 hover:bg-white/15'
               } ${lang === 'te' ? 'telugu' : ''}`}>
                 {t.signIn}
               </NextLink>
@@ -175,17 +176,17 @@ export default function Navbar() {
           <div className="flex md:hidden items-center gap-2">
             <button
               onClick={toggle}
-              className={`text-xs font-semibold border rounded-full px-2.5 py-1 ${
-                scrolled ? 'border-paddy-600 text-paddy-700' : 'border-white/40 text-white'
+              className={`text-xs font-semibold border-2 rounded-full px-2.5 py-1 ${
+                scrolled ? 'border-paddy-600 bg-white text-paddy-800 shadow-sm' : 'border-white/40 text-white'
               }`}
             >
               {lang === 'en' ? 'తె' : 'EN'}
             </button>
             <button onClick={() => setOpen(o => !o)}>
               {open ? (
-                <X className={scrolled ? 'text-gray-700' : 'text-white'} size={24} />
+                <X className={scrolled ? 'text-paddy-900' : 'text-white'} size={24} />
               ) : (
-                <Menu className={scrolled ? 'text-gray-700' : 'text-white'} size={24} />
+                <Menu className={scrolled ? 'text-paddy-900' : 'text-white'} size={24} />
               )}
             </button>
           </div>
