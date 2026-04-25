@@ -60,17 +60,20 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Brand */}
-          <div className="flex items-center gap-2">
-            <span className="text-lg mr-0.5">🌾</span>
-            <span
-              className={`font-display font-bold text-xl transition-colors ${
-                scrolled ? 'text-paddy-900' : 'text-white'
-              }`}
-            >
-              SDV Farms
-            </span>
-          </div>
+          {/* Brand — one place: main marketing header; click = home */}
+          <NextLink
+            href="/"
+            aria-label="SDV Farms — Home"
+            title="Home"
+            className={`flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-opacity hover:opacity-90 ${
+              scrolled
+                ? 'text-paddy-900 focus-visible:ring-paddy-500 focus-visible:ring-offset-white'
+                : 'text-white focus-visible:ring-white/70 focus-visible:ring-offset-transparent'
+            }`}
+          >
+            <span className="text-lg mr-0.5" aria-hidden>🌾</span>
+            <span className="font-display font-bold text-xl">SDV Farms</span>
+          </NextLink>
 
           {/* Desktop links */}
           <div className="hidden md:flex items-center gap-5">
