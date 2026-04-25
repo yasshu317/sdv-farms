@@ -51,33 +51,35 @@ export default function Navbar() {
     { to: 'location', label: t.contact },
   ]
 
+  // When scrolled, use a fully opaque light bar. Semi-transparent "cream/white" over dark
+  // page sections (Book a visit, etc.) tints to brown and dark nav text becomes unreadable.
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
         scrolled
-          ? 'bg-cream border-b border-paddy-200/90 shadow-[0_4px_20px_rgba(10,30,10,0.12)]'
-          : 'bg-gradient-to-b from-black/50 to-transparent'
+          ? 'border-b border-paddy-200/90 shadow-[0_4px_20px_rgba(10,30,10,0.1)] !bg-white'
+          : 'bg-gradient-to-b from-paddy-950/75 via-paddy-950/40 to-transparent'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 gap-3 min-w-0">
           {/* Brand — one place: main marketing header; click = home */}
           <NextLink
             href="/"
             aria-label="SDV Farms — Home"
             title="Home"
-            className={`flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-opacity hover:opacity-90 ${
+            className={`flex shrink-0 items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-opacity hover:opacity-90 ${
               scrolled
-                ? 'text-paddy-950 focus-visible:ring-paddy-500 focus-visible:ring-offset-cream'
-                : 'text-white focus-visible:ring-white/70 focus-visible:ring-offset-transparent'
+                ? 'text-paddy-900 focus-visible:ring-paddy-500 focus-visible:ring-offset-white'
+                : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)] focus-visible:ring-white/70'
             }`}
           >
             <span className="text-lg mr-0.5" aria-hidden>🌾</span>
-            <span className="font-display font-bold text-xl">SDV Farms</span>
+            <span className="font-display font-bold text-xl whitespace-nowrap">SDV Farms</span>
           </NextLink>
 
           {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-5">
+          <div className="hidden md:flex items-center gap-4 lg:gap-5 flex-1 min-w-0 justify-end flex-wrap">
             {links.map(l => (
               <Link
                 key={l.to}
@@ -85,8 +87,10 @@ export default function Navbar() {
                 smooth
                 duration={500}
                 offset={-64}
-                className={`cursor-pointer text-sm font-medium transition-colors hover:text-turmeric-600 ${
-                  scrolled ? 'text-paddy-900' : 'text-white/90'
+                className={`cursor-pointer text-sm font-medium transition-colors hover:text-turmeric-500 ${
+                  scrolled
+                    ? 'text-paddy-900'
+                    : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]'
                 } ${lang === 'te' ? 'telugu text-xs' : ''}`}
               >
                 {l.label}
@@ -108,13 +112,13 @@ export default function Navbar() {
             {/* Properties & Services links */}
             <NextLink
               href="/properties"
-              className={`text-sm font-medium transition-colors hover:text-turmeric-600 ${scrolled ? 'text-paddy-900' : 'text-white/90'} ${lang === 'te' ? 'telugu text-xs' : ''}`}
+              className={`text-sm font-medium transition-colors hover:text-turmeric-500 ${scrolled ? 'text-paddy-900' : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]'} ${lang === 'te' ? 'telugu text-xs' : ''}`}
             >
               {t.properties}
             </NextLink>
             <NextLink
               href="/services"
-              className={`text-sm font-medium transition-colors hover:text-turmeric-600 ${scrolled ? 'text-paddy-900' : 'text-white/90'} ${lang === 'te' ? 'telugu text-xs' : ''}`}
+              className={`text-sm font-medium transition-colors hover:text-turmeric-500 ${scrolled ? 'text-paddy-900' : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]'} ${lang === 'te' ? 'telugu text-xs' : ''}`}
             >
               {t.services}
             </NextLink>
