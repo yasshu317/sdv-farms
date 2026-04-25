@@ -36,7 +36,15 @@ export default function BuyerRequestPage() {
     return (
       <div className="min-h-screen flex items-center justify-center px-4" style={{ background: bg }}>
         <div className="text-center max-w-md">
-          <div className="text-5xl mb-4">🌾</div>
+          <Link
+            href="/"
+            title="Home"
+            aria-label="SDV Farms — Home"
+            className="inline-flex flex-col items-center gap-1 text-white/90 hover:text-white mb-5 transition-colors"
+          >
+            <span className="text-5xl" aria-hidden>🌾</span>
+            <span className="font-display font-semibold text-sm">SDV Farms</span>
+          </Link>
           <h2 className="text-white font-display text-2xl font-bold mb-3">Request Submitted!</h2>
           <p className="text-white/60 mb-6">
             Our team will review your requirements and get back to you within 48 hours.
@@ -56,6 +64,15 @@ export default function BuyerRequestPage() {
     <div className="min-h-screen px-4 py-12" style={{ background: bg }}>
       <div className="max-w-lg mx-auto">
         <div className="text-center mb-8">
+          <Link
+            href="/"
+            title="Home"
+            aria-label="SDV Farms — Home"
+            className="inline-flex items-center justify-center gap-2 text-white/90 hover:text-white mb-5 transition-colors"
+          >
+            <span className="text-2xl" aria-hidden>🌾</span>
+            <span className="font-display font-bold text-lg">SDV Farms</span>
+          </Link>
           <Link href="/properties" className="text-white/50 hover:text-white/70 text-sm transition-colors">
             ← Browse Properties
           </Link>

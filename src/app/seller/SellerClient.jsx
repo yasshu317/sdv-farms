@@ -41,9 +41,17 @@ export default function SellerClient({ user, properties, appointments }) {
       {/* Header */}
       <div className="border-b border-white/8 px-4 sm:px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="text-2xl">🌾</Link>
-            <div>
+          <div className="flex items-center gap-3 min-w-0">
+            <Link
+              href="/"
+              title="Home"
+              aria-label="SDV Farms — Home"
+              className="flex items-center gap-2 shrink-0 text-white hover:text-turmeric-200 transition-colors rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+            >
+              <span className="text-2xl" aria-hidden>🌾</span>
+              <span className="font-display font-bold text-lg hidden sm:inline">SDV Farms</span>
+            </Link>
+            <div className="min-w-0">
               <p className="text-white font-semibold text-sm">{user.full_name}</p>
               <p className="text-white/40 text-xs capitalize">{user.seller_type || 'Seller'} · {user.email}</p>
             </div>

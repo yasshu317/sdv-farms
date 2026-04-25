@@ -104,7 +104,16 @@ export default function ServicesPage() {
 
       {/* Hero */}
       <div className="border-b border-white/8 px-4 sm:px-6 py-12 text-center">
-        <Link href="/" className="text-white/50 hover:text-white/70 text-sm transition-colors">← SDV Farms</Link>
+        <Link
+          href="/"
+          title="Home"
+          aria-label="SDV Farms — Home"
+          className="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm font-medium transition-colors"
+        >
+          <span aria-hidden>🌾</span>
+          <span className="font-display font-semibold">SDV Farms</span>
+          <span className="text-white/45 font-normal">· Home</span>
+        </Link>
         <h1 className="text-white font-display text-3xl sm:text-4xl font-bold mt-4 mb-3">{t.heading}</h1>
         <p className={`text-white/60 max-w-xl mx-auto ${lang === 'te' ? 'telugu' : ''}`}>{t.subheading}</p>
       </div>

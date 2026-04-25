@@ -113,7 +113,16 @@ export default function PropertiesClient({ properties }) {
           style={{ backgroundImage: 'radial-gradient(circle, rgba(212,160,23,0.8) 1px, transparent 1px)', backgroundSize: '28px 28px' }}
         />
         <div className="relative max-w-6xl mx-auto">
-          <Link href="/" className="text-white/45 hover:text-white/70 text-sm transition-colors">← SDV Farms</Link>
+          <Link
+            href="/"
+            title="Home"
+            aria-label="SDV Farms — Home"
+            className="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm font-medium transition-colors"
+          >
+            <span aria-hidden>🌾</span>
+            <span className="font-display font-semibold">SDV Farms</span>
+            <span className="text-white/45 font-normal">· Home</span>
+          </Link>
           <h1 className="text-white font-display text-3xl sm:text-4xl font-bold mt-3 mb-2">
             Find Your Agricultural Land
           </h1>

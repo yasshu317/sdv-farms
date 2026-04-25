@@ -47,10 +47,21 @@ export default function PropertyDetailClient({ property: p, user, initialWishlis
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(160deg, #071709 0%, #0e2c13 50%, #071709 100%)' }}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-        {/* Back */}
-        <Link href="/properties" className="text-white/50 hover:text-white/70 text-sm transition-colors">
-          ← Back to Properties
-        </Link>
+        {/* Wayfinding */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+          <Link
+            href="/"
+            title="Home"
+            aria-label="SDV Farms — Home"
+            className="inline-flex items-center gap-1.5 text-white/80 hover:text-white font-medium transition-colors"
+          >
+            <span aria-hidden>🌾</span>
+            <span>Home</span>
+          </Link>
+          <Link href="/properties" className="text-white/50 hover:text-white/70 transition-colors">
+            ← All properties
+          </Link>
+        </div>
 
         <div className="mt-5 grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Left — Photos + Details */}

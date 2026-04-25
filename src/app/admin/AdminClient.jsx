@@ -170,8 +170,15 @@ export default function AdminClient({ enquiries: initial, profiles, plots: initi
       <header className="bg-paddy-900 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-xl">🌾</span>
-            <span className="font-display font-bold text-white text-lg">SDV Farms</span>
+            <NextLink
+              href="/"
+              aria-label="SDV Farms — Home"
+              title="Home"
+              className="flex items-center gap-2 text-white hover:text-turmeric-200 transition-colors rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+            >
+              <span className="text-xl" aria-hidden>🌾</span>
+              <span className="font-display font-bold text-white text-lg">SDV Farms</span>
+            </NextLink>
             <span className="bg-turmeric-500/20 text-turmeric-300 text-xs px-2 py-0.5 rounded-full font-medium border border-turmeric-500/30">
               Admin
             </span>
