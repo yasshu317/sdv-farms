@@ -55,7 +55,9 @@ test.describe('Buyer Land Request Page', () => {
     await expect(mandalSelect).toBeVisible()
   })
 
-  test('has link back to browse properties', async ({ page }) => {
-    await expect(page.getByRole('link', { name: /browse properties/i })).toBeVisible()
+  test('has link to property listings (breadcrumb or main nav)', async ({ page }) => {
+    const listingsCrumb = page.getByRole('link', { name: /^Listings$/ })
+    const navProperties = page.locator('header').getByRole('link', { name: /properties|ఆస్తులు/i })
+    await expect(listingsCrumb.or(navProperties).first()).toBeVisible()
   })
 })

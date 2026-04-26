@@ -3,6 +3,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import SiteHeader from '../../../components/SiteHeader'
 import { createClient } from '../../../lib/supabase'
 import StatusBadge from '../../../components/ui/StatusBadge'
 import AppointmentPicker from '../../../components/AppointmentPicker'
@@ -49,11 +50,15 @@ export default function PropertyDetailClient({ property: p, user, initialWishlis
 
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(160deg, #071709 0%, #0e2c13 50%, #071709 100%)' }}>
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-        {/* Back */}
-        <Link href="/properties" className="text-white/50 hover:text-white/70 text-sm transition-colors">
-          ← Back to Properties
-        </Link>
+      <SiteHeader active="properties" />
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <nav className="text-white/45 text-xs mb-4" aria-label="Breadcrumb">
+          <Link href="/" className="hover:text-white/70 transition-colors">Home</Link>
+          <span className="mx-1.5">·</span>
+          <Link href="/properties" className="hover:text-white/70 transition-colors">Listings</Link>
+          <span className="mx-1.5">·</span>
+          <span className="text-white/60">{p.property_id || 'Property'}</span>
+        </nav>
 
         <div className="mt-5 grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Left — Photos + Details */}

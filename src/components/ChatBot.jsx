@@ -249,7 +249,11 @@ export default function ChatBot() {
               <button
                 key={i}
                 type="button"
-                data-testid={`menu-action-${item.action ?? item.link?.replace(/[^a-z]/gi, '-') ?? i}`}
+                data-testid={
+                  item.link === '/properties'
+                    ? 'menu-browse-properties'
+                    : `menu-action-${item.action ?? item.link?.replace(/[^a-z]/gi, '-') ?? i}`
+                }
                 onClick={() => {
                   if (item.action === 'chat') {
                     setMode('chat')

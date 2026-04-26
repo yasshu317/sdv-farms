@@ -51,8 +51,8 @@ test.describe('Properties Browse Page', () => {
     expect(hasEither).toBe(true)
   })
 
-  test('navigates back to home via SDV Farms link', async ({ page }) => {
-    await page.getByRole('link', { name: '← SDV Farms' }).click()
+  test('navigates back to home via site header or breadcrumb', async ({ page }) => {
+    await page.locator('header').getByRole('link', { name: /SDV Farms/ }).click()
     await expect(page).toHaveURL('/')
   })
 })

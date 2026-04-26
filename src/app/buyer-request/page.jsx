@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import SiteHeader from '../../components/SiteHeader'
 import { createClient } from '../../lib/supabase'
 import BuyerLandRequestForm from '../../components/buyer/BuyerLandRequestForm'
 
@@ -34,7 +35,9 @@ export default function BuyerRequestPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4" style={{ background: bg }}>
+      <div className="min-h-screen flex flex-col" style={{ background: bg }}>
+        <SiteHeader active="buyer-request" />
+        <div className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="text-center max-w-md">
           <div className="text-5xl mb-4">🌾</div>
           <h2 className="text-white font-display text-2xl font-bold mb-3">Request Submitted!</h2>
@@ -48,17 +51,24 @@ export default function BuyerRequestPage() {
             Browse Available Properties →
           </Link>
         </div>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen px-4 py-12" style={{ background: bg }}>
+    <div className="min-h-screen" style={{ background: bg }}>
+      <SiteHeader active="buyer-request" />
+      <div className="px-4 py-8 sm:py-12">
       <div className="max-w-lg mx-auto">
         <div className="text-center mb-8">
-          <Link href="/properties" className="text-white/50 hover:text-white/70 text-sm transition-colors">
-            ← Browse Properties
-          </Link>
+          <p className="text-white/40 text-xs">
+            <Link href="/" className="hover:text-white/60 transition-colors">Home</Link>
+            <span className="mx-1.5">·</span>
+            <Link href="/properties" className="hover:text-white/60 transition-colors">Listings</Link>
+            <span className="mx-1.5">·</span>
+            <span className="text-white/55">Request</span>
+          </p>
           <h1 className="text-white font-display text-2xl font-bold mt-3">Post a Land Request</h1>
           <p className="text-white/50 text-sm mt-1">Tell us what you&apos;re looking for — we&apos;ll find a match</p>
         </div>
@@ -66,6 +76,7 @@ export default function BuyerRequestPage() {
         <div className="bg-white/8 backdrop-blur-sm border border-white/15 rounded-3xl p-8">
           <BuyerLandRequestForm submitLabel="Submit Request" onSubmit={handleCreate} />
         </div>
+      </div>
       </div>
     </div>
   )

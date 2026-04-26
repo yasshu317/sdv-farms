@@ -2,6 +2,7 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import SiteHeader from '../../components/SiteHeader'
 import FilterPanel from '../../components/ui/FilterPanel'
 import locations from '../../data/locations.json'
 
@@ -102,6 +103,7 @@ export default function PropertiesClient({ properties }) {
 
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(160deg, #071709 0%, #0e2c13 50%, #071709 100%)' }}>
+      <SiteHeader active="properties" />
 
       {/* Hero banner */}
       <div
@@ -113,7 +115,11 @@ export default function PropertiesClient({ properties }) {
           style={{ backgroundImage: 'radial-gradient(circle, rgba(212,160,23,0.8) 1px, transparent 1px)', backgroundSize: '28px 28px' }}
         />
         <div className="relative max-w-6xl mx-auto">
-          <Link href="/" className="text-white/45 hover:text-white/70 text-sm transition-colors">← SDV Farms</Link>
+          <p className="text-white/40 text-xs">
+            <Link href="/" className="hover:text-white/60 transition-colors">Home</Link>
+            <span className="mx-1.5">·</span>
+            <span className="text-white/55">Listings</span>
+          </p>
           <h1 className="text-white font-display text-3xl sm:text-4xl font-bold mt-3 mb-2">
             Find Your Agricultural Land
           </h1>

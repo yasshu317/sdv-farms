@@ -78,8 +78,34 @@ export default function Navbar() {
             <span className="font-display font-bold text-xl whitespace-nowrap">SDV Farms</span>
           </NextLink>
 
-          {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-4 lg:gap-5 flex-1 min-w-0 justify-end flex-wrap">
+          {/* Desktop links — task routes first, then in-page sections */}
+          <div className="hidden md:flex items-center gap-3 lg:gap-4 flex-1 min-w-0 justify-end flex-wrap">
+            <NextLink
+              href="/properties"
+              className={`text-sm font-medium transition-colors hover:text-turmeric-500 ${scrolled ? 'text-paddy-900' : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]'} ${lang === 'te' ? 'telugu text-xs' : ''}`}
+            >
+              {t.properties}
+            </NextLink>
+            <NextLink
+              href="/services"
+              className={`text-sm font-medium transition-colors hover:text-turmeric-500 ${scrolled ? 'text-paddy-900' : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]'} ${lang === 'te' ? 'telugu text-xs' : ''}`}
+            >
+              {t.services}
+            </NextLink>
+            <NextLink
+              href="/buyer-request"
+              className={`text-sm font-medium transition-colors hover:text-turmeric-500 ${scrolled ? 'text-paddy-900' : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]'} ${lang === 'te' ? 'telugu text-xs' : ''}`}
+            >
+              {t.landRequest}
+            </NextLink>
+            <NextLink
+              href="/auth/register"
+              className={`text-sm font-medium transition-colors hover:text-turmeric-500 ${scrolled ? 'text-paddy-900' : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]'} ${lang === 'te' ? 'telugu text-xs' : ''}`}
+            >
+              {t.listLand}
+            </NextLink>
+            <span className={`hidden lg:inline w-px h-4 shrink-0 mx-0.5 ${scrolled ? 'bg-paddy-200' : 'bg-white/35'}`} aria-hidden />
+
             {links.map(l => (
               <Link
                 key={l.to}
@@ -108,20 +134,6 @@ export default function Navbar() {
             >
               {lang === 'en' ? 'తెలుగు' : 'English'}
             </button>
-
-            {/* Properties & Services links */}
-            <NextLink
-              href="/properties"
-              className={`text-sm font-medium transition-colors hover:text-turmeric-500 ${scrolled ? 'text-paddy-900' : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]'} ${lang === 'te' ? 'telugu text-xs' : ''}`}
-            >
-              {t.properties}
-            </NextLink>
-            <NextLink
-              href="/services"
-              className={`text-sm font-medium transition-colors hover:text-turmeric-500 ${scrolled ? 'text-paddy-900' : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]'} ${lang === 'te' ? 'telugu text-xs' : ''}`}
-            >
-              {t.services}
-            </NextLink>
 
             {user ? (
               <div className="relative">
@@ -200,6 +212,35 @@ export default function Navbar() {
       {/* Mobile drawer */}
       {open && (
         <div className="md:hidden bg-white border-t border-turmeric-100 shadow-lg px-4 pb-5 pt-2">
+          <NextLink
+            href="/properties"
+            onClick={() => setOpen(false)}
+            className={`block py-3 text-paddy-800 font-medium border-b border-gray-50 hover:text-turmeric-600 transition-colors ${lang === 'te' ? 'telugu' : ''}`}
+          >
+            {t.properties}
+          </NextLink>
+          <NextLink
+            href="/services"
+            onClick={() => setOpen(false)}
+            className={`block py-3 text-paddy-800 font-medium border-b border-gray-50 hover:text-turmeric-600 transition-colors ${lang === 'te' ? 'telugu' : ''}`}
+          >
+            {t.services}
+          </NextLink>
+          <NextLink
+            href="/buyer-request"
+            onClick={() => setOpen(false)}
+            className={`block py-3 text-paddy-800 font-medium border-b border-gray-50 hover:text-turmeric-600 transition-colors ${lang === 'te' ? 'telugu' : ''}`}
+          >
+            {t.landRequest}
+          </NextLink>
+          <NextLink
+            href="/auth/register"
+            onClick={() => setOpen(false)}
+            className={`block py-3 text-paddy-800 font-medium border-b border-gray-50 hover:text-turmeric-600 transition-colors ${lang === 'te' ? 'telugu' : ''}`}
+          >
+            {t.listLand}
+          </NextLink>
+          <div className="my-2 border-t border-gray-100" role="separator" />
           {links.map(l => (
             <Link
               key={l.to}
@@ -215,20 +256,6 @@ export default function Navbar() {
               {l.label}
             </Link>
           ))}
-          <NextLink
-            href="/properties"
-            onClick={() => setOpen(false)}
-            className={`block py-3 text-paddy-800 font-medium border-b border-gray-50 hover:text-turmeric-600 transition-colors ${lang === 'te' ? 'telugu' : ''}`}
-          >
-            {t.properties}
-          </NextLink>
-          <NextLink
-            href="/services"
-            onClick={() => setOpen(false)}
-            className={`block py-3 text-paddy-800 font-medium border-b border-gray-50 hover:text-turmeric-600 transition-colors ${lang === 'te' ? 'telugu' : ''}`}
-          >
-            {t.services}
-          </NextLink>
           {user ? (
             <div className="mt-4 space-y-2">
               <NextLink

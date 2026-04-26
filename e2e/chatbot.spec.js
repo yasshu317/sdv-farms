@@ -146,9 +146,8 @@ test.describe('ChatBot Widget', () => {
   test('menu "Browse Properties" navigates to /properties', async ({ page }) => {
     await gotoHome(page)
     await openMenu(page)
-    // item.link '/properties' → .replace(/[^a-z]/gi, '-') = '-properties' → menu-action--properties
-    // Use jsClick like launcher — dev overlay can swallow Playwright’s synthetic click
-    await jsClick(page, '[data-testid="menu-action--properties"]')
-    await expect(page).toHaveURL(/\/properties/, { timeout: 8000 })
+    // Stable test id (ChatBot: first menu item with link /properties)
+    await page.getByTestId('menu-browse-properties').click({ timeout: 10000 })
+    await expect(page).toHaveURL(/\/properties/, { timeout: 15000 })
   })
 })

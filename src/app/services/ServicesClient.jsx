@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import SiteHeader from '../../components/SiteHeader'
 import { useLang } from '../../context/LanguageContext'
 import { content } from '../../data/content'
 
@@ -101,11 +102,16 @@ export default function ServicesPage() {
 
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(160deg, #071709 0%, #0e2c13 50%, #071709 100%)' }}>
+      <SiteHeader active="services" />
 
       {/* Hero */}
       <div className="border-b border-white/8 px-4 sm:px-6 py-12 text-center">
-        <Link href="/" className="text-white/50 hover:text-white/70 text-sm transition-colors">← SDV Farms</Link>
-        <h1 className="text-white font-display text-3xl sm:text-4xl font-bold mt-4 mb-3">{t.heading}</h1>
+        <p className="text-white/40 text-xs mb-3">
+          <Link href="/" className="hover:text-white/60 transition-colors">Home</Link>
+          <span className="mx-1.5">·</span>
+          <span className="text-white/55">Services</span>
+        </p>
+        <h1 className="text-white font-display text-3xl sm:text-4xl font-bold mt-0 mb-3">{t.heading}</h1>
         <p className={`text-white/60 max-w-xl mx-auto ${lang === 'te' ? 'telugu' : ''}`}>{t.subheading}</p>
       </div>
 
