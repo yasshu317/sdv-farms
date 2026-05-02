@@ -75,9 +75,23 @@ export default function SiteHeader({ active: activeProp = null }) {
             <NextLink href="/properties" className={linkClass('properties')}>{t.properties}</NextLink>
             <NextLink href="/services" className={linkClass('services')}>{t.services}</NextLink>
             <NextLink href="/buyer-request" className={linkClass('buyer-request')}>{t.landRequest}</NextLink>
-            <NextLink href="/auth/register" className="text-sm font-medium text-white/75 hover:text-turmeric-300 transition-colors">
-              {t.listLand}
-            </NextLink>
+            {/* Show role-appropriate dashboard link when logged in, otherwise "List your land" */}
+            {user ? (
+              <NextLink
+                href={
+                  user.user_metadata?.role === 'admin'  ? '/admin'     :
+                  user.user_metadata?.role === 'seller' ? '/seller'    : '/dashboard'
+                }
+                className="text-sm font-semibold bg-turmeric-500/20 border border-turmeric-400/30 text-turmeric-300 hover:bg-turmeric-500/30 px-3 py-1 rounded-full transition-colors"
+              >
+                {user.user_metadata?.role === 'admin'  ? '⚙️ Admin'         :
+                 user.user_metadata?.role === 'seller' ? '🌾 My Listings'   : '🏡 My Dashboard'}
+              </NextLink>
+            ) : (
+              <NextLink href="/auth/register" className="text-sm font-medium text-white/75 hover:text-turmeric-300 transition-colors">
+                {t.listLand}
+              </NextLink>
+            )}
           </nav>
         </div>
 
@@ -169,9 +183,23 @@ export default function SiteHeader({ active: activeProp = null }) {
           <NextLink href="/buyer-request" onClick={() => setMobileOpen(false)} className={`block py-2.5 px-1 ${linkClass('buyer-request')}`}>
             {t.landRequest}
           </NextLink>
-          <NextLink href="/auth/register" onClick={() => setMobileOpen(false)} className="block py-2.5 px-1 text-sm font-medium text-white/80 hover:text-turmeric-300">
-            {t.listLand}
-          </NextLink>
+          {user ? (
+            <NextLink
+              href={
+                user.user_metadata?.role === 'admin'  ? '/admin'  :
+                user.user_metadata?.role === 'seller' ? '/seller' : '/dashboard'
+              }
+              onClick={() => setMobileOpen(false)}
+              className="block py-2.5 px-1 text-sm font-semibold text-turmeric-300"
+            >
+              {user.user_metadata?.role === 'admin'  ? '⚙️ Admin'        :
+               user.user_metadata?.role === 'seller' ? '🌾 My Listings'  : '🏡 My Dashboard'}
+            </NextLink>
+          ) : (
+            <NextLink href="/auth/register" onClick={() => setMobileOpen(false)} className="block py-2.5 px-1 text-sm font-medium text-white/80 hover:text-turmeric-300">
+              {t.listLand}
+            </NextLink>
+          )}
           {user ? (
             <>
               <NextLink
