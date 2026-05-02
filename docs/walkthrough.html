@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SDV Farms — Business Walkthrough</title>
+<style>
+  :root {
+    --green:  #1a4520;
+    --green2: #286d2f;
+    --gold:   #d4a017;
+    --gold2:  #f0b429;
+    --white:  #ffffff;
+    --gray:   #f5f5f4;
+    --text:   #1c1c1c;
+    --muted:  #6b7280;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--gray);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* ── Cover ── */
+  .cover {
+    background: linear-gradient(160deg, #071709 0%, var(--green) 60%, var(--green2) 100%);
+    color: var(--white);
+    padding: 64px 32px;
+    text-align: center;
+  }
+  .cover .badge {
+    display: inline-block;
+    background: rgba(212,160,23,.2);
+    border: 1px solid rgba(212,160,23,.4);
+    color: var(--gold2);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 99px;
+    margin-bottom: 20px;
+  }
+  .cover h1 { font-size: clamp(28px,5vw,48px); font-weight: 800; margin-bottom: 12px; }
+  .cover p  { color: rgba(255,255,255,.65); font-size: 17px; max-width: 520px; margin: 0 auto 32px; }
+  .cover .meta { display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; }
+  .cover .meta span { color: rgba(255,255,255,.5); font-size: 13px; }
+  .cover .meta strong { color: var(--gold2); }
+
+  /* ── Layout ── */
+  .wrap { max-width: 900px; margin: 0 auto; padding: 48px 24px; }
+
+  /* ── Section headers ── */
+  .section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--white);
+    border: 1px solid #e5e7eb;
+    border-radius: 99px;
+    padding: 4px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  h2 { font-size: 22px; font-weight: 800; margin-bottom: 6px; color: var(--text); }
+  .intro { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+
+  /* ── Role cards ── */
+  .roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 16px; margin-bottom: 56px; }
+  .role-card {
+    background: var(--white);
+    border: 1px solid #e5e7eb;
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    text-align: center;
+  }
+  .role-card .icon { font-size: 36px; margin-bottom: 10px; }
+  .role-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .role-card p  { font-size: 13px; color: var(--muted); }
+  .role-card .pill {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 99px;
+    padding: 3px 10px;
+  }
+  .pill-buyer  { background: #dcfce7; color: #166534; }
+  .pill-seller { background: #fef9c3; color: #854d0e; }
+  .pill-admin  { background: #ede9fe; color: #5b21b6; }
+
+  /* ── Journey ── */
+  .journey { margin-bottom: 56px; }
+  .journey-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    color: var(--white);
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .jh-buyer  { background: linear-gradient(90deg, #166534, #22c55e22); background-color:#15803d; }
+  .jh-seller { background: linear-gradient(90deg, #854d0e, #f59e0b22); background-color:#92400e; }
+  .jh-admin  { background: linear-gradient(90deg, #4c1d95, #8b5cf622); background-color:#5b21b6; }
+  .journey-body {
+    background: var(--white);
+    border: 1px solid #e5e7eb;
+    border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
+    overflow: hidden;
+  }
+  .step {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 16px;
+    padding: 14px 20px;
+    border-bottom: 1px solid #f3f4f6;
+    align-items: start;
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: var(--white);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .num-buyer  { background: #15803d; }
+  .num-seller { background: #92400e; }
+  .num-admin  { background: #5b21b6; }
+  .step-title { font-weight: 600; font-size: 14px; }
+  .step-desc  { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .step-url   {
+    display: inline-block; margin-top: 4px;
+    font-size: 11px; font-family: monospace;
+    background: #f3f4f6; color: #374151;
+    padding: 2px 7px; border-radius: 4px;
+  }
+
+  /* ── Stats bar ── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+    gap: 12px;
+    margin-bottom: 56px;
+  }
+  .stat-card {
+    background: var(--white);
+    border: 1px solid #e5e7eb;
+    border-radius: var(--radius);
+    padding: 20px 16px;
+    text-align: center;
+  }
+  .stat-val  { font-size: 28px; font-weight: 800; color: var(--green); }
+  .stat-label{ font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* ── Feature table ── */
+  table { width: 100%; border-collapse: collapse; background: var(--white); border-radius: var(--radius); overflow: hidden; border: 1px solid #e5e7eb; margin-bottom: 56px; }
+  th { background: #f9fafb; text-align: left; padding: 10px 16px; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); border-bottom: 1px solid #e5e7eb; }
+  td { padding: 11px 16px; font-size: 13px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .tick { color: #16a34a; font-weight: 700; }
+  .soon { color: #d97706; }
+
+  /* ── URL reference ── */
+  .pages { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 10px; margin-bottom: 56px; }
+  .page-row {
+    background: var(--white);
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  }
+  .page-row .name { font-size: 13px; font-weight: 600; }
+  .page-row .url  { font-size: 11px; font-family: monospace; color: var(--muted); }
+  .page-row .who  { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+  /* ── Footer ── */
+  footer {
+    background: var(--green);
+    color: rgba(255,255,255,.7);
+    text-align: center;
+    padding: 32px 24px;
+    font-size: 13px;
+  }
+  footer strong { color: var(--gold2); }
+  footer a { color: var(--gold2); text-decoration: none; }
+
+  @media print {
+    .cover { padding: 40px 24px; }
+    .wrap  { padding: 32px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ COVER ══════════════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="badge">🌾 SDV Farms · Business Walkthrough</div>
+  <h1>End-to-End Platform Guide</h1>
+  <p>How buyers, sellers, and admin use SDV Farms — from first visit to deal closed.</p>
+  <div class="meta">
+    <span>📅 <strong>May 2026</strong></span>
+    <span>🔗 <strong><a href="https://sdv-farms.vercel.app" style="color:inherit">sdv-farms.vercel.app</a></strong></span>
+    <span>📞 <strong>7780312525</strong></span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ══ WHO USES THE PLATFORM ═══════════════════════════════════════════ -->
+  <div class="section-label">👥 Who uses it</div>
+  <h2>Three types of users</h2>
+  <p class="intro">Every user picks their role at registration. The platform shows each user exactly what they need.</p>
+
+  <div class="roles">
+    <div class="role-card">
+      <div class="icon">🏡</div>
+      <h3>Buyer / Investor</h3>
+      <p>Browses listings, books site visits, tracks enquiries.</p>
+      <span class="pill pill-buyer">🏡 Buyer</span>
+    </div>
+    <div class="role-card">
+      <div class="icon">🌾</div>
+      <h3>Seller / Farmer</h3>
+      <p>Lists land for sale, uploads documents, monitors interest.</p>
+      <span class="pill pill-seller">🌾 Seller</span>
+    </div>
+    <div class="role-card">
+      <div class="icon">⚙️</div>
+      <h3>Admin (SDV Team)</h3>
+      <p>Reviews listings, approves, manages all leads and appointments.</p>
+      <span class="pill pill-admin">⚙️ Admin</span>
+    </div>
+  </div>
+
+  <!-- ══ BUYER JOURNEY ════════════════════════════════════════════════════ -->
+  <div class="journey">
+    <div class="journey-header jh-buyer">🏡 Buyer Journey — "I want to invest in agricultural land"</div>
+    <div class="journey-body">
+      <div class="step">
+        <div class="step-num num-buyer">1</div>
+        <div>
+          <div class="step-title">Lands on home page</div>
+          <div class="step-desc">Sees the hero, chatbot for quick questions, "How It Works" explained in 3 steps. Language toggle for Telugu.</div>
+          <span class="step-url">/</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num num-buyer">2</div>
+        <div>
+          <div class="step-title">Browses property listings</div>
+          <div class="step-desc">Filters by State, Soil Type, Area, and Price. Each card shows acreage, price/acre, and location.</div>
+          <span class="step-url">/properties</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num num-buyer">3</div>
+        <div>
+          <div class="step-title">Opens a property detail page</div>
+          <div class="step-desc">Photo gallery, full land details, document type, road access, SDV-verified badge.</div>
+          <span class="step-url">/properties/{id}</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num num-buyer">4</div>
+        <div>
+          <div class="step-title">Books a site visit</div>
+          <div class="step-desc">Picks a date and 1-hour time slot (minimum 2-hour notice). Receives email confirmation with property and slot details.</div>
+          <span class="step-url">Appointment picker on detail page</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num num-buyer">5</div>
+        <div>
+          <div class="step-title">Registers &amp; tracks (optional)</div>
+          <div class="step-desc">Creates a Buyer account. Dashboard shows all enquiries, plot interests, and their current "journey" (Registered → Enquired → Site Visit → Booked).</div>
+          <span class="step-url">/dashboard</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num num-buyer">6</div>
+        <div>
+          <div class="step-title">Can't find what they want?</div>
+          <div class="step-desc">Posts a land request — state, district, budget, area preference. Admin matches them with a suitable listing.</div>
+          <span class="step-url">/buyer-request</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SELLER JOURNEY ════════════════════════════════════════════════════ -->
+  <div class="journey">
+    <div class="journey-header jh-seller">🌾 Seller Journey — "I have land to sell"</div>
+    <div class="journey-body">
+      <div class="step">
+        <div class="step-num num-seller">1</div>
+        <div>
+          <div class="step-title">Registers as Seller</div>
+          <div class="step-desc">Chooses "Sell Land" → eligibility check (Government / Poramboke / Forest land is blocked with a clear message) → selects Farmer or Agent.</div>
+          <span class="step-url">/auth/register</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num num-seller">2</div>
+        <div>
+          <div class="step-title">Clicks "+ Add Property"</div>
+          <div class="step-desc">3-step form: <strong>Step 1</strong> — State, District, Mandal, Village. <strong>Step 2</strong> — Land type, soil type, area, price/acre, road access. <strong>Step 3</strong> — Upload Pahani / ROR-1B / Adangal (Submit button disabled until document is attached).</div>
+          <span class="step-url">/seller/property/new</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num num-seller">3</div>
+        <div>
+          <div class="step-title">Listing is "Pending Review"</div>
+          <div class="step-desc">SDV team reviews within 24 hours. Seller sees status clearly in their dashboard.</div>
+          <span class="step-url">/seller</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num num-seller">4</div>
+        <div>
+          <div class="step-title">Admin approves → listing goes live</div>
+          <div class="step-desc">Auto-assigned SDV-YYYY-NNN property ID. Seller receives email. Listing is now public on /properties.</div>
+          <span class="step-url">Status: Approved</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num num-seller">5</div>
+        <div>
+          <div class="step-title">Tracks performance</div>
+          <div class="step-desc">Sees view count, buyer enquiries, upcoming site visit appointments. Can edit the listing or add another (up to 2 active listings).</div>
+          <span class="step-url">/seller</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ADMIN JOURNEY ═════════════════════════════════════════════════════ -->
+  <div class="journey">
+    <div class="journey-header jh-admin">⚙️ Admin Journey — "SDV team managing the platform"</div>
+    <div class="journey-body">
+      <div class="step">
+        <div class="step-num num-admin">1</div>
+        <div>
+          <div class="step-title">Logs in → Admin Panel</div>
+          <div class="step-desc">Automatically routed to the admin dashboard. Role badge visible in top-right corner.</div>
+          <span class="step-url">/admin</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num num-admin">2</div>
+        <div>
+          <div class="step-title">Reviews &amp; approves property listings</div>
+          <div class="step-desc">Properties tab: view submitted listings with all documents. Click Approve → system assigns SDV ID and notifies seller. Click Reject → listing is removed.</div>
+          <span class="step-url">Admin → Properties</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num num-admin">3</div>
+        <div>
+          <div class="step-title">Manages enquiries &amp; leads</div>
+          <div class="step-desc">Updates each lead status: Pending → Contacted → Site Visited → Booked → Closed.</div>
+          <span class="step-url">Admin → Enquiries</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num num-admin">4</div>
+        <div>
+          <div class="step-title">Manages site visit appointments</div>
+          <div class="step-desc">Sees all booked slots. Can confirm or cancel. Buyer and seller both receive email on update.</div>
+          <span class="step-url">Admin → Appointments</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num num-admin">5</div>
+        <div>
+          <div class="step-title">Matches buyer land requests</div>
+          <div class="step-desc">Reviews open buyer requests (state, budget, area), matches them to a listing, marks as Matched or Closed.</div>
+          <span class="step-url">Admin → Requests</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PLATFORM STATS ═══════════════════════════════════════════════════ -->
+  <div class="section-label">📊 Platform stats</div>
+  <h2>What's built &amp; tested</h2>
+  <p class="intro">Every feature is covered by automated tests that run before every deployment.</p>
+
+  <div class="stats">
+    <div class="stat-card"><div class="stat-val">3</div><div class="stat-label">States covered (TS · AP · KA)</div></div>
+    <div class="stat-card"><div class="stat-val">2</div><div class="stat-label">Languages (EN + Telugu)</div></div>
+    <div class="stat-card"><div class="stat-val">121</div><div class="stat-label">Unit tests passing</div></div>
+    <div class="stat-card"><div class="stat-val">68</div><div class="stat-label">E2E browser tests</div></div>
+    <div class="stat-card"><div class="stat-val">₹0</div><div class="stat-label">Monthly server cost</div></div>
+    <div class="stat-card"><div class="stat-val">24h</div><div class="stat-label">Listing review SLA</div></div>
+  </div>
+
+  <!-- ══ FEATURES TABLE ════════════════════════════════════════════════════ -->
+  <div class="section-label">✅ Features</div>
+  <h2>What's live today</h2>
+  <p class="intro">All features below are live on <strong>sdv-farms.vercel.app</strong>.</p>
+
+  <table>
+    <thead>
+      <tr><th>Feature</th><th>Who benefits</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Bilingual UI — English &amp; Telugu toggle</td><td>Everyone</td><td class="tick">✓ Live</td></tr>
+      <tr><td>Property listings with filters (state, soil, area, price)</td><td>Buyers</td><td class="tick">✓ Live</td></tr>
+      <tr><td>Property detail page with photo gallery</td><td>Buyers</td><td class="tick">✓ Live</td></tr>
+      <tr><td>Site visit booking — date &amp; time slot</td><td>Buyers</td><td class="tick">✓ Live</td></tr>
+      <tr><td>Buyer dashboard — journey tracker, enquiries</td><td>Buyers</td><td class="tick">✓ Live</td></tr>
+      <tr><td>Buyer land request form</td><td>Buyers</td><td class="tick">✓ Live</td></tr>
+      <tr><td>Seller registration with land eligibility check</td><td>Sellers</td><td class="tick">✓ Live</td></tr>
+      <tr><td>3-step property listing form (doc upload required)</td><td>Sellers</td><td class="tick">✓ Live</td></tr>
+      <tr><td>Seller dashboard — listings, views, appointments</td><td>Sellers</td><td class="tick">✓ Live</td></tr>
+      <tr><td>Admin — approve/reject listings, assign SDV IDs</td><td>Admin</td><td class="tick">✓ Live</td></tr>
+      <tr><td>Admin — manage appointments, leads, buyer requests</td><td>Admin</td><td class="tick">✓ Live</td></tr>
+      <tr><td>Auto email confirmations (appointments, approvals)</td><td>All</td><td class="tick">✓ Live</td></tr>
+      <tr><td>Role badge visible in account menu on every page</td><td>All</td><td class="tick">✓ Live</td></tr>
+      <tr><td>AI Chatbot — instant FAQ + quick actions</td><td>Everyone</td><td class="tick">✓ Live</td></tr>
+      <tr><td>Services page — Phase II catalog</td><td>Buyers</td><td class="tick">✓ Live</td></tr>
+      <tr><td>Mobile-first, installable PWA</td><td>Everyone</td><td class="tick">✓ Live</td></tr>
+      <tr><td>Phase III services — security, farmhouse, crops</td><td>Buyers</td><td class="soon">⏳ Coming soon</td></tr>
+      <tr><td>OTP / mobile verification</td><td>All</td><td class="soon">⏳ Phase 3</td></tr>
+      <tr><td>Online payment / advance booking fee</td><td>Buyers</td><td class="soon">⏳ Phase 3</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ══ PAGES QUICK REFERENCE ════════════════════════════════════════════ -->
+  <div class="section-label">🔗 Pages</div>
+  <h2>Quick URL reference</h2>
+  <p class="intro">Share these links directly with your team or clients.</p>
+
+  <div class="pages">
+    <div class="page-row"><div><div class="name">Home</div><div class="url">sdv-farms.vercel.app/</div></div><div class="who">Everyone</div></div>
+    <div class="page-row"><div><div class="name">Browse Listings</div><div class="url">/properties</div></div><div class="who">Everyone</div></div>
+    <div class="page-row"><div><div class="name">Services</div><div class="url">/services</div></div><div class="who">Everyone</div></div>
+    <div class="page-row"><div><div class="name">Land Request</div><div class="url">/buyer-request</div></div><div class="who">Buyers</div></div>
+    <div class="page-row"><div><div class="name">Register</div><div class="url">/auth/register</div></div><div class="who">New users</div></div>
+    <div class="page-row"><div><div class="name">Login</div><div class="url">/auth/login</div></div><div class="who">Returning users</div></div>
+    <div class="page-row"><div><div class="name">Buyer Dashboard</div><div class="url">/dashboard</div></div><div class="who">🏡 Buyers only</div></div>
+    <div class="page-row"><div><div class="name">Seller Dashboard</div><div class="url">/seller</div></div><div class="who">🌾 Sellers only</div></div>
+    <div class="page-row"><div><div class="name">Post New Property</div><div class="url">/seller/property/new</div></div><div class="who">🌾 Sellers only</div></div>
+    <div class="page-row"><div><div class="name">Admin Panel</div><div class="url">/admin</div></div><div class="who">⚙️ Admin only</div></div>
+  </div>
+
+</div><!-- /wrap -->
+
+<footer>
+  <p><strong>SDV Farms</strong> · Agricultural Land Marketplace · Telangana · Andhra Pradesh · Karnataka</p>
+  <p style="margin-top:8px">
+    📞 <a href="tel:7780312525">7780312525</a> &nbsp;·&nbsp;
+    ✉️ <a href="mailto:info@sdvfarms.in">info@sdvfarms.in</a> &nbsp;·&nbsp;
+    🌐 <a href="https://sdv-farms.vercel.app">sdv-farms.vercel.app</a>
+  </p>
+  <p style="margin-top:8px; font-size:11px; opacity:.5">Prepared May 2026 · Confidential</p>
+</footer>
+
+</body>
+</html>

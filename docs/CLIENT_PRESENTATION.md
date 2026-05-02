@@ -2,7 +2,7 @@
 
 **Prepared for:** Client Review
 **Prepared by:** SDV Farms Development Team
-**Date:** March 2026
+**Date:** May 2026
 **Live URL:** https://sdv-farms.vercel.app
 **Version:** Phase 1 + Phase 2 (Marketplace)
 
@@ -53,7 +53,7 @@ The platform is:
 | 2. Eligibility check | Selects land type — Government/Poramboke/Forest blocked with clear message | Register page Step 2 |
 | 3. Farmer or Agent? | Selects sub-type | Register page Step 2 |
 | 4. Creates account | Standard email + password signup | Register page Step 3 |
-| 5. Clicks "Post Property" | 3-step form: Location → Land Details → Documents | [/seller/property/new](https://sdv-farms.vercel.app/seller/property/new) |
+| 5. Clicks "+ Add Property" | 3-step form: Location → Land Details → Documents (submit disabled until land doc is attached) | [/seller/property/new](https://sdv-farms.vercel.app/seller/property/new) |
 | 6. Step 1 — Location | State → District → Mandal → Village (cascading dropdowns) | Form Step 1 |
 | 7. Step 2 — Land details | Land type, soil type, document type, area, price/acre, road access | Form Step 2 |
 | 8. Step 3 — Upload docs | Pahani / Adangal / RTC photos (PDF or image, max 10MB) | Form Step 3 |
@@ -136,7 +136,7 @@ The platform is:
 | Chat widget | Built-in FAQ + quick replies (no AI API cost) |
 | Hosting | Vercel (free tier) |
 | Monthly cost | **₹0** — all free tiers |
-| Tests | 39 unit tests + 47 E2E browser tests |
+| Tests | 121 unit tests + 68 E2E browser tests |
 | CI/CD | GitHub Actions — tests run before every deploy |
 
 ---
