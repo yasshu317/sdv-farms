@@ -144,10 +144,19 @@ test.describe('ChatBot Widget', () => {
   })
 
   test('menu "Browse Properties" navigates to /properties', async ({ page }) => {
+    // Pre-warm the /properties route so Next.js dev server won't start compiling
+    // it mid-click (compilation triggers a blocking overlay that intercepts clicks).
+    await page.goto('/properties')
+    await page.waitForLoadState('domcontentloaded')
+
     await gotoHome(page)
     await openMenu(page)
-    // Stable test id (ChatBot: first menu item with link /properties)
-    await page.getByTestId('menu-browse-properties').click({ timeout: 10000 })
-    await expect(page).toHaveURL(/\/properties/, { timeout: 15000 })
+    // Menu item is now a NextLink <a href="/properties"> — Playwright can navigate it reliably.
+    const link = page.getByTestId('menu-browse-properties')
+    await link.waitFor({ state: 'visible', timeout: 10000 })
+    await Promise.all([
+      page.waitForURL(/\/properties/, { timeout: 20000 }),
+      link.click(),
+    ])
   })
 })

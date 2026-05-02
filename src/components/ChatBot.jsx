@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import NextLink from 'next/link'
 import { MessageCircle, X, Send, User } from 'lucide-react'
 import { content } from '../data/content.js'
 import { matchFAQ } from '../lib/chatbotFaq.js'
@@ -245,39 +246,60 @@ export default function ChatBot() {
           </div>
 
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 divide-y divide-gray-50">
-            {c.menuActions.map((item, i) => (
-              <button
-                key={i}
-                type="button"
-                data-testid={
-                  item.link === '/properties'
-                    ? 'menu-browse-properties'
-                    : `menu-action-${item.action ?? item.link?.replace(/[^a-z]/gi, '-') ?? i}`
-                }
-                onClick={() => {
-                  if (item.action === 'chat') {
-                    setMode('chat')
-                  } else if (item.link?.startsWith('tel:')) {
-                    window.location.href = item.link
-                  } else if (item.link?.startsWith('/#')) {
-                    setMode('closed')
-                    router.push(item.link)
-                  } else {
-                    setMode('closed')
-                    router.push(item.link)
-                  }
-                }}
-                className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-turmeric-50 active:bg-turmeric-100 transition-colors group"
-              >
-                <span className="text-xl w-8 text-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                  {item.icon}
-                </span>
-                <span className={`text-gray-800 text-sm font-medium flex-1 ${lang === 'te' ? 'telugu' : ''}`}>
-                  {item.label}
-                </span>
-                <span className="text-gray-300 group-hover:text-turmeric-400 transition-colors text-base">›</span>
-              </button>
-            ))}
+            {c.menuActions.map((item, i) => {
+              const testId = item.link === '/properties'
+                ? 'menu-browse-properties'
+                : `menu-action-${item.action ?? item.link?.replace(/[^a-z]/gi, '-') ?? i}`
+              const inner = (
+                <>
+                  <span className="text-xl w-8 text-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    {item.icon}
+                  </span>
+                  <span className={`text-gray-800 text-sm font-medium flex-1 ${lang === 'te' ? 'telugu' : ''}`}>
+                    {item.label}
+                  </span>
+                  <span className="text-gray-300 group-hover:text-turmeric-400 transition-colors text-base">›</span>
+                </>
+              )
+              const cls = 'w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-turmeric-50 active:bg-turmeric-100 transition-colors group'
+
+              // Render proper <a> for path links so browsers (and Playwright) handle
+              // navigation natively — no router.push required, no dev-overlay interference.
+              if (item.link && !item.link.startsWith('tel:') && !item.action) {
+                return (
+                  <NextLink
+                    key={i}
+                    href={item.link}
+                    data-testid={testId}
+                    onClick={() => setMode('closed')}
+                    className={cls}
+                  >
+                    {inner}
+                  </NextLink>
+                )
+              }
+
+              // Buttons for: chat action, tel: links, anything non-navigable
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  data-testid={testId}
+                  onClick={() => {
+                    if (item.action === 'chat') {
+                      setMode('chat')
+                    } else if (item.link?.startsWith('tel:')) {
+                      window.location.href = item.link
+                    } else {
+                      setMode('closed')
+                    }
+                  }}
+                  className={cls}
+                >
+                  {inner}
+                </button>
+              )
+            })}
           </div>
 
           <div className="mt-2 flex justify-center">
