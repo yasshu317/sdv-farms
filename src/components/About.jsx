@@ -37,7 +37,7 @@ export default function About() {
           {/* Text */}
           <div>
             <span className="inline-block text-terracotta-600 font-semibold text-xs uppercase tracking-[0.2em] mb-3">
-              Government Approved • Phase 1
+              Approved Agricultural Layout • Phase 1
             </span>
             <h2 className={`section-heading ${lang === 'te' ? 'telugu' : ''}`}>
               {t.heading}

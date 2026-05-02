@@ -1,6 +1,6 @@
 'use client'
 
-export default function StepForm({ steps, currentStep, children, onNext, onBack, onSubmit, loading, submitLabel = 'Submit' }) {
+export default function StepForm({ steps, currentStep, children, onNext, onBack, onSubmit, loading, submitLabel = 'Submit', canSubmit = true, canSubmitHint = '' }) {
   const total = steps.length
   const isLast = currentStep === total - 1
 
@@ -46,14 +46,19 @@ export default function StepForm({ steps, currentStep, children, onNext, onBack,
           </button>
         )}
         {isLast ? (
-          <button
-            type="button"
-            onClick={onSubmit}
-            disabled={loading}
-            className="flex-1 bg-turmeric-500 hover:bg-turmeric-600 disabled:opacity-60 text-white font-semibold py-3 rounded-xl transition-colors"
-          >
-            {loading ? 'Submitting…' : submitLabel}
-          </button>
+          <div className="flex-1">
+            <button
+              type="button"
+              onClick={onSubmit}
+              disabled={loading || !canSubmit}
+              className="w-full bg-turmeric-500 hover:bg-turmeric-600 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-colors"
+            >
+              {loading ? 'Submitting…' : submitLabel}
+            </button>
+            {!canSubmit && canSubmitHint && (
+              <p className="text-yellow-300/80 text-xs text-center mt-2">{canSubmitHint}</p>
+            )}
+          </div>
         ) : (
           <button
             type="button"

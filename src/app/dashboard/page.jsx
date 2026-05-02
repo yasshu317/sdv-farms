@@ -11,10 +11,15 @@ export default async function DashboardPage(props) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  // Fetch this user's enquiries
+  // Redirect wrong-role users to their actual home with an explanation banner
+  const role = user.user_metadata?.role
+  if (role === 'seller') redirect('/seller?redirected=1')
+  if (role === 'admin')  redirect('/admin?redirected=1')
+
+  // Fetch this user's enquiries, join property title for context
   const { data: enquiries } = await supabase
     .from('enquiries')
-    .select('*')
+    .select('*, properties(id, title, location)')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 

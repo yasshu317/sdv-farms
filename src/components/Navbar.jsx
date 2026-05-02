@@ -78,8 +78,8 @@ export default function Navbar() {
             <span className="font-display font-bold text-xl whitespace-nowrap">SDV Farms</span>
           </NextLink>
 
-          {/* Desktop links — task routes first, then in-page sections */}
-          <div className="hidden md:flex items-center gap-3 lg:gap-4 flex-1 min-w-0 justify-end flex-wrap">
+          {/* Desktop links — 4 task routes + language + account. No in-page scroll items. */}
+          <div className="hidden md:flex items-center gap-3 lg:gap-5 flex-1 min-w-0 justify-end">
             <NextLink
               href="/properties"
               className={`text-sm font-medium transition-colors hover:text-turmeric-500 ${scrolled ? 'text-paddy-900' : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]'} ${lang === 'te' ? 'telugu text-xs' : ''}`}
@@ -104,24 +104,6 @@ export default function Navbar() {
             >
               {t.listLand}
             </NextLink>
-            <span className={`hidden lg:inline w-px h-4 shrink-0 mx-0.5 ${scrolled ? 'bg-paddy-200' : 'bg-white/35'}`} aria-hidden />
-
-            {links.map(l => (
-              <Link
-                key={l.to}
-                to={l.to}
-                smooth
-                duration={500}
-                offset={-64}
-                className={`cursor-pointer text-sm font-medium transition-colors hover:text-turmeric-500 ${
-                  scrolled
-                    ? 'text-paddy-900'
-                    : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]'
-                } ${lang === 'te' ? 'telugu text-xs' : ''}`}
-              >
-                {l.label}
-              </Link>
-            ))}
 
             {/* Language toggle */}
             <button
@@ -147,7 +129,26 @@ export default function Navbar() {
                   <span className="max-w-[80px] truncate">{user.user_metadata?.full_name?.split(' ')[0] || 'Account'}</span>
                 </button>
                 {userMenu && (
-                  <div className="absolute right-0 top-10 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 w-48 z-50">
+                  <div className="absolute right-0 top-10 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 w-52 z-50">
+                    {/* Role identity header */}
+                    <div className="px-4 py-2.5 border-b border-gray-100">
+                      <p className="text-xs text-gray-400 mb-0.5">Signed in as</p>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-sm text-gray-800 truncate">
+                          {user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0]}
+                        </span>
+                        {user.user_metadata?.role && (
+                          <span className={`text-xs font-medium rounded-full px-2 py-0.5 capitalize shrink-0 ${
+                            user.user_metadata.role === 'admin'  ? 'bg-purple-100 text-purple-700' :
+                            user.user_metadata.role === 'seller' ? 'bg-turmeric-100 text-turmeric-700' :
+                            'bg-green-100 text-green-700'
+                          }`}>
+                            {user.user_metadata.role === 'admin' ? '⚙️ Admin' :
+                             user.user_metadata.role === 'seller' ? '🌾 Seller' : '🏡 Buyer'}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                     <NextLink
                       href={
                         user.user_metadata?.role === 'admin' ? '/admin' :
@@ -177,15 +178,6 @@ export default function Navbar() {
               </NextLink>
             )}
 
-            <Link
-              to="contact"
-              smooth
-              duration={500}
-              offset={-64}
-              className="btn-gold py-2 px-5 text-sm"
-            >
-              {t.bookVisit}
-            </Link>
           </div>
 
           {/* Mobile */}
@@ -241,6 +233,7 @@ export default function Navbar() {
             {t.listLand}
           </NextLink>
           <div className="my-2 border-t border-gray-100" role="separator" />
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-paddy-400 pt-1 pb-0.5 px-1">On this page</p>
           {links.map(l => (
             <Link
               key={l.to}
@@ -249,7 +242,7 @@ export default function Navbar() {
               duration={500}
               offset={-64}
               onClick={() => setOpen(false)}
-              className={`block py-3 text-paddy-800 font-medium border-b border-gray-50 cursor-pointer hover:text-turmeric-600 transition-colors ${
+              className={`block py-2.5 text-sm text-paddy-600 border-b border-gray-50 cursor-pointer hover:text-turmeric-600 transition-colors ${
                 lang === 'te' ? 'telugu' : ''
               }`}
             >
@@ -283,16 +276,6 @@ export default function Navbar() {
               {t.signInRegister}
             </NextLink>
           )}
-          <Link
-            to="contact"
-            smooth
-            duration={500}
-            offset={-64}
-            onClick={() => setOpen(false)}
-            className="btn-gold mt-3 text-sm text-center w-full block"
-          >
-            {t.bookVisit}
-          </Link>
         </div>
       )}
     </nav>

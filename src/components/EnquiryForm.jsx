@@ -87,7 +87,7 @@ export default function EnquiryForm() {
       <div className="relative max-w-2xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-10">
           <span className="inline-block text-turmeric-400 font-semibold text-xs uppercase tracking-[0.2em] mb-3">
-            Book a Visit
+            {lang === 'en' ? 'Talk to Our Team' : 'మాతో మాట్లాడండి'}
           </span>
           <h2 className={`font-display text-3xl md:text-4xl font-bold text-white mb-3 ${lang === 'te' ? 'telugu' : ''}`}>
             {t.heading}

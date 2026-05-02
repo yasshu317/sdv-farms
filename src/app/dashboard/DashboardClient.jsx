@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { createClient } from '../../lib/supabase'
 import { LogOut, Home, FileText, MapPin, Phone, CheckCircle, Clock, XCircle } from 'lucide-react'
 import EmailVerificationBanner from '../../components/EmailVerificationBanner'
+import RoleRedirectBanner from '../../components/RoleRedirectBanner'
 
 const STATUS_BADGE = {
   pending:   { label: 'Pending',   color: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
@@ -65,7 +66,12 @@ export default function DashboardClient({ user, enquiries, interests, landReques
             <div className="w-8 h-8 bg-paddy-700 rounded-full flex items-center justify-center text-white text-xs font-bold">
               {initials}
             </div>
-            <span className="text-sm text-gray-700 hidden sm:block font-medium">{name}</span>
+            <div className="hidden sm:flex flex-col items-start">
+              <span className="text-sm text-gray-700 font-medium leading-tight">{name}</span>
+              <span className="text-xs bg-green-100 text-green-700 font-medium rounded-full px-2 py-0.5 leading-tight mt-0.5">
+                🏡 Buyer
+              </span>
+            </div>
             <button
               onClick={handleLogout}
               className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-500 transition-colors ml-1"
@@ -78,6 +84,7 @@ export default function DashboardClient({ user, enquiries, interests, landReques
       </header>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+        <RoleRedirectBanner />
         <EmailVerificationBanner user={user} />
 
         {/* Welcome */}
@@ -147,11 +154,11 @@ export default function DashboardClient({ user, enquiries, interests, landReques
                     <p className="text-xs text-green-600">7780312525</p>
                   </div>
                 </a>
-                <Link href="/#contact" className="flex items-center gap-3 p-3 rounded-xl bg-turmeric-50 hover:bg-turmeric-100 transition-colors">
+                <Link href="/properties" className="flex items-center gap-3 p-3 rounded-xl bg-turmeric-50 hover:bg-turmeric-100 transition-colors">
                   <Home size={16} className="text-turmeric-600" />
                   <div>
-                    <p className="text-sm font-medium text-turmeric-800">Book a site visit</p>
-                    <p className="text-xs text-turmeric-600">Fill the enquiry form</p>
+                    <p className="text-sm font-medium text-turmeric-800">Browse &amp; book a site visit</p>
+                    <p className="text-xs text-turmeric-600">Pick a listing → book from its page</p>
                   </div>
                 </Link>
                 <Link href="/buyer-request" className="flex items-center gap-3 p-3 rounded-xl bg-blue-50 hover:bg-blue-100 transition-colors">
@@ -202,9 +209,9 @@ export default function DashboardClient({ user, enquiries, interests, landReques
               <div className="text-center py-16 text-gray-400">
                 <FileText size={32} className="mx-auto mb-3 opacity-40" />
                 <p className="font-medium">No enquiries yet</p>
-                <p className="text-sm mt-1">Fill the contact form on the home page to get started</p>
-                <Link href="/#contact" className="inline-block mt-4 text-sm text-turmeric-600 hover:underline">
-                  Make an enquiry →
+                <p className="text-sm mt-1">Browse a listing and enquire directly from its page</p>
+                <Link href="/properties" className="inline-block mt-4 text-sm text-turmeric-600 hover:underline font-medium">
+                  Browse listings →
                 </Link>
               </div>
             ) : (
@@ -212,8 +219,18 @@ export default function DashboardClient({ user, enquiries, interests, landReques
                 {enquiries.map(eq => (
                   <div key={eq.id} className="p-5 hover:bg-gray-50/50 transition-colors">
                     <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="font-medium text-gray-800 text-sm">{eq.message || 'General enquiry'}</p>
+                      <div className="min-w-0">
+                        {/* Property context if available */}
+                        {eq.properties?.title ? (
+                          <Link href={`/properties/${eq.property_id}`} className="text-xs font-semibold text-turmeric-600 hover:underline block mb-0.5">
+                            {eq.properties.title}
+                          </Link>
+                        ) : eq.property_id ? (
+                          <Link href={`/properties/${eq.property_id}`} className="text-xs font-semibold text-turmeric-600 hover:underline block mb-0.5">
+                            View property →
+                          </Link>
+                        ) : null}
+                        <p className="text-sm text-gray-700 line-clamp-2">{eq.message || 'General enquiry'}</p>
                         <p className="text-xs text-gray-400 mt-1">
                           {new Date(eq.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })}
                         </p>

@@ -68,8 +68,21 @@ export default function ServicesPage() {
   const [bookSuccess, setBookSuccess]   = useState(false)
   const [bookError, setBookError]       = useState('')
 
-  function handleNotify(e) {
+  async function handleNotify(e) {
     e.preventDefault()
+    try {
+      await fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: 'info@sdvfarms.in',
+          subject: 'Phase III Notify Me — SDV Farms',
+          html: `<p>A visitor wants to be notified when Phase III launches:</p><p><strong>${notifyEmail}</strong></p>`,
+        }),
+      })
+    } catch (_) {
+      // best-effort — show success regardless so UX isn't broken
+    }
     setNotifyDone(true)
   }
 

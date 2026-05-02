@@ -232,6 +232,8 @@ export default function SellerPropertyForm({ variant, propertyId, initialForm })
             onSubmit={handleSubmit}
             loading={loading}
             submitLabel={submitLabel}
+            canSubmit={Array.isArray(form.doc_urls) && form.doc_urls.length > 0}
+            canSubmitHint="Please upload at least one land document to submit"
           >
             {step === 0 && (
               <div className="space-y-4">
@@ -409,9 +411,16 @@ export default function SellerPropertyForm({ variant, propertyId, initialForm })
 
             {step === 2 && (
               <div className="space-y-6">
-                <div className="bg-yellow-500/10 border border-yellow-400/20 rounded-xl px-4 py-3">
-                  <p className="text-yellow-200/80 text-xs">
-                    Upload clear photos of your land documents. Accepted: PDF, JPG, PNG (max 10MB each).
+                <div className={`border rounded-xl px-4 py-3 flex items-start gap-2 ${
+                  form.doc_urls?.length > 0
+                    ? 'bg-paddy-500/10 border-paddy-400/20'
+                    : 'bg-yellow-500/10 border-yellow-400/30'
+                }`}>
+                  <span className="text-base mt-0.5">{form.doc_urls?.length > 0 ? '✓' : '⚠'}</span>
+                  <p className={`text-xs ${form.doc_urls?.length > 0 ? 'text-paddy-200/80' : 'text-yellow-200/90'}`}>
+                    {form.doc_urls?.length > 0
+                      ? `${form.doc_urls.length} document${form.doc_urls.length > 1 ? 's' : ''} attached — you can submit.`
+                      : 'Land document upload is required before you can submit. Upload Pahani / Adangal / RTC / Patta (PDF, JPG, PNG — max 10 MB each).'}
                   </p>
                 </div>
                 <FileUpload
@@ -420,7 +429,7 @@ export default function SellerPropertyForm({ variant, propertyId, initialForm })
                   folder={docsFolder.current}
                   accept="docs"
                   maxFiles={3}
-                  label="Land Documents *"
+                  label="Land Documents (required) *"
                   hint="Pahani / Adangal / RTC / Patta — up to 3 files"
                   initialItems={isEdit ? urlsToInitialItems(form.doc_urls, 'Document') : undefined}
                   onUpload={urls => setForm(f => ({ ...f, doc_urls: urls }))}
