@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-scroll'
+import NextLink from 'next/link'
 import { Phone } from 'lucide-react'
 import { useLang } from '../context/LanguageContext'
 import { content } from '../data/content'
@@ -318,23 +319,31 @@ export default function Hero() {
 
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          {/* Primary: take them to actual listings where they can book a visit */}
+          <NextLink
+            href="/properties"
+            className={`btn-gold shadow-turmeric-500/30 ${lang === 'te' ? 'telugu' : ''}`}
+          >
+            🔍 {lang === 'en' ? 'Browse Listings' : 'జాబితాలు చూడండి'}
+          </NextLink>
+          {/* Secondary: scroll to enquiry/callback form */}
           <Link
             to="contact"
             smooth
             duration={600}
             offset={-64}
-            className={`btn-gold shadow-turmeric-500/30 ${lang === 'te' ? 'telugu' : ''}`}
-          >
-            🌾 {t.ctaVisit}
-          </Link>
-          <a
-            href={`tel:${t.phone}`}
-            className="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/25 text-white font-semibold py-3 px-8 rounded-full transition-all duration-200 backdrop-blur-sm"
+            className="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/25 text-white font-semibold py-3 px-8 rounded-full transition-all duration-200 backdrop-blur-sm cursor-pointer"
           >
             <Phone size={17} />
-            {t.ctaCall}: {t.phone}
-          </a>
+            {lang === 'en' ? 'Talk to Our Team' : 'మాతో మాట్లాడండి'}
+          </Link>
         </div>
+        {/* Inline phone hint — no ambiguity */}
+        <p className="mt-4 text-white/35 text-xs">
+          {lang === 'en'
+            ? 'Or call directly: +91 7780312525 · Mon–Sat 9AM–6PM'
+            : 'నేరుగా కాల్ చేయండి: +91 7780312525 · సోమ–శని 9–6'}
+        </p>
 
         {/* Scroll cue */}
         <div className="mt-14 flex flex-col items-center gap-1 text-white/30 text-xs">
