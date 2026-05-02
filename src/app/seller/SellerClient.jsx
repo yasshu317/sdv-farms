@@ -109,14 +109,27 @@ export default function SellerClient({ user, properties, appointments }) {
         </div>
 
         {/* ── Tabs ── */}
-        <div className="flex gap-1 bg-white/5 rounded-xl p-1 mb-6 w-fit">
-          {['listings', 'appointments'].map(t => (
+        <div className="flex gap-2 mb-6">
+          {[
+            { id: 'listings',      icon: '🌾', label: 'Listings',     count: properties.length },
+            { id: 'appointments',  icon: '📅', label: 'Appointments', count: appointments.length },
+          ].map(t => (
             <button
-              key={t} onClick={() => setTab(t)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize ${
-                tab === t ? 'bg-white/15 text-white' : 'text-white/50 hover:text-white/70'
+              key={t.id} onClick={() => setTab(t.id)}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all border ${
+                tab === t.id
+                  ? 'bg-white/15 border-white/25 text-white shadow-sm'
+                  : 'bg-white/5 border-white/10 text-white/50 hover:text-white/75 hover:bg-white/8'
               }`}
-            >{t}</button>
+            >
+              <span>{t.icon}</span>
+              <span>{t.label}</span>
+              {t.count > 0 && (
+                <span className={`text-xs font-bold rounded-full px-1.5 py-0.5 min-w-[20px] text-center ${
+                  tab === t.id ? 'bg-turmeric-500/30 text-turmeric-300' : 'bg-white/10 text-white/40'
+                }`}>{t.count}</span>
+              )}
+            </button>
           ))}
         </div>
 
@@ -129,7 +142,7 @@ export default function SellerClient({ user, properties, appointments }) {
                 <div className="text-5xl mb-4">🌾</div>
                 <h2 className="text-white font-semibold text-lg mb-2">No listings yet</h2>
                 <p className="text-white/45 text-sm mb-6 max-w-xs mx-auto">
-                  List your agricultural land — free, fast, reviewed within 48 hours.
+                  List your agricultural land — free, fast, reviewed within 24 hours.
                 </p>
                 <Link
                   href="/seller/property/new"
@@ -273,19 +286,25 @@ export default function SellerClient({ user, properties, appointments }) {
         {/* ══ Appointments tab ══ */}
         {tab === 'appointments' && (
           <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-white font-semibold">My Appointments</h2>
-              <button
-                onClick={() => setShowPicker(true)}
-                className="bg-paddy-600 hover:bg-paddy-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors"
-              >
-                + Book a Call
-              </button>
-            </div>
+            {/* Book a call CTA */}
+            {!showPicker && (
+              <div className="flex items-center justify-between mb-5">
+                <p className="text-white/50 text-sm">Site visits &amp; calls booked with SDV Farms</p>
+                <button
+                  onClick={() => setShowPicker(true)}
+                  className="flex items-center gap-2 bg-paddy-600 hover:bg-paddy-700 active:scale-95 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all"
+                >
+                  📞 Book a Call
+                </button>
+              </div>
+            )}
 
             {showPicker && (
               <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-6">
-                <h3 className="text-white font-medium mb-4">Book a Call with SDV Farms</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-white font-semibold">📞 Book a Call with SDV Farms</h3>
+                  <button onClick={() => setShowPicker(false)} className="text-white/40 hover:text-white/70 text-sm">✕ Cancel</button>
+                </div>
                 <AppointmentPicker
                   type="seller"
                   userEmail={user.email}
@@ -296,20 +315,69 @@ export default function SellerClient({ user, properties, appointments }) {
             )}
 
             {appointments.length === 0 ? (
-              <div className="text-center py-12 border border-dashed border-white/15 rounded-2xl">
-                <p className="text-white/40 text-sm">No appointments scheduled yet</p>
+              <div className="text-center py-16 border border-dashed border-white/15 rounded-2xl">
+                <div className="text-4xl mb-3">📅</div>
+                <p className="text-white/70 font-medium mb-1">No appointments yet</p>
+                <p className="text-white/35 text-sm mb-5">Book a call with our team to discuss your listing or site visit.</p>
+                <button
+                  onClick={() => setShowPicker(true)}
+                  className="inline-flex items-center gap-2 bg-paddy-600 hover:bg-paddy-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors"
+                >
+                  📞 Book a Call
+                </button>
               </div>
             ) : (
               <div className="space-y-3">
-                {appointments.map(a => (
-                  <div key={a.id} className="flex items-center justify-between bg-white/5 border border-white/10 rounded-xl px-4 py-3">
-                    <div>
-                      <p className="text-white text-sm font-medium">{a.appointment_date} · {a.time_slot}</p>
-                      {a.notes && <p className="text-white/40 text-xs mt-0.5">{a.notes}</p>}
+                {appointments.map(a => {
+                  // Format date nicely — appointment_date is typically "YYYY-MM-DD"
+                  let dateStr = a.appointment_date
+                  try {
+                    dateStr = new Date(a.appointment_date + 'T00:00:00')
+                      .toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+                  } catch { /* keep raw */ }
+
+                  const statusStyles = {
+                    pending:   'bg-yellow-500/15 border-yellow-400/30 text-yellow-300',
+                    confirmed: 'bg-green-500/15  border-green-400/30  text-green-300',
+                    cancelled: 'bg-red-500/15    border-red-400/30    text-red-300',
+                  }
+                  const statusLabel = {
+                    pending: '🕐 Pending confirmation',
+                    confirmed: '✅ Confirmed',
+                    cancelled: '✕ Cancelled',
+                  }
+                  const style = statusStyles[a.status] ?? statusStyles.pending
+                  const label = statusLabel[a.status] ?? a.status
+
+                  return (
+                    <div key={a.id} className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        {/* Date + time */}
+                        <div className="flex items-start gap-3">
+                          <div className="bg-paddy-700/50 border border-paddy-500/30 rounded-xl p-2.5 text-center min-w-[52px] shrink-0">
+                            <p className="text-turmeric-300 font-bold text-lg leading-none">
+                              {a.appointment_date?.split('-')[2] ?? '—'}
+                            </p>
+                            <p className="text-white/50 text-[10px] uppercase mt-0.5">
+                              {a.appointment_date
+                                ? new Date(a.appointment_date + 'T00:00:00').toLocaleString('en-IN', { month: 'short' })
+                                : ''}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-white font-semibold text-sm">{dateStr}</p>
+                            <p className="text-white/55 text-xs mt-0.5">🕐 {a.time_slot}</p>
+                            {a.notes && <p className="text-white/35 text-xs mt-1.5 italic">{a.notes}</p>}
+                          </div>
+                        </div>
+                        {/* Status pill */}
+                        <span className={`text-xs font-semibold border rounded-full px-2.5 py-1 whitespace-nowrap shrink-0 ${style}`}>
+                          {label}
+                        </span>
+                      </div>
                     </div>
-                    <StatusBadge status={a.status} />
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
