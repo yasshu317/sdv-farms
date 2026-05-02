@@ -95,7 +95,26 @@ export default function SiteHeader({ active: activeProp = null }) {
                 </span>
               </button>
               {userMenu && (
-                <div className="absolute right-0 top-11 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 w-48 z-50">
+                <div className="absolute right-0 top-11 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 w-52 z-50">
+                  {/* Role identity header */}
+                  <div className="px-4 py-2.5 border-b border-gray-100">
+                    <p className="text-xs text-gray-400 mb-0.5">Signed in as</p>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-semibold text-sm text-gray-800 truncate">
+                        {user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0]}
+                      </span>
+                      {user.user_metadata?.role && (
+                        <span className={`text-xs font-medium rounded-full px-2 py-0.5 capitalize shrink-0 ${
+                          user.user_metadata.role === 'admin'  ? 'bg-purple-100 text-purple-700' :
+                          user.user_metadata.role === 'seller' ? 'bg-turmeric-100 text-turmeric-700' :
+                          'bg-green-100 text-green-700'
+                        }`}>
+                          {user.user_metadata.role === 'admin' ? '⚙️ Admin' :
+                           user.user_metadata.role === 'seller' ? '🌾 Seller' : '🏡 Buyer'}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                   <NextLink
                     href={
                       user.user_metadata?.role === 'admin' ? '/admin' :

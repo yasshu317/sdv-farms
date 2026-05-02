@@ -92,6 +92,11 @@ export default function RegisterPage() {
 
   // ── Success ──
   if (success) {
+    const roleIcon  = role === 'seller' ? '🌾' : '🏡'
+    const roleLabel = role === 'seller' ? 'Seller' : 'Buyer'
+    const roleDesc  = role === 'seller'
+      ? 'You can list your agricultural land and manage enquiries from your Seller dashboard.'
+      : 'You can browse listings, book site visits, and track your enquiries from your dashboard.'
     return (
       <div className="min-h-screen flex items-center justify-center px-4" style={{ background: bg }}>
         <div className="w-full max-w-md text-center">
@@ -100,7 +105,23 @@ export default function RegisterPage() {
           <p className="text-white/60 mb-2">
             We sent a confirmation link to <strong className="text-turmeric-300">{form.email}</strong>.
           </p>
-          <p className="text-white/40 text-sm mb-6">Click it to activate your account, then sign in.</p>
+          <p className="text-white/40 text-sm mb-4">Click it to activate your account, then sign in.</p>
+
+          {/* Role confirmation */}
+          <div className="bg-white/8 border border-white/15 rounded-2xl px-5 py-4 mb-6 text-left">
+            <p className="text-white/50 text-xs uppercase tracking-wider mb-2">You signed up as</p>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-2xl">{roleIcon}</span>
+              <span className="text-white font-bold text-lg">{roleLabel}</span>
+              {role === 'seller' && sellerType && (
+                <span className="text-xs bg-turmeric-500/20 text-turmeric-300 border border-turmeric-400/30 rounded-full px-2 py-0.5 capitalize">
+                  {sellerType}
+                </span>
+              )}
+            </div>
+            <p className="text-white/50 text-sm">{roleDesc}</p>
+          </div>
+
           <Link href="/auth/login" className="text-turmeric-400 hover:text-turmeric-300 text-sm font-medium">
             Back to login →
           </Link>
