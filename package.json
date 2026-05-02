@@ -1,7 +1,7 @@
 {
   "name": "sdv-farms",
   "private": true,
-  "version": "0.2.12",
+  "version": "0.2.13",
   "type": "module",
   "scripts": {
     "prepare": "sh scripts/install-hooks.sh",
