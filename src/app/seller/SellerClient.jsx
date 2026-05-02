@@ -55,7 +55,12 @@ export default function SellerClient({ user, properties, appointments }) {
             <Link href="/" className="text-2xl" title="SDV Farms Home">🌾</Link>
             <div>
               <p className="text-white font-semibold text-sm">{user.full_name}</p>
-              <p className="text-white/40 text-xs capitalize">{user.seller_type || 'Seller'} · {user.email}</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-xs bg-turmeric-500/20 text-turmeric-300 border border-turmeric-400/30 rounded-full px-2 py-0.5 font-semibold">
+                  🌾 Seller{user.seller_type ? ` (${user.seller_type.charAt(0).toUpperCase() + user.seller_type.slice(1)})` : ''}
+                </span>
+                <span className="text-white/35 text-xs">· {user.email?.toLowerCase()}</span>
+              </div>
             </div>
           </div>
           <button onClick={handleSignOut} className="text-white/40 hover:text-white/70 text-xs transition-colors">
