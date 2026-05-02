@@ -1,13 +1,8 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 
-/**
- * Shows a one-time banner when a user was redirected because they tried
- * to access a page that doesn't match their role.
- * Usage: add ?redirected=1 to the destination URL inside authRedirects / middleware.
- */
-export default function RoleRedirectBanner() {
+function Banner() {
   const searchParams = useSearchParams()
   const [show, setShow] = useState(false)
 
@@ -26,5 +21,13 @@ export default function RoleRedirectBanner() {
         <a href="mailto:info@sdvfarms.in" className="underline hover:text-turmeric-100">contact us</a>.
       </span>
     </div>
+  )
+}
+
+export default function RoleRedirectBanner() {
+  return (
+    <Suspense fallback={null}>
+      <Banner />
+    </Suspense>
   )
 }
