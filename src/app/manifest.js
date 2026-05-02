@@ -2,7 +2,7 @@ export default function manifest() {
   return {
     name: 'SDV Farms — Phase 1',
     short_name: 'SDV Farms',
-    description: 'Government-approved agricultural land investment near Hyderabad, Telangana.',
+    description: 'Approved agricultural land investment near Hyderabad, Telangana.',
     start_url: '/',
     display: 'standalone',
     background_color: '#071709',

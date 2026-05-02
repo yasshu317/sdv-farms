@@ -1,7 +1,7 @@
 // Eligibility logic from /auth/register — which land types are blocked
 
 const DISALLOWED_LAND_TYPES = [
-  'Government land', 'Poramboke', 'Assigned land', 'Forest land',
+  'Restricted land', 'Poramboke', 'Assigned land', 'Forest land',
   'Ceiling land', 'Inam land', 'Civil Dispute land',
 ]
 
@@ -30,8 +30,8 @@ describe('Seller registration — land eligibility', () => {
     expect(isEligible('Forest land')).toBe(false)
   })
 
-  it('blocks Government land specifically', () => {
-    expect(isEligible('Government land')).toBe(false)
+  it('blocks Restricted land specifically', () => {
+    expect(isEligible('Restricted land')).toBe(false)
   })
 
   it('has exactly 7 blocked land types', () => {

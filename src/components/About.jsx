@@ -57,7 +57,7 @@ export default function About() {
               </span>
               <span className="text-turmeric-300">|</span>
               <span className="flex items-center gap-1.5">
-                <span className="text-turmeric-500 text-base">✓</span> Govt. Approved
+                <span className="text-turmeric-500 text-base">✓</span> Approved
               </span>
               <span className="text-turmeric-300">|</span>
               <span className="flex items-center gap-1.5">

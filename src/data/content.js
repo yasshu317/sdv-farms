@@ -56,7 +56,7 @@ export const content = {
       body: 'SDV Farms – Phase 1 is a government-approved agricultural land project designed for secure investment, long-term appreciation, and sustainable farming income. Own legally verified farmland and create a future-ready family asset that grows with every season.',
       stats: [
         { value: '100%', label: 'Clear Title' },
-        { value: 'Govt.', label: 'Approved Layout' },
+        { value: '✓', label: 'Approved Layout' },
         { value: 'Reg.', label: 'Sale Deed' },
         { value: '0', label: 'Hidden Charges' },
       ],
@@ -174,7 +174,7 @@ export const content = {
         properties: (count) =>
           `🌾 We have **${count} approved properties** listed across Telangana, Andhra Pradesh & Karnataka.\n\nBrowse and filter by state, soil type, area or price at [/properties](/properties) — no login needed!`,
         sell: () =>
-          `🌾 To list your land on SDV Farms:\n\n1. Register as a **Seller** at [/auth/register](/auth/register)\n2. Pass a quick eligibility check (Government/Poramboke land is not allowed)\n3. Fill our 3-step form — location, land details, upload Pahani/ROR-1B\n\nOnce submitted, our team reviews and approves it within 24 hours. Free listing — no commission!`,
+          `🌾 To list your land on SDV Farms:\n\n1. Register as a **Seller** at [/auth/register](/auth/register)\n2. Pass a quick eligibility check (Poramboke, Forest & restricted land types are not allowed)\n3. Fill our 3-step form — location, land details, upload Pahani/ROR-1B\n\nOnce submitted, our team reviews and approves it within 24 hours. Free listing — no commission!`,
         buy: () =>
           `🏡 To buy agricultural land through SDV Farms:\n\n1. **Browse** listings at [/properties](/properties)\n2. **Filter** by state, soil type, area, or price\n3. **Book a site visit** directly on any property page\n4. Or submit a **land request** at [/buyer-request](/buyer-request) if you can't find what you need\n\nAll listings have clear title & government verification. Call **7780312525** for guidance.`,
         services: () =>

@@ -4,7 +4,7 @@ import PWARegister from '../components/PWARegister'
 export const metadata = {
   title: 'SDV Farms – Phase 1 | Secure Land Investment',
   description:
-    'SDV Farms Phase 1 – Government-approved agricultural land near Hyderabad. Secure investment, long-term appreciation, sustainable farming income. Contact: 7780312525',
+    'SDV Farms Phase 1 – Approved agricultural land near Hyderabad. Secure investment, long-term appreciation, sustainable farming income. Contact: 7780312525',
   keywords:
     'SDV Farms, agricultural land, Hyderabad farmland, land investment, Telangana farms, government approved layout',
   manifest: '/manifest.webmanifest',
@@ -16,7 +16,7 @@ export const metadata = {
   openGraph: {
     title: 'SDV Farms – Phase 1 | Agricultural Land Investment',
     description:
-      'Own legally verified farmland near Hyderabad. Government-approved layout. Contact: 7780312525',
+      'Own legally verified farmland near Hyderabad. Approved Agricultural Layout. Contact: 7780312525',
     type: 'website',
   },
 }

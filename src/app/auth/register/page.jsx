@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { createClient } from '../../../lib/supabase'
 
 const DISALLOWED_LAND_TYPES = [
-  'Government land', 'Poramboke', 'Assigned land', 'Forest land',
+  'Restricted land', 'Poramboke', 'Assigned land', 'Forest land',
   'Ceiling land', 'Inam land', 'Civil Dispute land',
 ]
 
@@ -141,7 +141,7 @@ export default function RegisterPage() {
             Unfortunately <strong className="text-turmeric-300">{eligLandType}</strong> cannot be listed on SDV Farms.
           </p>
           <p className="text-white/40 text-sm mb-6">
-            Government, Forest, Poramboke, Ceiling, Inam and Civil Dispute lands are not permitted.
+            Poramboke, Forest, Ceiling, Inam, Assigned and Civil Dispute lands are not permitted.
           </p>
           <div className="flex flex-col gap-3">
             <button
