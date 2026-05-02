@@ -12,10 +12,12 @@ export default async function SellerPage() {
   const role = user.user_metadata?.role
   if (role !== 'seller' && role !== 'admin') redirect('/dashboard')
 
+  // Seller dashboard shows only Pending and Approved listings (the 2 statuses sellers act on)
   const { data: properties } = await supabase
     .from('seller_properties')
     .select('*')
     .eq('seller_id', user.id)
+    .in('status', ['pending', 'approved'])
     .order('created_at', { ascending: false })
 
   const { data: appointments } = await supabase

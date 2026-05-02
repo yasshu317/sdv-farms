@@ -40,7 +40,7 @@ export const content = {
       marketingTitle: 'Marketing Support',
     },
     hero: {
-      badge: 'Government Approved Agricultural Layout',
+      badge: 'Approved Agricultural Layout',
       title: 'SDV Farms',
       phase: 'Phase 1',
       tagline: 'Secure Land • Earn Income • Build Generational Wealth',
@@ -66,7 +66,7 @@ export const content = {
       subheading: 'Everything you need for a safe, growing, and profitable land investment.',
       reasons: [
         { title: 'Clear Title & Legal Verification', icon: 'ShieldCheck' },
-        { title: 'Government Approved Agricultural Layout', icon: 'BadgeCheck' },
+        { title: 'Approved Agricultural Layout', icon: 'BadgeCheck' },
         { title: 'Registered Sale Deed in Buyer\'s Name', icon: 'FileText' },
         { title: 'Transparent Pricing – No Hidden Charges', icon: 'Tag' },
         { title: 'High Appreciation Potential', icon: 'TrendingUp' },
