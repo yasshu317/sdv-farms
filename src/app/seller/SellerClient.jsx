@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import StatusBadge from '../../components/ui/StatusBadge'
 import AppointmentPicker from '../../components/AppointmentPicker'
 import EmailVerificationBanner from '../../components/EmailVerificationBanner'
+import RoleRedirectBanner from '../../components/RoleRedirectBanner'
 
 /** Only statuses a seller cares about */
 const SELLER_STATUSES = ['pending', 'approved']
@@ -64,6 +65,7 @@ export default function SellerClient({ user, properties, appointments }) {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-4">
+        <RoleRedirectBanner />
         <EmailVerificationBanner user={user} />
       </div>
 

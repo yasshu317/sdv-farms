@@ -10,7 +10,7 @@ export default async function SellerPage() {
   if (!user) redirect('/auth/login')
 
   const role = user.user_metadata?.role
-  if (role !== 'seller' && role !== 'admin') redirect('/dashboard')
+  if (role !== 'seller' && role !== 'admin') redirect('/dashboard?redirected=1')
 
   // Seller dashboard shows only Pending and Approved listings (the 2 statuses sellers act on)
   const { data: properties } = await supabase

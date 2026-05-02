@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useLang } from '../context/LanguageContext'
+import { createClient } from '../lib/supabase'
 
 const STEPS = [
   {
@@ -23,13 +24,19 @@ const STEPS = [
 
 export default function HowItWorks() {
   const { lang } = useLang()
-  const [stats, setStats] = useState({ properties: 0, states: 3 })
+  const [stats, setStats]       = useState({ properties: 0, states: 3 })
+  const [sellerUser, setSellerUser] = useState(false)
 
   useEffect(() => {
     fetch('/api/property-count')
       .then(r => r.json())
       .then(d => setStats(s => ({ ...s, properties: d.count ?? 0 })))
       .catch(() => {})
+    // Check if logged-in user is already a seller so we can swap the CTA
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user?.user_metadata?.role === 'seller') setSellerUser(true)
+    })
   }, [])
 
   return (
@@ -39,7 +46,7 @@ export default function HowItWorks() {
         {/* Stats bar */}
         <div className="grid grid-cols-3 gap-4 mb-14">
           {[
-            { value: stats.properties > 0 ? `${stats.properties}+` : 'Free', label: stats.properties > 0 ? 'Properties Listed' : 'Registration' },
+            { value: stats.properties > 0 ? `${stats.properties}+` : 'Free', label: stats.properties > 0 ? 'Properties Listed' : 'to List & Buy' },
             { value: stats.states,   label: 'States Covered' },
             { value: '100%',         label: 'Clear Title' },
           ].map((s, i) => (
@@ -118,7 +125,7 @@ export default function HowItWorks() {
             {[
               { icon: '📋', en: { title: 'Register as Seller', desc: 'Create a free account. Takes under 2 minutes.' }, te: { title: 'విక్రేతగా నమోదు', desc: '2 నిమిషాల్లో ఉచిత ఖాతా సృష్టించండి.' } },
               { icon: '🌾', en: { title: 'Fill Land Details', desc: 'Location, area, price per acre, upload Pahani / ROR-1B doc.' }, te: { title: 'భూమి వివరాలు నమోదు', desc: 'స్థానం, విస్తీర్ణం, ధర, పహానీ/ROR-1B అప్‌లోడ్ చేయండి.' } },
-              { icon: '✅', en: { title: 'Go Live After Review', desc: 'We verify your listing within 48 hours. Then buyers can find you.' }, te: { title: 'సమీక్ష తర్వాత లైవ్', desc: '48 గంటల్లోపు మేము తనిఖీ చేస్తాము. తర్వాత కొనుగోలుదారులు మిమ్మల్ని కనుగొంటారు.' } },
+              { icon: '✅', en: { title: 'Go Live After Review', desc: 'We verify your listing within 24 hours. Then buyers can find you.' }, te: { title: 'సమీక్ష తర్వాత లైవ్', desc: '24 గంటల్లోపు మేము తనిఖీ చేస్తాము. తర్వాత కొనుగోలుదారులు మిమ్మల్ని కనుగొంటారు.' } },
             ].map((s, i) => (
               <div key={i} className="flex flex-col items-center text-center">
                 <div className="w-16 h-16 rounded-full bg-paddy-700/40 border border-paddy-400/20 flex items-center justify-center text-2xl mb-4">
@@ -130,12 +137,21 @@ export default function HowItWorks() {
             ))}
           </div>
           <div className="text-center">
-            <Link
-              href="/auth/register"
-              className="inline-block border border-paddy-400/40 text-paddy-300 hover:bg-paddy-500/15 hover:border-paddy-300 px-8 py-3 text-sm font-medium rounded-xl transition-colors"
-            >
-              {lang === 'en' ? 'List Your Land — Free →' : 'మీ భూమి జాబితా చేయండి — ఉచితం →'}
-            </Link>
+            {sellerUser ? (
+              <Link
+                href="/seller"
+                className="inline-block border border-turmeric-400/40 text-turmeric-300 hover:bg-turmeric-500/15 hover:border-turmeric-300 px-8 py-3 text-sm font-medium rounded-xl transition-colors"
+              >
+                {lang === 'en' ? 'Go to My Listings →' : 'నా జాబితాలకు వెళ్ళు →'}
+              </Link>
+            ) : (
+              <Link
+                href="/auth/register"
+                className="inline-block border border-paddy-400/40 text-paddy-300 hover:bg-paddy-500/15 hover:border-paddy-300 px-8 py-3 text-sm font-medium rounded-xl transition-colors"
+              >
+                {lang === 'en' ? 'List Your Land — Free →' : 'మీ భూమి జాబితా చేయండి — ఉచితం →'}
+              </Link>
+            )}
           </div>
         </div>
 
