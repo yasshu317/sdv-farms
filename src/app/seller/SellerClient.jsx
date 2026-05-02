@@ -46,7 +46,7 @@ export default function SellerClient({ user, properties, appointments }) {
   const totalViews    = properties.reduce((acc, p) => acc + (p.views || 0), 0)
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(160deg, #071709 0%, #0e2c13 50%, #071709 100%)' }}>
+    <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #071709 0%, #0a1f0c 40%, #0d2510 100%)' }}>
 
       {/* ── Header ── */}
       <div className="border-b border-white/8 px-4 sm:px-6 py-4">
@@ -102,13 +102,14 @@ export default function SellerClient({ user, properties, appointments }) {
         {/* ── Stats ── */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           {[
-            { label: 'Pending Review', value: pendingCount,  color: 'text-yellow-300' },
-            { label: 'Live / Approved', value: approvedCount, color: 'text-paddy-300' },
-            { label: 'Total Views',    value: totalViews,     color: 'text-turmeric-400' },
+            { icon: '🕐', label: 'Pending Review',  value: pendingCount,  color: 'text-yellow-300' },
+            { icon: '✅', label: 'Live / Approved', value: approvedCount, color: 'text-paddy-300'   },
+            { icon: '👁', label: 'Total Views',     value: totalViews,    color: 'text-turmeric-400' },
           ].map(s => (
-            <div key={s.label} className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
-              <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-              <p className="text-white/50 text-xs mt-1">{s.label}</p>
+            <div key={s.label} className="bg-white/4 border border-white/8 rounded-2xl py-5 px-3 text-center">
+              <p className="text-xl mb-1">{s.icon}</p>
+              <p className={`font-display font-bold text-3xl sm:text-4xl ${s.color}`}>{s.value}</p>
+              <p className="text-white/50 text-xs sm:text-sm mt-1">{s.label}</p>
             </div>
           ))}
         </div>
