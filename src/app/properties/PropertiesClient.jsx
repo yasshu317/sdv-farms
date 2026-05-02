@@ -37,9 +37,9 @@ function PropertyCard({ p }) {
           )}
         </div>
         {/* View count */}
-        {p.view_count > 0 && (
+        {p.views > 0 && (
           <div className="absolute bottom-2 right-2 bg-black/50 text-white/70 text-xs px-2 py-0.5 rounded-lg flex items-center gap-1">
-            <span>👁</span> {p.view_count}
+            <span>👁</span> {p.views}
           </div>
         )}
       </div>

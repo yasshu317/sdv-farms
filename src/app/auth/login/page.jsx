@@ -16,10 +16,11 @@ const bg = 'linear-gradient(160deg, #071709 0%, #1a4520 60%, #286d2f 100%)'
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [email, setEmail]     = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError]     = useState('')
-  const [loading, setLoading] = useState(false)
+  const [email, setEmail]         = useState('')
+  const [password, setPassword]   = useState('')
+  const [error, setError]         = useState('')
+  const [loading, setLoading]     = useState(false)
+  const [redirecting, setRedirecting] = useState(false)
 
   useEffect(() => {
     const urlError = searchParams.get('error')
@@ -32,11 +33,36 @@ function LoginForm() {
     setError('')
     const supabase = createClient()
     const { data, error: err } = await supabase.auth.signInWithPassword({ email, password })
-    setLoading(false)
-    if (err) { setError(err.message); return }
+    if (err) {
+      setLoading(false)
+      setError(err.message)
+      return
+    }
+    // Auth succeeded — show branded redirect overlay while Next.js navigates
+    setRedirecting(true)
     const role = data.user?.user_metadata?.role
     router.push(homePathForRole(role))
     router.refresh()
+  }
+
+  // Full-screen branded overlay shown after successful auth during navigation
+  if (redirecting) {
+    return (
+      <div className="fixed inset-0 flex flex-col items-center justify-center gap-6 z-50"
+           style={{ background: bg }}>
+        <div className="flex flex-col items-center gap-4 animate-pulse">
+          <span className="text-6xl">🌾</span>
+          <p className="text-white font-display text-xl font-bold">SDV Farms</p>
+        </div>
+        <div className="flex items-center gap-2 text-white/60 text-sm">
+          <svg className="animate-spin w-4 h-4 text-turmeric-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+          </svg>
+          Taking you to your dashboard…
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -69,9 +95,17 @@ function LoginForm() {
 
         <button
           type="submit" disabled={loading}
-          className="w-full bg-turmeric-500 hover:bg-turmeric-600 disabled:opacity-60 text-white font-semibold py-3 rounded-xl transition-colors mt-2"
+          className="w-full bg-turmeric-500 hover:bg-turmeric-600 disabled:opacity-70 text-white font-semibold py-3 rounded-xl transition-colors mt-2 flex items-center justify-center gap-2"
         >
-          {loading ? 'Signing in…' : 'Sign in'}
+          {loading ? (
+            <>
+              <svg className="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+              </svg>
+              Signing in…
+            </>
+          ) : 'Sign in'}
         </button>
       </form>
 
