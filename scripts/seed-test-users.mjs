@@ -45,23 +45,25 @@ const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
 })
 
 // ── Test user definitions ─────────────────────────────────────────────────────
+// Using real accounts (all owned by Yash) — just resets password to a known
+// value so you can log in quickly during flow testing.
 const TEST_USERS = [
   {
-    email:    'admin@sdvfarms.test',
+    email:    'yaswanth4urs@gmail.com',
     password: 'Test@1234',
-    meta: { full_name: 'SDV Admin', phone: '9999900001', role: 'admin' },
+    meta: { full_name: 'Yash', role: 'admin' },
     label: '⚙️  Admin',
   },
   {
-    email:    'seller@sdvfarms.test',
+    email:    'yashfse@gmail.com',
     password: 'Test@1234',
-    meta: { full_name: 'Test Seller', phone: '9999900002', role: 'seller', seller_type: 'farmer' },
+    meta: { full_name: 'Yash', role: 'seller', seller_type: 'farmer' },
     label: '🌾 Seller',
   },
   {
-    email:    'buyer@sdvfarms.test',
+    email:    'rorchow@gmail.com',
     password: 'Test@1234',
-    meta: { full_name: 'Test Buyer', phone: '9999900003', role: 'buyer' },
+    meta: { full_name: 'Yash', role: 'buyer' },
     label: '🏡 Buyer',
   },
 ]
@@ -109,9 +111,9 @@ console.log(`
 ─────────────────────────────────────────────────
  Test credentials (all passwords: Test@1234)
 ─────────────────────────────────────────────────
- ⚙️  Admin   → admin@sdvfarms.test
- 🌾 Seller  → seller@sdvfarms.test
- 🏡 Buyer   → buyer@sdvfarms.test
+ ⚙️  Admin   → yaswanth4urs@gmail.com
+ 🌾 Seller  → yashfse@gmail.com
+ 🏡 Buyer   → rorchow@gmail.com
 ─────────────────────────────────────────────────
  URL: http://localhost:3000/auth/login
 ─────────────────────────────────────────────────
