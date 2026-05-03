@@ -60,6 +60,18 @@ export default function SiteHeader({ active: activeProp = null }) {
         : 'text-white/75 hover:text-white'
     } ${lang === 'te' && key !== 'properties' && key !== 'services' ? 'telugu text-xs' : ''}`
 
+  const hashLinkClass = `text-sm font-medium transition-colors text-white/70 hover:text-white ${lang === 'te' ? 'telugu text-xs' : ''}`
+
+  /** Same sections as marketing Navbar — jump to home anchor from inner pages */
+  const homeSectionLinks = [
+    { href: '/#about',       label: t.about },
+    { href: '/#why-invest',  label: t.whyInvest },
+    { href: '/#benefits',    label: t.benefits },
+    { href: '/#highlights',  label: t.highlights },
+    { href: '/#gallery',     label: t.gallery },
+    { href: '/#location',    label: t.contact },
+  ]
+
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-paddy-950/95 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-2 min-w-0">
@@ -72,11 +84,10 @@ export default function SiteHeader({ active: activeProp = null }) {
             <span aria-hidden>🌾</span>
             <span className="whitespace-nowrap">SDV Farms</span>
           </NextLink>
-          <nav className="hidden md:flex items-center gap-3 lg:gap-4" aria-label="Main">
+          <nav className="hidden md:flex items-center gap-2 lg:gap-3 flex-wrap min-w-0" aria-label="Main">
             <NextLink href="/properties" className={linkClass('properties')}>{t.properties}</NextLink>
             <NextLink href="/services" className={linkClass('services')}>{t.services}</NextLink>
             <NextLink href="/buyer-request" className={linkClass('buyer-request')}>{t.landRequest}</NextLink>
-            {/* Show role-appropriate dashboard link when logged in, otherwise "List your land" */}
             {user ? (
               <NextLink
                 href={
@@ -93,6 +104,18 @@ export default function SiteHeader({ active: activeProp = null }) {
                 {t.listLand}
               </NextLink>
             )}
+            <span className="hidden lg:inline w-px h-4 shrink-0 mx-0.5 bg-white/25" aria-hidden />
+            {homeSectionLinks.map(item => (
+              <NextLink key={item.href} href={item.href} className={`hidden lg:inline ${hashLinkClass}`}>
+                {item.label}
+              </NextLink>
+            ))}
+            <NextLink
+              href="/#contact"
+              className="hidden lg:inline-block btn-gold text-xs font-semibold py-1.5 px-4 rounded-full"
+            >
+              {t.bookVisit}
+            </NextLink>
           </nav>
         </div>
 
@@ -201,26 +224,32 @@ export default function SiteHeader({ active: activeProp = null }) {
               {t.listLand}
             </NextLink>
           )}
+
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-white/35 pt-2 pb-0.5 px-1 border-t border-white/10 mt-2">Home page</p>
+          {homeSectionLinks.map(item => (
+            <NextLink
+              key={item.href}
+              href={item.href}
+              onClick={() => setMobileOpen(false)}
+              className={`block py-2 px-1 text-sm text-white/70 hover:text-turmeric-300 ${lang === 'te' ? 'telugu' : ''}`}
+            >
+              {item.label}
+            </NextLink>
+          ))}
+          <NextLink
+            href="/#contact"
+            onClick={() => setMobileOpen(false)}
+            className="block mt-2 btn-gold text-sm text-center py-2.5 rounded-xl font-semibold"
+          >
+            {t.bookVisit}
+          </NextLink>
+
           {user ? (
-            <>
-              <NextLink
-                href={
-                  user.user_metadata?.role === 'admin' ? '/admin' :
-                    user.user_metadata?.role === 'seller' ? '/seller' : '/dashboard'
-                }
-                onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-2 py-2.5 px-1 text-sm text-white/90"
-              >
-                <LayoutDashboard size={14} />
-                {user.user_metadata?.role === 'admin' ? t.adminPanel :
-                  user.user_metadata?.role === 'seller' ? t.myListings : t.myDashboard}
-              </NextLink>
-              <button type="button" onClick={() => { setMobileOpen(false); handleLogout() }} className="w-full text-left flex items-center gap-2 py-2.5 px-1 text-sm text-red-400">
-                <LogOut size={14} /> {t.signOut}
-              </button>
-            </>
+            <button type="button" onClick={() => { setMobileOpen(false); handleLogout() }} className="w-full text-left flex items-center gap-2 py-2.5 px-1 text-sm text-red-400 border-t border-white/10 mt-2 pt-3">
+              <LogOut size={14} /> {t.signOut}
+            </button>
           ) : (
-            <NextLink href="/auth/login" onClick={() => setMobileOpen(false)} className="block py-2.5 px-1 text-sm font-semibold text-turmeric-300">
+            <NextLink href="/auth/login" onClick={() => setMobileOpen(false)} className="block py-2.5 px-1 text-sm font-semibold text-turmeric-300 border-t border-white/10 mt-2 pt-3">
               {t.signInRegister}
             </NextLink>
           )}

@@ -79,8 +79,8 @@ export default function Navbar() {
             <span className="font-display font-bold text-xl whitespace-nowrap">SDV Farms</span>
           </NextLink>
 
-          {/* Desktop links — 4 task routes + language + account. No in-page scroll items. */}
-          <div className="hidden md:flex items-center gap-3 lg:gap-5 flex-1 min-w-0 justify-end">
+          {/* Desktop — task routes, homepage sections (About…), language, account, Book a visit */}
+          <div className="hidden md:flex items-center gap-3 lg:gap-4 flex-1 min-w-0 justify-end flex-wrap">
             <NextLink
               href="/properties"
               className={`text-sm font-medium transition-colors hover:text-turmeric-500 ${scrolled ? 'text-paddy-900' : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]'} ${lang === 'te' ? 'telugu text-xs' : ''}`}
@@ -105,6 +105,25 @@ export default function Navbar() {
             >
               {t.listLand}
             </NextLink>
+
+            <span className={`hidden lg:inline w-px h-4 shrink-0 mx-0.5 ${scrolled ? 'bg-paddy-200' : 'bg-white/35'}`} aria-hidden />
+
+            {links.map(l => (
+              <Link
+                key={l.to}
+                to={l.to}
+                smooth
+                duration={500}
+                offset={-64}
+                className={`cursor-pointer text-sm font-medium transition-colors hover:text-turmeric-500 ${
+                  scrolled
+                    ? 'text-paddy-900'
+                    : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]'
+                } ${lang === 'te' ? 'telugu text-xs' : ''}`}
+              >
+                {l.label}
+              </Link>
+            ))}
 
             {/* Language toggle */}
             <button
@@ -179,6 +198,15 @@ export default function Navbar() {
               </NextLink>
             )}
 
+            <Link
+              to="contact"
+              smooth
+              duration={500}
+              offset={-64}
+              className="btn-gold py-2 px-5 text-sm"
+            >
+              {t.bookVisit}
+            </Link>
           </div>
 
           {/* Mobile */}
@@ -277,6 +305,16 @@ export default function Navbar() {
               {t.signInRegister}
             </NextLink>
           )}
+          <Link
+            to="contact"
+            smooth
+            duration={500}
+            offset={-64}
+            onClick={() => setOpen(false)}
+            className="btn-gold mt-3 text-sm text-center w-full block"
+          >
+            {t.bookVisit}
+          </Link>
         </div>
       )}
     </nav>
