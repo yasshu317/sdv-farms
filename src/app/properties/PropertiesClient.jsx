@@ -5,6 +5,7 @@ import Image from 'next/image'
 import SiteHeader from '../../components/SiteHeader'
 import FilterPanel from '../../components/ui/FilterPanel'
 import locations from '../../data/locations.json'
+import { REGISTER_LIST_LAND } from '../../lib/routes'
 
 const SOIL_TYPES  = ['Black', 'Red', 'Sandy', 'Mixed']
 const LAND_TYPES  = ['Agriculture', 'Estate Agriculture', 'Industrial', 'Commercial', 'Residential']
@@ -200,7 +201,7 @@ export default function PropertiesClient({ properties }) {
                   Be the first to list your agricultural land on SDV Farms. Free, fast, and government-verified.
                 </p>
                 <Link
-                  href="/auth/register"
+                  href={REGISTER_LIST_LAND}
                   className="inline-block btn-gold px-6 py-2.5 text-sm rounded-xl"
                 >
                   List Your Land →

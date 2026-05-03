@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useLang } from '../context/LanguageContext'
 import { createClient } from '../lib/supabase'
+import { REGISTER_LIST_LAND } from '../lib/routes'
 
 const STEPS = [
   {
@@ -146,7 +147,7 @@ export default function HowItWorks() {
               </Link>
             ) : (
               <Link
-                href="/auth/register"
+                href={REGISTER_LIST_LAND}
                 className="inline-block border border-paddy-400/40 text-paddy-300 hover:bg-paddy-500/15 hover:border-paddy-300 px-8 py-3 text-sm font-medium rounded-xl transition-colors"
               >
                 {lang === 'en' ? 'List Your Land — Free →' : 'మీ భూమి జాబితా చేయండి — ఉచితం →'}

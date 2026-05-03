@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { createClient } from '../lib/supabase'
 import { useLang } from '../context/LanguageContext'
+import { REGISTER_LIST_LAND } from '../lib/routes'
 
 function PropertyCard({ p }) {
   const photo = p.photo_urls?.[0]
@@ -79,7 +80,7 @@ export default function FeaturedProperties() {
               ? 'No listings yet — register as a seller and post your agricultural land in minutes. Free, fast, and government-verified.'
               : 'ఇంకా జాబితాలు లేవు — విక్రేతగా నమోదు చేసుకుని మీ భూమిని నిమిషాల్లో పోస్ట్ చేయండి.'}
           </p>
-          <Link href="/auth/register" className="btn-gold px-6 py-2.5 text-sm rounded-xl">
+          <Link href={REGISTER_LIST_LAND} className="btn-gold px-6 py-2.5 text-sm rounded-xl">
             {lang === 'en' ? 'List Your Land →' : 'మీ భూమి జాబితా చేయండి →'}
           </Link>
         </div>

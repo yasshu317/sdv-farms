@@ -1,6 +1,6 @@
 'use client'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '../../../lib/supabase'
 
@@ -27,13 +27,16 @@ function RoleCard({ role, icon, title, description, selected, onClick }) {
   )
 }
 
-export default function RegisterPage() {
-  const router = useRouter()
+const bg = 'linear-gradient(160deg, #071709 0%, #1a4520 60%, #286d2f 100%)'
+
+function RegisterForm() {
+  const searchParams = useSearchParams()
+  const listLandFlow = searchParams.get('flow') === 'seller'
 
   // Step 0 = role choice, Step 1 = eligibility (seller only), Step 2 = form
-  const [step, setStep]           = useState(0)
-  const [role, setRole]           = useState('')           // buyer | seller
-  const [sellerType, setSellerType] = useState('')         // farmer | agent
+  const [step, setStep]           = useState(() => (listLandFlow ? 1 : 0))
+  const [role, setRole]           = useState(() => (listLandFlow ? 'seller' : ''))
+  const [sellerType, setSellerType] = useState('')
   const [eligLandType, setEligLandType] = useState('')
   const [eligBlocked, setEligBlocked]   = useState(false)
 
@@ -88,8 +91,6 @@ export default function RegisterPage() {
     setSuccess(true)
   }
 
-  const bg = 'linear-gradient(160deg, #071709 0%, #1a4520 60%, #286d2f 100%)'
-
   // ── Success ──
   if (success) {
     const roleIcon  = role === 'seller' ? '🌾' : '🏡'
@@ -105,9 +106,8 @@ export default function RegisterPage() {
           <p className="text-white/60 mb-2">
             We sent a confirmation link to <strong className="text-turmeric-300">{form.email}</strong>.
           </p>
-          <p className="text-white/40 text-sm mb-4">Click it to activate your account, then sign in.</p>
+          <p className="text-white/40 text-sm mb-4">Click it to activate your account, then sign in with your email and password.</p>
 
-          {/* Role confirmation */}
           <div className="bg-white/8 border border-white/15 rounded-2xl px-5 py-4 mb-6 text-left">
             <p className="text-white/50 text-xs uppercase tracking-wider mb-2">You signed up as</p>
             <div className="flex items-center gap-2 mb-1">
@@ -122,9 +122,15 @@ export default function RegisterPage() {
             <p className="text-white/50 text-sm">{roleDesc}</p>
           </div>
 
-          <Link href="/auth/login" className="text-turmeric-400 hover:text-turmeric-300 text-sm font-medium">
-            Back to login →
+          <Link
+            href="/auth/login"
+            className="inline-flex w-full items-center justify-center bg-turmeric-500 hover:bg-turmeric-600 text-white font-semibold py-3 rounded-xl transition-colors mb-3"
+          >
+            Sign in with your credentials →
           </Link>
+          <p className="text-white/35 text-xs">
+            After email confirmation, you’ll go straight to your role dashboard (Buyer or Seller).
+          </p>
         </div>
       </div>
     )
@@ -159,21 +165,24 @@ export default function RegisterPage() {
     )
   }
 
+  const subtitle = listLandFlow && step >= 1
+    ? 'List your land — quick seller signup'
+    : step === 0
+      ? 'How would you like to use SDV Farms?'
+      : step === 1
+        ? 'Quick eligibility check'
+        : `Create your ${role === 'seller' ? 'seller' : 'buyer'} account`
+
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12" style={{ background: bg }}>
       <div className="w-full max-w-md">
 
-        {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 text-white hover:text-turmeric-300 transition-colors">
             <span className="text-3xl">🌾</span>
             <span className="font-display text-2xl font-bold">SDV Farms</span>
           </Link>
-          <p className="text-white/50 text-sm mt-2">
-            {step === 0 ? 'How would you like to use SDV Farms?' :
-             step === 1 ? 'Quick eligibility check' :
-             `Create your ${role === 'seller' ? 'seller' : 'buyer'} account`}
-          </p>
+          <p className="text-white/50 text-sm mt-2">{subtitle}</p>
         </div>
 
         <div className="bg-white/8 backdrop-blur-sm border border-white/15 rounded-3xl p-8">
@@ -184,7 +193,6 @@ export default function RegisterPage() {
             </div>
           )}
 
-          {/* ── Step 0: Role choice ── */}
           {step === 0 && (
             <div>
               <h1 className="text-white font-display text-xl font-bold mb-5">I want to…</h1>
@@ -209,11 +217,12 @@ export default function RegisterPage() {
             </div>
           )}
 
-          {/* ── Step 1: Eligibility (seller only) ── */}
           {step === 1 && (
             <div>
-              <h1 className="text-white font-display text-xl font-bold mb-2">Eligibility Check</h1>
-              <p className="text-white/50 text-sm mb-5">Let's make sure your land qualifies before we proceed.</p>
+              <h1 className="text-white font-display text-xl font-bold mb-2">
+                {listLandFlow ? 'List your land' : 'Eligibility Check'}
+              </h1>
+              <p className="text-white/50 text-sm mb-5">Let&apos;s make sure your land qualifies before we proceed.</p>
 
               <div className="space-y-4 mb-6">
                 <div>
@@ -256,12 +265,21 @@ export default function RegisterPage() {
               </div>
 
               <div className="flex gap-3">
-                <button
-                  type="button" onClick={() => { setStep(0); setError('') }}
-                  className="flex-1 bg-white/10 hover:bg-white/15 text-white font-medium py-3 rounded-xl transition-colors"
-                >
-                  ← Back
-                </button>
+                {listLandFlow ? (
+                  <Link
+                    href="/auth/register"
+                    className="flex-1 flex items-center justify-center bg-white/10 hover:bg-white/15 text-white font-medium py-3 rounded-xl transition-colors text-sm"
+                  >
+                    ← Buy land instead
+                  </Link>
+                ) : (
+                  <button
+                    type="button" onClick={() => { setStep(0); setError('') }}
+                    className="flex-1 bg-white/10 hover:bg-white/15 text-white font-medium py-3 rounded-xl transition-colors"
+                  >
+                    ← Back
+                  </button>
+                )}
                 <button
                   type="button" onClick={handleEligNext}
                   className="flex-1 bg-turmeric-500 hover:bg-turmeric-600 text-white font-semibold py-3 rounded-xl transition-colors"
@@ -272,7 +290,6 @@ export default function RegisterPage() {
             </div>
           )}
 
-          {/* ── Step 2: Registration form ── */}
           {step === 2 && (
             <div>
               <div className="flex items-center gap-2 mb-5">
@@ -352,5 +369,19 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center px-4" style={{ background: bg }}>
+          <div className="text-white/40 text-sm">Loading…</div>
+        </div>
+      }
+    >
+      <RegisterForm />
+    </Suspense>
   )
 }

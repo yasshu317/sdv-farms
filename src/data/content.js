@@ -1,3 +1,5 @@
+import { REGISTER_LIST_LAND } from '../lib/routes'
+
 export const content = {
   en: {
     nav: {
@@ -164,7 +166,7 @@ export const content = {
       ],
       menuActions: [
         { icon: '🏡', label: 'Browse Properties', link: '/properties' },
-        { icon: '🌾', label: 'Sell My Land', link: '/auth/register' },
+        { icon: '🌾', label: 'Sell My Land', link: REGISTER_LIST_LAND },
         { icon: '📅', label: 'Book a Site Visit', link: '/#contact' },
         { icon: '🛠️', label: 'Our Services', link: '/services' },
         { icon: '📞', label: 'Call / WhatsApp', link: 'tel:7780312525' },
@@ -174,7 +176,7 @@ export const content = {
         properties: (count) =>
           `🌾 We have **${count} approved properties** listed across Telangana, Andhra Pradesh & Karnataka.\n\nBrowse and filter by state, soil type, area or price at [/properties](/properties) — no login needed!`,
         sell: () =>
-          `🌾 To list your land on SDV Farms:\n\n1. Register as a **Seller** at [/auth/register](/auth/register)\n2. Pass a quick eligibility check (Poramboke, Forest & restricted land types are not allowed)\n3. Fill our 3-step form — location, land details, upload Pahani/ROR-1B\n\nOnce submitted, our team reviews and approves it within 24 hours. Free listing — no commission!`,
+          `🌾 To list your land on SDV Farms:\n\n1. Register as a **Seller** at [list your land — free signup](${REGISTER_LIST_LAND})\n2. Pass a quick eligibility check (Poramboke, Forest & restricted land types are not allowed)\n3. Fill our 3-step form — location, land details, upload Pahani/ROR-1B\n\nOnce submitted, our team reviews and approves it within 24 hours. Free listing — no commission!`,
         buy: () =>
           `🏡 To buy agricultural land through SDV Farms:\n\n1. **Browse** listings at [/properties](/properties)\n2. **Filter** by state, soil type, area, or price\n3. **Book a site visit** directly on any property page\n4. Or submit a **land request** at [/buyer-request](/buyer-request) if you can't find what you need\n\nAll listings have clear title & government verification. Call **7780312525** for guidance.`,
         services: () =>
@@ -366,7 +368,7 @@ export const content = {
       ],
       menuActions: [
         { icon: '🏡', label: 'ప్రాపర్టీలు చూడండి', link: '/properties' },
-        { icon: '🌾', label: 'నా భూమి అమ్మాలి', link: '/auth/register' },
+        { icon: '🌾', label: 'నా భూమి అమ్మాలి', link: REGISTER_LIST_LAND },
         { icon: '📅', label: 'సైట్ విజిట్ బుక్ చేయండి', link: '/#contact' },
         { icon: '🛠️', label: 'మా సేవలు', link: '/services' },
         { icon: '📞', label: 'కాల్ / వాట్సాప్', link: 'tel:7780312525' },
@@ -376,7 +378,7 @@ export const content = {
         properties: (count) =>
           `🌾 తెలంగాణ, ఆంధ్రప్రదేశ్ & కర్ణాటకలో **${count} ఆమోదిత ఆస్తులు** జాబితా చేయబడ్డాయి.\n\nరాష్ట్రం, నేల రకం, విస్తీర్ణం లేదా ధర ప్రకారం [/properties](/properties) వద్ద ఫిల్టర్ చేయండి — లాగిన్ అవసరం లేదు!`,
         sell: () =>
-          `🌾 SDV ఫామ్స్‌లో మీ భూమిని జాబితా చేయడం:\n\n1. [/auth/register](/auth/register) వద్ద **విక్రేత**గా నమోదు చేయండి\n2. త్వరిత అర్హత తనిఖీ (ప్రభుత్వ/పోరంబోకే భూమి అనుమతి లేదు)\n3. 3-దశల ఫారమ్ — స్థానం, భూమి వివరాలు, పహానీ/ROR-1B అప్‌లోడ్\n\nసమర్పించిన తర్వాత మా టీమ్ 24 గంటల్లోపు సమీక్షిస్తుంది. ఉచిత జాబితా — కమిషన్ లేదు!`,
+          `🌾 SDV ఫామ్స్‌లో మీ భూమిని జాబితా చేయడం:\n\n1. [జాబితా చేయండి — ఉచిత నమోదు](${REGISTER_LIST_LAND}) వద్ద **విక్రేత**గా నమోదు చేయండి\n2. త్వరిత అర్హత తనిఖీ (పోరంబోకే, అటవీ మరియు నిరోధిత భూమి రకాలు అనుమతి లేదు)\n3. 3-దశల ఫారమ్ — స్థానం, భూమి వివరాలు, పహానీ/ROR-1B అప్‌లోడ్\n\nసమర్పించిన తర్వాత మా టీమ్ 24 గంటల్లోపు సమీక్షిస్తుంది. ఉచిత జాబితా — కమిషన్ లేదు!`,
         buy: () =>
           `🏡 SDV ఫామ్స్ ద్వారా వ్యవసాయ భూమి కొనుగోలు:\n\n1. [/properties](/properties) వద్ద జాబితాలు **బ్రౌజ్** చేయండి\n2. రాష్ట్రం, నేల, విస్తీర్ణం, ధర ప్రకారం **ఫిల్టర్** చేయండి\n3. ఏదైనా ఆస్తి పేజీలో నేరుగా **సైట్ విజిట్ బుక్** చేయండి\n4. అవసరమైతే [/buyer-request](/buyer-request) వద్ద **భూమి అభ్యర్థన** పంపండి\n\nఅన్ని జాబితాలకు స్పష్టమైన శీర్షిక & ప్రభుత్వ ధృవీకరణ. మార్గదర్శనానికి **7780312525** కి కాల్ చేయండి.`,
         services: () =>

@@ -38,6 +38,13 @@ test.describe('Register Page — 3-step flow', () => {
     await expect(page.getByText('Land Not Eligible')).toBeVisible()
   })
 
+  test('list-your-land (?flow=seller) skips role picker — starts at eligibility', async ({ page }) => {
+    await page.goto('/auth/register?flow=seller')
+    await expect(page.getByRole('heading', { name: /List your land|Eligibility/i })).toBeVisible()
+    await expect(page.getByText('I want to…')).not.toBeVisible()
+    await expect(page.getByRole('link', { name: /Buy land instead/i })).toBeVisible()
+  })
+
   test('seller can go back from eligibility to role selection', async ({ page }) => {
     await page.getByText('Sell Land').click()
     await page.getByRole('button', { name: 'Continue →' }).click()

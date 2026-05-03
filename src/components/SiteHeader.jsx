@@ -7,6 +7,7 @@ import { User, LogOut, LayoutDashboard, Menu, X } from 'lucide-react'
 import { useLang } from '../context/LanguageContext'
 import { content } from '../data/content'
 import { createClient } from '../lib/supabase'
+import { REGISTER_LIST_LAND } from '../lib/routes'
 
 /**
  * Sticky top bar for inner pages: consistent paths to Properties, Services,
@@ -88,7 +89,7 @@ export default function SiteHeader({ active: activeProp = null }) {
                  user.user_metadata?.role === 'seller' ? '🌾 My Listings'   : '🏡 My Dashboard'}
               </NextLink>
             ) : (
-              <NextLink href="/auth/register" className="text-sm font-medium text-white/75 hover:text-turmeric-300 transition-colors">
+              <NextLink href={REGISTER_LIST_LAND} className="text-sm font-medium text-white/75 hover:text-turmeric-300 transition-colors">
                 {t.listLand}
               </NextLink>
             )}
@@ -196,7 +197,7 @@ export default function SiteHeader({ active: activeProp = null }) {
                user.user_metadata?.role === 'seller' ? '🌾 My Listings'  : '🏡 My Dashboard'}
             </NextLink>
           ) : (
-            <NextLink href="/auth/register" onClick={() => setMobileOpen(false)} className="block py-2.5 px-1 text-sm font-medium text-white/80 hover:text-turmeric-300">
+            <NextLink href={REGISTER_LIST_LAND} onClick={() => setMobileOpen(false)} className="block py-2.5 px-1 text-sm font-medium text-white/80 hover:text-turmeric-300">
               {t.listLand}
             </NextLink>
           )}
