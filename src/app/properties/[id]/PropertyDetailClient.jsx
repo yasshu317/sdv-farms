@@ -1,19 +1,32 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import SiteHeader from '../../../components/SiteHeader'
 import { createClient } from '../../../lib/supabase'
 import StatusBadge from '../../../components/ui/StatusBadge'
 import AppointmentPicker from '../../../components/AppointmentPicker'
 
 export default function PropertyDetailClient({ property: p, user, initialWishlisted }) {
-  const router = useRouter()
-  const [wishlisted, setWishlisted]       = useState(initialWishlisted)
+  const router       = useRouter()
+  const searchParams = useSearchParams()
+  const [wishlisted, setWishlisted]           = useState(initialWishlisted)
   const [wishlistLoading, setWishlistLoading] = useState(false)
-  const [showPicker, setShowPicker]       = useState(false)
-  const [activePhoto, setActivePhoto]     = useState(0)
+  const [showPicker, setShowPicker]           = useState(false)
+  const [activePhoto, setActivePhoto]         = useState(0)
+
+  // Auto-open the booking picker when ?book=1 is in the URL (e.g. from "Book Visit" on listing card)
+  useEffect(() => {
+    if (searchParams.get('book') === '1' && user && !showPicker) {
+      setShowPicker(true)
+      // Scroll the picker into view after a short delay so it's rendered
+      setTimeout(() => {
+        document.getElementById('booking-picker')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 200)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, user])
 
   const photos = p.photo_urls?.filter(Boolean) || []
   const totalPrice = (p.area_acres * p.expected_price).toLocaleString('en-IN')
@@ -188,7 +201,7 @@ export default function PropertyDetailClient({ property: p, user, initialWishlis
                   )}
 
                   {showPicker && user && (
-                    <div className="mt-5 pt-5 border-t border-white/10">
+                    <div id="booking-picker" className="mt-5 pt-5 border-t border-white/10">
                       <AppointmentPicker
                         propertyId={p.id}
                         type="buyer"

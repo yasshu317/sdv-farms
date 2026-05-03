@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import { createClient } from '../../../lib/supabase-server'
 import PropertyDetailClient from './PropertyDetailClient'
@@ -34,11 +35,15 @@ export default async function PropertyDetailPage({ params }) {
     wishlisted = !!wl
   }
 
+  const clientUser = user ? { id: user.id, email: user.email, ...user.user_metadata } : null
+
   return (
-    <PropertyDetailClient
-      property={property}
-      user={user ? { id: user.id, email: user.email, ...user.user_metadata } : null}
-      initialWishlisted={wishlisted}
-    />
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#071709' }}>
+        <span className="text-4xl animate-pulse">🌾</span>
+      </div>
+    }>
+      <PropertyDetailClient property={property} user={clientUser} initialWishlisted={wishlisted} />
+    </Suspense>
   )
 }

@@ -11,52 +11,71 @@ const LAND_TYPES  = ['Agriculture', 'Estate Agriculture', 'Industrial', 'Commerc
 const ALL_STATES  = Object.keys(locations)
 
 function PropertyCard({ p }) {
-  const photo = p.photo_urls?.[0]
+  const photo      = p.photo_urls?.[0]
   const totalPrice = (p.area_acres * p.expected_price).toLocaleString('en-IN')
-  return (
-    <Link href={`/properties/${p.id}`} className="group block bg-white/5 hover:bg-white/8 border border-white/10 hover:border-turmeric-400/30 rounded-2xl overflow-hidden transition-all">
-      {/* Photo */}
-      <div className="relative h-44 bg-paddy-900/40 overflow-hidden">
-        {photo ? (
-          <Image src={photo} alt="Property" fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
-        ) : (
-          <div className="flex items-center justify-center h-full">
-            <span className="text-5xl opacity-30">🌾</span>
-          </div>
-        )}
-        <div className="absolute top-2 left-2 flex gap-1.5">
-          {p.property_id && (
-            <span className="bg-black/60 text-turmeric-300 text-xs font-mono px-2 py-0.5 rounded-lg">
-              {p.property_id}
-            </span>
-          )}
-        </div>
-        <div className="absolute top-2 right-2 flex gap-1.5">
-          {p.road_access && (
-            <span className="bg-paddy-700/80 text-white text-xs px-2 py-0.5 rounded-lg">🛣️ Road</span>
-          )}
-        </div>
-        {/* View count */}
-        {p.views > 0 && (
-          <div className="absolute bottom-2 right-2 bg-black/50 text-white/70 text-xs px-2 py-0.5 rounded-lg flex items-center gap-1">
-            <span>👁</span> {p.views}
-          </div>
-        )}
-      </div>
+  const detailHref = `/properties/${p.id}`
+  const whatsapp   = `https://wa.me/917780312525?text=Hi%2C+I'm+interested+in+${p.property_id || p.id}+at+${encodeURIComponent([p.village, p.district].filter(Boolean).join(', '))}`
 
-      {/* Details */}
-      <div className="p-4">
-        <p className="text-white font-semibold text-sm mb-0.5">
-          {[p.village, p.mandal].filter(Boolean).join(', ') || p.district}
-        </p>
-        <p className="text-white/50 text-xs mb-3">{[p.district, p.state].filter(Boolean).join(', ')}</p>
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-white/70">{p.area_acres} acres · {p.land_soil_type} soil</span>
-          <span className="text-turmeric-400 font-bold">₹{totalPrice}</span>
+  return (
+    <div className="group bg-white/5 hover:bg-white/8 border border-white/10 hover:border-turmeric-400/30 rounded-2xl overflow-hidden transition-all flex flex-col">
+      {/* ── Clickable photo + info ── */}
+      <Link href={detailHref} className="block flex-1">
+        <div className="relative h-44 bg-paddy-900/40 overflow-hidden">
+          {photo ? (
+            <Image src={photo} alt="Property" fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <span className="text-5xl opacity-30">🌾</span>
+            </div>
+          )}
+          <div className="absolute top-2 left-2">
+            {p.property_id && (
+              <span className="bg-black/60 text-turmeric-300 text-xs font-mono px-2 py-0.5 rounded-lg">
+                {p.property_id}
+              </span>
+            )}
+          </div>
+          <div className="absolute top-2 right-2 flex gap-1.5">
+            {p.road_access && (
+              <span className="bg-paddy-700/80 text-white text-xs px-2 py-0.5 rounded-lg">🛣️ Road</span>
+            )}
+          </div>
+          {p.views > 0 && (
+            <div className="absolute bottom-2 right-2 bg-black/50 text-white/70 text-xs px-2 py-0.5 rounded-lg flex items-center gap-1">
+              <span>👁</span> {p.views}
+            </div>
+          )}
         </div>
-        <p className="text-white/35 text-xs mt-1">₹{Number(p.expected_price).toLocaleString('en-IN')}/acre</p>
+        <div className="p-4">
+          <p className="text-white font-semibold text-sm mb-0.5">
+            {[p.village, p.mandal].filter(Boolean).join(', ') || p.district}
+          </p>
+          <p className="text-white/50 text-xs mb-3">{[p.district, p.state].filter(Boolean).join(', ')}</p>
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-white/70">{p.area_acres} acres · {p.land_soil_type} soil</span>
+            <span className="text-turmeric-400 font-bold">₹{totalPrice}</span>
+          </div>
+          <p className="text-white/35 text-xs mt-1">₹{Number(p.expected_price).toLocaleString('en-IN')}/acre</p>
+        </div>
+      </Link>
+
+      {/* ── Quick action bar — no need to open detail page first ── */}
+      <div className="flex gap-2 px-4 pb-4">
+        <Link
+          href={`${detailHref}?book=1`}
+          className="flex-1 flex items-center justify-center gap-1.5 bg-turmeric-500 hover:bg-turmeric-600 active:scale-95 text-white text-xs font-semibold py-2 rounded-xl transition-all"
+        >
+          📅 Book Visit
+        </Link>
+        <a
+          href={whatsapp}
+          target="_blank" rel="noopener noreferrer"
+          className="flex-1 flex items-center justify-center gap-1.5 bg-white/8 hover:bg-white/15 border border-white/15 text-white text-xs font-semibold py-2 rounded-xl transition-all"
+        >
+          💬 Enquire
+        </a>
       </div>
-    </Link>
+    </div>
   )
 }
 
