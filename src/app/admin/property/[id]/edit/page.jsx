@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { createClient } from '../../../../../lib/supabase'
 import AdminPropertyForm from '../../../../../components/admin/AdminPropertyForm'
 import { mapSellerPropertyRowToForm } from '../../../../seller/property/propertyFormConstants'
+import { isAdminOrStaff } from '../../../../../lib/roles'
 
 export default function AdminEditPropertyPage() {
   const { id } = useParams()
@@ -17,8 +18,8 @@ export default function AdminEditPropertyPage() {
     async function load() {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user || user.user_metadata?.role !== 'admin') {
-        setBlocked('Admin access required.')
+      if (!user || !isAdminOrStaff(user.user_metadata?.role)) {
+        setBlocked('Admin or staff access required.')
         setLoading(false)
         return
       }

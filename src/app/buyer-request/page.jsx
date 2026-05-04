@@ -27,6 +27,9 @@ export default function BuyerRequestPage() {
       area_max: form.area_max ? Number(form.area_max) : null,
       price_max: form.price_max ? Number(form.price_max) : null,
       notes: form.notes || null,
+      buyer_residence_city: form.buyer_residence_city || null,
+      buyer_residence_state: form.buyer_residence_state || null,
+      buyer_residence_notes: form.buyer_residence_notes || null,
     })
 
     if (insertErr) throw new Error(insertErr.message)

@@ -22,6 +22,7 @@ export const INITIAL_FORM = {
   road_access: false,
   area_acres: '',
   expected_price: '',
+  seller_interest: '',
   doc_urls: [],
   photo_urls: [],
 }
@@ -42,6 +43,7 @@ export function mapSellerPropertyRowToForm(row) {
     road_access: !!row.road_access,
     area_acres: row.area_acres != null ? String(row.area_acres) : '',
     expected_price: row.expected_price != null ? String(row.expected_price) : '',
+    seller_interest: row.seller_interest || '',
     doc_urls: Array.isArray(row.doc_urls) ? [...row.doc_urls] : [],
     photo_urls: Array.isArray(row.photo_urls) ? [...row.photo_urls] : [],
   }
