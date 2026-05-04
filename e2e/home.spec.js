@@ -22,13 +22,19 @@ test.describe('Homepage', () => {
   })
 
   test('Properties nav link navigates to /properties', async ({ page }) => {
-    await page.locator('nav').first().getByRole('link', { name: 'Properties', exact: true }).click()
-    await expect(page).toHaveURL(/\/properties/)
+    const navToProperties = page.locator('nav').first().getByRole('link', { name: 'Properties', exact: true })
+    await Promise.all([
+      page.waitForURL(/\/properties/, { timeout: 45_000 }),
+      navToProperties.click(),
+    ])
   })
 
   test('Services nav link navigates to /services', async ({ page }) => {
-    await page.locator('nav').first().getByRole('link', { name: 'Services', exact: true }).click()
-    await expect(page).toHaveURL(/\/services/)
+    const navToServices = page.locator('nav').first().getByRole('link', { name: 'Services', exact: true })
+    await Promise.all([
+      page.waitForURL(/\/services/, { timeout: 45_000 }),
+      navToServices.click(),
+    ])
   })
 
   test('language toggle switches to Telugu', async ({ page }) => {

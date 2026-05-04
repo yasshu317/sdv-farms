@@ -1,5 +1,6 @@
 import './globals.css'
 import PWARegister from '../components/PWARegister'
+import GlobalLoadingOverlay from '../components/GlobalLoadingOverlay'
 
 export const metadata = {
   title: 'SDV Farms – Phase 1 | Secure Land Investment',
@@ -44,6 +45,7 @@ export default function RootLayout({ children }) {
         <meta name="apple-mobile-web-app-title" content="SDV Farms" />
       </head>
       <body>
+        <GlobalLoadingOverlay />
         <PWARegister />
         {children}
       </body>

@@ -20,6 +20,13 @@ export const content = {
       myListings: 'My Listings',
       adminPanel: 'Admin Panel',
       signInRegister: 'Sign in / Register',
+      phase1: 'Phase 1',
+    },
+    stats: {
+      propertyEnquiries: 'Property enquiries',
+      subscribedMembers: 'Subscribed members',
+      propertiesListed: 'Properties listed',
+      propertiesSold: 'Properties sold',
     },
     services: {
       heading: 'Our Services',
@@ -222,6 +229,13 @@ export const content = {
       myListings: 'నా జాబితాలు',
       adminPanel: 'అడ్మిన్',
       signInRegister: 'లాగిన్ / నమోదు',
+      phase1: 'దశ 1',
+    },
+    stats: {
+      propertyEnquiries: 'ఆస్తి విచారణలు',
+      subscribedMembers: 'నమోదైన సభ్యులు',
+      propertiesListed: 'జాబితా చేసిన ఆస్తులు',
+      propertiesSold: 'అమ్మబడిన ఆస్తులు',
     },
     services: {
       heading: 'మా సేవలు',
