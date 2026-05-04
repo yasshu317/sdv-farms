@@ -1,0 +1,24 @@
+---
+description: Admin vs staff roles, proxy protection, and ops RLS naming
+globs: ["src/proxy.js", "src/lib/roles.js", "src/lib/authRedirects.js", "src/app/admin/**/*", "src/app/api/admin/**/*", "supabase/migrations/**/*.sql"]
+alwaysApply: false
+---
+
+# Admin, staff, and route guards
+
+## Roles (`src/lib/roles.js`)
+- `isAdminOrStaff(role)` — `/admin` hub, RLS policies that include **both** `admin` and `staff`
+- `isAdminOnly(role)` — user listing/role changes (`/api/admin/users`), **Add property** (`/admin/property/new`), approve/reject listings in UI
+
+## Proxy (`src/proxy.js`)
+- `/admin` requires `isAdminOrStaff` (not admin-only)
+- `/seller` denies `staff` (redirect to `/admin`); allows `seller` and `admin`
+- Logged-in redirects on `/auth/*` use `homePathForRole` — **staff** → `/admin`
+
+## SQL policy naming (phase 8+)
+- Elevated tables use **"Admin staff …"** policies:  
+  `(auth.jwt()->'user_metadata'->>'role') in ('admin', 'staff')`
+- New ops tables should follow the same unless access should be admin-only
+
+## Migrations
+- Phase 8 ops hub: `supabase/migrations/phase8_admin_ops_hub.sql` (buyer_request notes, SDVF, plot verification, staff on key tables). Phase 3 (`service_bookings`, `payment_orders`) must exist before running phase 8 bottom section.
