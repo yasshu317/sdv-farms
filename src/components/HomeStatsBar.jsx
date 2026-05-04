@@ -12,6 +12,7 @@ function formatCount(n, lang) {
 export default function HomeStatsBar({ scrolled }) {
   const { lang } = useLang()
   const t = content[lang].stats
+  const [visible, setVisible] = useState(true)
   const [data, setData] = useState({
     propertyEnquiries: null,
     subscribedMembers: null,
@@ -21,13 +22,31 @@ export default function HomeStatsBar({ scrolled }) {
 
   useEffect(() => {
     let cancelled = false
-    fetch('/api/platform-stats')
-      .then(r => (r.ok ? r.json() : null))
-      .then(j => {
-        if (!cancelled && j && typeof j === 'object') setData(j)
-      })
-      .catch(() => {})
-    return () => { cancelled = true }
+    ;(async () => {
+      let vis = true
+      try {
+        const fr = await fetch('/api/feature-flags')
+        const fj = fr.ok ? await fr.json() : null
+        if (!cancelled && fj?.flags?.home_stats_bar !== undefined) {
+          vis = !!fj.flags.home_stats_bar.enabled
+        }
+      } catch {
+        /* keep default visible */
+      }
+      if (cancelled) return
+      setVisible(vis)
+      if (!vis) return
+      try {
+        const pr = await fetch('/api/platform-stats')
+        const pj = pr.ok ? await pr.json() : null
+        if (!cancelled && pj && typeof pj === 'object') setData(pj)
+      } catch {
+        /* stats optional */
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const items = [
@@ -36,6 +55,8 @@ export default function HomeStatsBar({ scrolled }) {
     { label: t.propertiesListed, value: data.propertiesListed },
     { label: t.propertiesSold, value: data.propertiesSold },
   ]
+
+  if (!visible) return null
 
   return (
     <div

@@ -21,4 +21,4 @@ alwaysApply: false
 - New ops tables should follow the same unless access should be admin-only
 
 ## Migrations
-- Phase 8 ops hub: `supabase/migrations/phase8_admin_ops_hub.sql` (buyer_request notes, SDVF, plot verification, staff on key tables). Phase 3 (`service_bookings`, `payment_orders`) must exist before running phase 8 bottom section.
+- Phase 9 ops hub: `supabase/migrations/phase9_feature_flags.sql` (`feature_flags` remote config — public read, admin/staff write). Phase 8: `phase8_admin_ops_hub.sql`. Phase 3 (`service_bookings`, `payment_orders`) must exist before running phase 8 bottom section.

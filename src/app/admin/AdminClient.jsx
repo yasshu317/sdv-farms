@@ -2,7 +2,7 @@
 import { useState, Fragment, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '../../lib/supabase'
-import { LogOut, Users, FileText, MapPin, RefreshCw, Home, Calendar, MessageSquare, ShieldCheck, Search, Plus } from 'lucide-react'
+import { LogOut, Users, FileText, MapPin, RefreshCw, Home, Calendar, MessageSquare, ShieldCheck, Search, Plus, Flag } from 'lucide-react'
 import NextLink from 'next/link'
 import StatusBadge from '../../components/ui/StatusBadge'
 import { adminField, storageLinkLabel } from '../../lib/adminDisplay'
@@ -21,6 +21,8 @@ const SELLER_INTEREST_OPTIONS = [
   { value: 'ready_to_sale', label: 'Ready to sell' },
   { value: 'interested', label: 'Interested' },
 ]
+
+const FLAG_KEY_RE = /^[a-z][a-z0-9_]*$/
 
 const ENQUIRY_COLORS = {
   pending:   'bg-yellow-100 text-yellow-700',
@@ -49,6 +51,20 @@ function datetimeLocalToIso(local) {
   return Number.isNaN(d.getTime()) ? null : d.toISOString()
 }
 
+function payloadTextMap(flags) {
+  const m = {}
+  for (const f of flags || []) m[f.id] = JSON.stringify(f.payload ?? {}, null, 2)
+  return m
+}
+
+function flagRowFieldsMap(flags) {
+  const m = {}
+  for (const f of flags || []) {
+    m[f.id] = { description: f.description ?? '', sort: String(f.sort_order ?? 0) }
+  }
+  return m
+}
+
 export default function AdminClient({
   viewerRole = 'admin',
   buyerRequestNotesById: initialNotesById = {},
@@ -57,6 +73,7 @@ export default function AdminClient({
   sellerProperties: initialProps,
   appointments: initialAppts,
   buyerRequests: initialRequests,
+  featureFlags: initialFeatureFlags = [],
 }) {
   const canManageUsers = isAdminOnly(viewerRole)
   const isStaffViewer = viewerRole === 'staff'
@@ -68,6 +85,7 @@ export default function AdminClient({
     ['properties',  'Properties',  Home],
     ['appointments','Appointments',Calendar],
     ['requests',    'Requests',    MessageSquare],
+    ['flags',       'Flags',       Flag],
     ['services',    'Services',    Users],
   ]
   const visibleTabs = canManageUsers ? TAB_DEFS : TAB_DEFS.filter(([id]) => id !== 'users')
@@ -92,6 +110,21 @@ export default function AdminClient({
   const [roleFilter, setRoleFilter]       = useState('all')
   const [serviceBookings, setServiceBookings] = useState(null)
   const [svcLoading, setSvcLoading]       = useState(false)
+
+  const [featureFlags, setFeatureFlags]   = useState(initialFeatureFlags ?? [])
+  const [payloadTexts, setPayloadTexts]   = useState(() => payloadTextMap(initialFeatureFlags))
+  const [flagRowFields, setFlagRowFields] = useState(() => flagRowFieldsMap(initialFeatureFlags))
+  const [flagBanner, setFlagBanner]       = useState('')
+  const [flagDraft, setFlagDraft]         = useState({
+    key: '', enabled: false, description: '', sort_order: '100', payload: '{}',
+  })
+
+  useEffect(() => {
+    const list = initialFeatureFlags ?? []
+    setFeatureFlags(list)
+    setPayloadTexts(payloadTextMap(list))
+    setFlagRowFields(flagRowFieldsMap(list))
+  }, [initialFeatureFlags])
 
   useEffect(() => {
     if (!canManageUsers && tab === 'users') setTab('enquiries')
@@ -259,6 +292,120 @@ export default function AdminClient({
     await patchBuyerRequest(id, { status })
   }
 
+  async function setFlagEnabledOnly(row, enabled) {
+    setFlagBanner('')
+    setSaving(row.id)
+    const supabase = createClient()
+    const { error } = await supabase.from('feature_flags').update({ enabled }).eq('id', row.id)
+    setSaving(null)
+    if (error) setFlagBanner(error.message)
+    else {
+      router.refresh()
+      await reloadFeatureFlags()
+    }
+  }
+
+  async function reloadFeatureFlags() {
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from('feature_flags')
+      .select('*')
+      .order('sort_order', { ascending: true })
+      .order('key', { ascending: true })
+    if (!error && data) {
+      setFeatureFlags(data)
+      setPayloadTexts(payloadTextMap(data))
+      setFlagRowFields(flagRowFieldsMap(data))
+    }
+  }
+
+  function parseFlagPayload(jsonText, label = 'payload') {
+    const t = jsonText.trim() || '{}'
+    let parsed
+    try {
+      parsed = JSON.parse(t)
+    } catch (e) {
+      throw new Error(`${label}: invalid JSON (${e.message})`)
+    }
+    if (parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed
+    throw new Error(`${label} must be a JSON object (not array or primitive)`)
+  }
+
+  async function saveFeatureFlagRow(row) {
+    setFlagBanner('')
+    let payloadObj
+    try {
+      payloadObj = parseFlagPayload(payloadTexts[row.id] ?? JSON.stringify(row.payload ?? {}))
+    } catch (e) {
+      setFlagBanner(e.message)
+      return
+    }
+    const rf = flagRowFields[row.id]
+    const description = rf?.description ?? ''
+    const so = Number.parseInt(rf?.sort ?? '', 10)
+    const sort_order = Number.isNaN(so) ? row.sort_order ?? 0 : so
+    setSaving(row.id)
+    const supabase = createClient()
+    const { error } = await supabase.from('feature_flags').update({
+      enabled: row.enabled,
+      description: description?.trim() || null,
+      sort_order,
+      payload: payloadObj,
+    }).eq('id', row.id)
+    setSaving(null)
+    if (error) setFlagBanner(error.message)
+    else {
+      router.refresh()
+      await reloadFeatureFlags()
+    }
+  }
+
+  async function createFeatureFlag() {
+    setFlagBanner('')
+    const key = flagDraft.key.trim().toLowerCase().replace(/\s+/g, '_')
+    if (!FLAG_KEY_RE.test(key)) {
+      setFlagBanner('Key must match: lowercase letters, digits, underscores; start with a letter (e.g. new_home_hero)')
+      return
+    }
+    let payloadObj = {}
+    try {
+      payloadObj = parseFlagPayload(flagDraft.payload ?? '{}')
+    } catch (e) {
+      setFlagBanner(e.message)
+      return
+    }
+    setSaving('new-flag')
+    const supabase = createClient()
+    const so = Number.parseInt(flagDraft.sort_order, 10)
+    const sort_order = Number.isNaN(so) ? 100 : so
+    const { error } = await supabase.from('feature_flags').insert({
+      key,
+      enabled: !!flagDraft.enabled,
+      description: flagDraft.description?.trim() || null,
+      sort_order,
+      payload: payloadObj,
+      metadata: {},
+    })
+    setSaving(null)
+    if (error) {
+      setFlagBanner(error.message.includes('duplicate') ? `Key "${key}" already exists.` : error.message)
+      return
+    }
+    setFlagDraft({ key: '', enabled: false, description: '', sort_order: '100', payload: '{}' })
+    router.refresh()
+    await reloadFeatureFlags()
+  }
+
+  async function deleteFeatureFlag(row) {
+    if (!confirm(`Remove flag "${row.key}" permanently? Apps using this key stop seeing it.`)) return
+    setSaving(row.id)
+    const supabase = createClient()
+    await supabase.from('feature_flags').delete().eq('id', row.id)
+    setSaving(null)
+    router.refresh()
+    await reloadFeatureFlags()
+  }
+
   const stats = {
     total:        enquiries.length,
     pending:      enquiries.filter(e => e.status === 'pending').length,
@@ -327,6 +474,10 @@ export default function AdminClient({
                 setTab(id)
                 if (id === 'users' && allUsers === null) loadUsers()
                 if (id === 'services' && serviceBookings === null) loadServiceBookings()
+                if (id === 'flags') {
+                  setFlagBanner('')
+                  reloadFeatureFlags()
+                }
               }}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-all ${tab === id ? 'bg-white shadow-sm text-paddy-900' : 'text-gray-500 hover:text-gray-700'}`}
             >
@@ -1083,6 +1234,172 @@ export default function AdminClient({
             )}
           </div>
         )}
+
+        {/* Feature flags / remote config */}
+        {tab === 'flags' && (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-50 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+              <div>
+                <h2 className="font-semibold text-gray-800">Feature flags & remote config</h2>
+                <p className="text-xs text-gray-400 mt-1 max-w-2xl">
+                  Each row is a stable{' '}
+                  <code className="bg-gray-100 px-1 rounded text-[11px]">key</code>.{' '}
+                  <code className="bg-gray-100 px-1 rounded text-[11px]">payload</code>{' '}
+                  is merged into{' '}
+                  <code className="bg-gray-100 px-1 rounded text-[11px]">GET /api/feature-flags</code>{' '}
+                  (cached briefly; JSON is public — do not store secrets). Extra fields can live in{' '}
+                  <code className="bg-gray-100 px-1 rounded text-[11px]">metadata</code> in Supabase SQL only for now.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setFlagBanner('')
+                  reloadFeatureFlags()
+                }}
+                className="shrink-0 text-xs border border-gray-200 text-gray-500 hover:text-paddy-700 hover:border-paddy-300 rounded-lg px-3 py-1.5 flex items-center gap-1"
+              >
+                <RefreshCw size={12} /> Reload
+              </button>
+            </div>
+            {flagBanner && (
+              <div className="mx-6 mt-4 text-sm text-red-700 bg-red-50 border border-red-100 rounded-xl px-4 py-3">{flagBanner}</div>
+            )}
+            <div className="px-6 py-5 space-y-8">
+              <section>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Add flag</p>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  <input
+                    placeholder="key_snake_case"
+                    value={flagDraft.key}
+                    onChange={e => setFlagDraft(f => ({ ...f, key: e.target.value }))}
+                    className="text-xs border border-gray-200 rounded-lg px-3 py-2 font-mono"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Sort order"
+                    value={flagDraft.sort_order}
+                    onChange={e => setFlagDraft(f => ({ ...f, sort_order: e.target.value }))}
+                    className="text-xs border border-gray-200 rounded-lg px-3 py-2"
+                  />
+                  <label className="flex items-center gap-2 text-xs text-gray-600">
+                    <input
+                      type="checkbox"
+                      checked={flagDraft.enabled}
+                      onChange={e => setFlagDraft(f => ({ ...f, enabled: e.target.checked }))}
+                    />
+                    Enabled
+                  </label>
+                  <input
+                    placeholder="Description"
+                    value={flagDraft.description}
+                    onChange={e => setFlagDraft(f => ({ ...f, description: e.target.value }))}
+                    className="text-xs border border-gray-200 rounded-lg px-3 py-2 sm:col-span-2 lg:col-span-1"
+                  />
+                </div>
+                <textarea
+                  value={flagDraft.payload}
+                  onChange={e => setFlagDraft(f => ({ ...f, payload: e.target.value }))}
+                  rows={4}
+                  placeholder='JSON object e.g. {}'
+                  className="mt-3 w-full font-mono text-xs border border-gray-200 rounded-xl px-3 py-2 bg-gray-50"
+                />
+                <button
+                  type="button"
+                  disabled={saving === 'new-flag'}
+                  onClick={createFeatureFlag}
+                  className="mt-3 text-xs bg-paddy-700 hover:bg-paddy-800 text-white font-medium px-4 py-2 rounded-lg disabled:opacity-50"
+                >
+                  Create flag
+                </button>
+              </section>
+
+              <section>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                  Flags ({featureFlags.length})
+                </p>
+                {featureFlags.length === 0 ? (
+                  <p className="text-sm text-gray-400">
+                    No rows yet — apply <code className="bg-gray-100 px-1 rounded">phase9_feature_flags.sql</code> then refresh, or create a flag above.
+                  </p>
+                ) : (
+                  <div className="space-y-6">
+                    {featureFlags.map(ff => (
+                      <div key={ff.id} className="border border-gray-100 rounded-2xl p-4 bg-gray-50/80">
+                        <div className="flex flex-wrap items-center gap-3 mb-3">
+                          <span className="font-mono text-sm font-bold text-paddy-800">{ff.key}</span>
+                          <label className="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={!!ff.enabled}
+                              disabled={saving === ff.id}
+                              onChange={e => setFlagEnabledOnly(ff, e.target.checked)}
+                            />
+                            On
+                          </label>
+                          <button
+                            type="button"
+                            disabled={saving === ff.id}
+                            onClick={() => deleteFeatureFlag(ff)}
+                            className="text-xs text-red-600 hover:underline ml-auto"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          <div>
+                            <label className="text-[10px] uppercase text-gray-400 block mb-1">Sort</label>
+                            <input
+                              value={flagRowFields[ff.id]?.sort ?? '0'}
+                              onChange={e => setFlagRowFields(prev => ({
+                                ...prev,
+                                [ff.id]: {
+                                  description: prev[ff.id]?.description ?? ff.description ?? '',
+                                  sort: e.target.value,
+                                },
+                              }))}
+                              className="w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] uppercase text-gray-400 block mb-1">Description</label>
+                            <input
+                              value={flagRowFields[ff.id]?.description ?? ''}
+                              onChange={e => setFlagRowFields(prev => ({
+                                ...prev,
+                                [ff.id]: {
+                                  description: e.target.value,
+                                  sort: prev[ff.id]?.sort ?? String(ff.sort_order ?? 0),
+                                },
+                              }))}
+                              className="w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5 bg-white"
+                            />
+                          </div>
+                        </div>
+                        <label className="text-[10px] uppercase text-gray-400 block mt-3 mb-1">Payload (JSON object)</label>
+                        <textarea
+                          value={payloadTexts[ff.id] ?? '{}'}
+                          onChange={e => setPayloadTexts(prev => ({ ...prev, [ff.id]: e.target.value }))}
+                          rows={5}
+                          className="w-full font-mono text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white"
+                        />
+                        <button
+                          type="button"
+                          disabled={saving === ff.id}
+                          onClick={() => saveFeatureFlagRow(ff)}
+                          className="mt-2 text-xs bg-white border border-paddy-200 text-paddy-800 font-medium px-3 py-1.5 rounded-lg hover:bg-paddy-50 disabled:opacity-50"
+                        >
+                          Save changes
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+            </div>
+          </div>
+        )}
+
         {/* Service Bookings */}
         {tab === 'services' && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">

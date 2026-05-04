@@ -34,6 +34,13 @@ export default async function AdminPage() {
     notesByRequestId[n.buyer_request_id].push(n)
   }
 
+  const ffRes = await supabase
+    .from('feature_flags')
+    .select('*')
+    .order('sort_order', { ascending: true })
+    .order('key', { ascending: true })
+  const featureFlags = ffRes.error ? [] : (ffRes.data ?? [])
+
   return (
     <AdminClient
       viewerRole={user.user_metadata?.role ?? 'buyer'}
@@ -43,6 +50,7 @@ export default async function AdminPage() {
       appointments={appointments ?? []}
       buyerRequests={buyerRequests ?? []}
       buyerRequestNotesById={notesByRequestId}
+      featureFlags={featureFlags}
     />
   )
 }

@@ -187,6 +187,13 @@ cream        → background
 
 Requires phase 3 tables (`service_bookings`, `payment_orders`) for the last policy swaps in that file.
 
+### Phase 9 (`phase9_feature_flags.sql`) — Feature flags / remote config
+| Table | Notes |
+|---|---|
+| `feature_flags` | Stable `key`, `enabled`, `payload` (JSON — **public** via `GET /api/feature-flags`, no secrets), `metadata` JSON for extra internal fields without new columns, `sort_order`. RLS: world-readable `SELECT`; admin + staff INSERT/UPDATE/DELETE. Manage in Admin → **Flags**. |
+
+Bundled seeds include `home_stats_bar` (toggles navbar `HomeStatsBar` stats ribbon when enabled).
+
 All Phase 2 tables have: RLS policies · `updated_at` trigger · `jsonb metadata` for future fields without migrations (where originally added).
 
 ---
