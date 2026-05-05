@@ -61,10 +61,10 @@ src/
 │   │   ├── page.jsx          # Server wrapper
 │   │   └── ServicesClient.jsx
 │   ├── dashboard/            # Buyer portal
-│   └── admin/                # Admin panel (6 tabs)
+│   └── admin/                # Admin / ops hub (AdminClient; staff + admin)
 ├── components/
 │   ├── AppointmentPicker.jsx # Date + 1-hr slot grid, 2-hr delay rule
-│   ├── Navbar.jsx            # Bilingual + role-aware (buyer/seller/admin)
+│   ├── Navbar.jsx            # Bilingual + role-aware (buyer/seller/admin/staff)
 │   ├── ChatBot.jsx
 │   ├── PWARegister.jsx
 │   └── ui/
@@ -80,8 +80,12 @@ src/
 ├── lib/
 │   ├── supabase.js           # createClient() for browser
 │   ├── supabase-server.js    # createClient() for server
+│   ├── supabase-admin.js     # Service role client — SERVER API ROUTES ONLY
+│   ├── roles.js              # isAdminOrStaff, isAdminOnly
+│   ├── authRedirects.js      # homePathForRole (admin + staff → /admin)
+│   ├── plotDisplay.js        # Acres from sq.yd (÷ 4840)
 │   └── notify.js             # Notification abstraction — sendNotification({ to, type, data })
-└── proxy.js                  # Route protection (replaces middleware.js)
+└── proxy.js                  # Route protection (`export async function proxy` — Next middleware)
 ```
 
 ---
@@ -150,7 +154,6 @@ cream        → background
 
 ### API Routes
 - App Router format only: `export async function POST(req) { ... }`
-- AI chatbot uses `streamText` + `toUIMessageStreamResponse()` from `ai` v6
 - Always handle errors: `return Response.json({ error: err.message }, { status: 500 })`
 
 ### Hydration Safety
@@ -164,19 +167,34 @@ cream        → background
 ### Phase 1
 | Table | Key Columns |
 |---|---|
-| `profiles` | `id`, `full_name`, `email`, `phone` |
+| `profiles` | `id`, `full_name`, `email`, `phone`, `occupation` (phase 8) |
 | `enquiries` | `id`, `user_id`, `name`, `phone`, `email`, `message`, `status` |
-| `plots` | `id`, `plot_number`, `area_sqyds`, `price_per_sqyd`, `status` |
+| `plots` | `plot_number`, `area_sqyds`, `price_per_sqyd`, `status` + verification columns (phase 8) |
 
 ### Phase 2
 | Table | Key Columns |
 |---|---|
-| `seller_properties` | `id`, `seller_id`, `property_id` (SDV-YYYY-NNN), `state/district/mandal/village`, `land_used_type`, `land_soil_type`, `area_acres`, `expected_price`, `doc_urls[]`, `photo_urls[]`, `status`, `views`, `metadata jsonb` |
-| `appointments` | `id`, `user_id`, `property_id`, `appointment_date`, `time_slot`, `appointment_type`, `status`, `metadata jsonb` |
+| `seller_properties` | `id`, `seller_id`, `property_id` (SDV-YYYY-NNN), `state/district/mandal/village`, `land_used_type`, `land_soil_type`, `area_acres`, `expected_price`, `doc_urls[]`, `photo_urls[]`, `status`, `views`, `metadata jsonb`, `seller_interest` (phase 8) |
+| `appointments` | `user_id`, `property_id`, `appointment_date`, `time_slot`, `appointment_type`, `status`, … + `assigned_to`, `related_buyer_request_id`, `sla_target_at` (phase 8) |
 | `buyer_wishlist` | `id`, `buyer_id`, `property_id` — max 2 per buyer |
-| `buyer_requests` | `id`, `buyer_id`, `state/district/mandal`, `land_soil_type`, `area_min/max`, `price_max`, `status`, `metadata jsonb` |
+| `buyer_requests` | Preferred search: `state/district/mandal`. Plus `buyer_residence_city/state/notes`, `ops_comment`, `sdvf_status`, `sdvf_reason` (phase 8). |
 
-All Phase 2 tables have: RLS policies · `updated_at` trigger · `jsonb metadata` for future fields without migrations.
+### Phase 8 (migration `phase8_admin_ops_hub.sql`)
+| Table | Notes |
+|---|---|
+| `buyer_request_notes` | Internal thread per request; RLS admin + staff |
+| Policies | Several tables widened from admin-only to **admin + staff**; plots get admin/staff manage policy |
+
+Requires phase 3 tables (`service_bookings`, `payment_orders`) for the last policy swaps in that file.
+
+### Phase 9 (`phase9_feature_flags.sql`) — Feature flags / remote config
+| Table | Notes |
+|---|---|
+| `feature_flags` | Stable `key`, `enabled`, `payload` (JSON — **public** via `GET /api/feature-flags`, no secrets), `metadata` JSON for extra internal fields without new columns, `sort_order`. RLS: world-readable `SELECT`; admin + staff INSERT/UPDATE/DELETE. Manage in Admin → **Flags**. |
+
+Bundled seeds include `home_stats_bar` (toggles navbar `HomeStatsBar` stats ribbon when enabled).
+
+All Phase 2 tables have: RLS policies · `updated_at` trigger · `jsonb metadata` for future fields without migrations (where originally added).
 
 ---
 
@@ -185,15 +203,18 @@ All Phase 2 tables have: RLS policies · `updated_at` trigger · `jsonb metadata
 | Role | `user_metadata.role` | Default redirect |
 |---|---|---|
 | Buyer | `buyer` | `/dashboard` |
-| Seller (farmer) | `seller` | `/seller` |
-| Seller (agent) | `seller` | `/seller` |
+| Seller | `seller` | `/seller` |
+| Operations | `staff` | `/admin` |
 | Admin | `admin` | `/admin` |
 
-Route protection is in `src/proxy.js` (Next.js proxy convention).
+Route protection is in `src/proxy.js` (`isAdminOrStaff` for `/admin`; **staff** cannot access `/seller`).
 
-To make admin:
+Elevated UI logic uses `src/lib/roles.js`: **staff** has no Users tab, no approve/reject, no `/admin/property/new`. **`/api/admin/users`** remains **admin-only** (listing + PATCH roles).
+
+To promote a user:
 ```sql
 update auth.users set raw_user_meta_data = raw_user_meta_data || '{"role":"admin"}'::jsonb where email = 'x@x.com';
+-- or "staff" for ops
 ```
 
 ---
@@ -204,9 +225,17 @@ update auth.users set raw_user_meta_data = raw_user_meta_data || '{"role":"admin
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Client | `supabase.js`, `supabase-server.js` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Client | `supabase.js`, `supabase-server.js` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server **only** | `supabase-admin.js`, `/api/admin/users` listing, migrations tooling |
 | `RESEND_API_KEY` | Server | `api/send-enquiry/route.js`, `api/notify/route.js` |
 
-Never put `RESEND_API_KEY` in `NEXT_PUBLIC_` variables.
+Never put `RESEND_API_KEY` or `SUPABASE_SERVICE_ROLE_KEY` in `NEXT_PUBLIC_*` variables.
+
+---
+
+## Cursor (this repo)
+
+- **Rules:** `.cursor/rules/` — `sdv-farms.mdc` (stack + patterns), `content.mdc`, `admin-auth-rls.mdc`, `secrets.mdc`
+- **Skills:** `.cursor/skills/` — e.g. `add-supabase-table`, `sdv-farms-admin-ops`, `add-notification`, `add-page`, `add-bilingual-content`
 
 ---
 
@@ -234,8 +263,9 @@ CI runs: **Jest → Playwright → Build → Auto-tag** in that order.
 
 ❌ DON'T:
 - Don't use TypeScript
+- Don't commit passwords, API tokens, or service_role keys — use `.env.local` / CI secrets (`secrets.mdc` rule)
 - Don't add `Math.random()` or `Date.now()` in JSX render (hydration errors)
-- Don't expose `RESEND_API_KEY` to the client
+- Don't expose `RESEND_API_KEY` or `SUPABASE_SERVICE_ROLE_KEY` to the client
 - Don't hardcode English/Telugu text outside `content.js`
 - Don't call Resend directly from components — always go through `notify.js`
 - Don't put `'use client'` in a page file that needs `export const dynamic`

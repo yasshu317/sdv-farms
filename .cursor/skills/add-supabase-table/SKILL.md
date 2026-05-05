@@ -36,9 +36,17 @@ create policy "Users manage own rows"
   on your_table_name for all
   using (auth.uid() = user_id);
 
-create policy "Admin full access"
+-- Pick ONE pattern for ops-managed data:
+-- A) Admin + staff (see phase8 policies)
+create policy "Admin staff full access on your_table_name"
   on your_table_name for all
-  using ((auth.jwt()->'user_metadata'->>'role') = 'admin');
+  using ((auth.jwt()->'user_metadata'->>'role') in ('admin', 'staff'))
+  with check ((auth.jwt()->'user_metadata'->>'role') in ('admin', 'staff'));
+
+-- B) Admin-only (sensitive: billing, raw user listing from app DB, etc.)
+-- create policy "Admin full access on your_table_name"
+--   on your_table_name for all
+--   using ((auth.jwt()->'user_metadata'->>'role') = 'admin');
 
 -- Optional: public read
 -- create policy "Public can read"

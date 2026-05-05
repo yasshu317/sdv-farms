@@ -5,6 +5,7 @@ import NextLink from 'next/link'
 import { Phone } from 'lucide-react'
 import { useLang } from '../context/LanguageContext'
 import { content } from '../data/content'
+import { NAV_SCROLL_OFFSET } from '../lib/nav-scroll'
 
 // ─── Decoration data — ALL values pre-computed at module level ───────────────
 const MANGO_DATA = [
@@ -279,7 +280,7 @@ export default function Hero() {
       {mounted && <FloatingDecor />}
 
       {/* Main content */}
-      <div className="relative z-10 text-center px-4 sm:px-6 max-w-4xl mx-auto pt-20">
+      <div className="relative z-10 text-center px-4 sm:px-6 max-w-4xl mx-auto pt-28 md:pt-36">
         {/* Badge */}
         <span className="inline-flex items-center gap-2 bg-turmeric-500/20 border border-turmeric-400/40 text-turmeric-200 text-xs sm:text-sm font-semibold px-5 py-2 rounded-full mb-8 tracking-wide">
           <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
@@ -331,7 +332,7 @@ export default function Hero() {
             to="contact"
             smooth
             duration={600}
-            offset={-64}
+            offset={NAV_SCROLL_OFFSET}
             className="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/25 text-white font-semibold py-3 px-8 rounded-full transition-all duration-200 backdrop-blur-sm cursor-pointer"
           >
             <Phone size={17} />

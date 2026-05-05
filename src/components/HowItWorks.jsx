@@ -25,7 +25,7 @@ const STEPS = [
 
 export default function HowItWorks() {
   const { lang } = useLang()
-  const [stats, setStats]       = useState({ properties: 0, states: 3 })
+  const [stats, setStats]       = useState({ properties: 0 })
   const [sellerUser, setSellerUser] = useState(false)
 
   useEffect(() => {
@@ -45,10 +45,9 @@ export default function HowItWorks() {
       <div className="max-w-5xl mx-auto">
 
         {/* Stats bar */}
-        <div className="grid grid-cols-3 gap-4 mb-14">
+        <div className="grid grid-cols-2 gap-4 mb-14">
           {[
             { value: stats.properties > 0 ? `${stats.properties}+` : 'Free', label: stats.properties > 0 ? 'Properties Listed' : 'to List & Buy' },
-            { value: stats.states,   label: 'States Covered' },
             { value: '100%',         label: 'Clear Title' },
           ].map((s, i) => (
             <div key={i} className="text-center py-5 rounded-2xl bg-white/4 border border-white/8">

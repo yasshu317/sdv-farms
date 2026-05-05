@@ -11,6 +11,12 @@ const STEPS = ['Location', 'Land Details', 'Documents & Photos']
 
 const LAND_USED_TYPES = ['Agriculture', 'Estate Agriculture', 'Industrial', 'Commercial', 'Residential']
 const LAND_SOIL_TYPES = ['Black', 'Red', 'Sandy', 'Mixed']
+const ADMIN_SELLER_INTEREST_OPTS = [
+  { value: '', label: 'Seller timing (optional)' },
+  { value: 'urgent_sale', label: 'Urgent sale' },
+  { value: 'ready_to_sale', label: 'Ready to sell' },
+  { value: 'interested', label: 'Interested' },
+]
 const DOC_TYPE_BY_STATE = {
   'Andhra Pradesh': 'Adangal / 1B',
   Telangana: 'Pahani / ROR-1B',
@@ -30,6 +36,7 @@ const INITIAL = {
   road_access: false,
   area_acres: '',
   expected_price: '',
+  seller_interest: '',
   doc_urls: [],
   photo_urls: [],
 }
@@ -108,6 +115,7 @@ export default function AdminPropertyForm({ mode, propertyId, initialForm }) {
             road_access: form.road_access,
             area_acres: Number(form.area_acres),
             expected_price: Number(form.expected_price),
+            seller_interest: form.seller_interest || null,
             doc_urls: form.doc_urls,
             photo_urls: form.photo_urls,
           })
@@ -144,6 +152,7 @@ export default function AdminPropertyForm({ mode, propertyId, initialForm }) {
           road_access: form.road_access,
           area_acres: Number(form.area_acres),
           expected_price: Number(form.expected_price),
+          seller_interest: form.seller_interest || null,
           doc_urls: form.doc_urls,
           photo_urls: form.photo_urls,
           status: 'approved',
@@ -263,6 +272,18 @@ export default function AdminPropertyForm({ mode, propertyId, initialForm }) {
           onChange={set('expected_price')}
           className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-paddy-500"
         />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Seller interest / urgency</label>
+        <select
+          value={form.seller_interest}
+          onChange={set('seller_interest')}
+          className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-paddy-500 bg-white"
+        >
+          {ADMIN_SELLER_INTEREST_OPTS.map(o => (
+            <option key={o.value || '-'} value={o.value}>{o.label}</option>
+          ))}
+        </select>
       </div>
       <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700">
         <input

@@ -8,6 +8,7 @@ import { useLang } from '../context/LanguageContext'
 import { content } from '../data/content'
 import { createClient } from '../lib/supabase'
 import { REGISTER_LIST_LAND } from '../lib/routes'
+import { isAdminOrStaff } from '../lib/roles'
 
 /**
  * Sticky top bar for inner pages: consistent paths to Properties, Services,
@@ -74,52 +75,25 @@ export default function SiteHeader({ active: activeProp = null }) {
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-paddy-950/95 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-2 min-w-0">
-        <div className="flex items-center gap-3 sm:gap-5 min-w-0">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-w-0">
+        {/* Row 1 — brand + account + book (desktop) */}
+        <div className="flex items-center justify-between gap-3 min-h-[3.25rem] py-2 md:min-h-[3.75rem] md:py-2.5">
           <NextLink
             href="/"
-            className="flex shrink-0 items-center gap-1.5 text-white font-display font-bold text-base sm:text-lg hover:opacity-90 transition-opacity"
+            className="flex shrink-0 items-center gap-1.5 text-white font-display font-bold text-base sm:text-lg hover:opacity-90 transition-opacity leading-none"
             title="SDV Farms — Home"
           >
-            <span aria-hidden>🌾</span>
-            <span className="whitespace-nowrap">SDV Farms</span>
+            <span aria-hidden className="text-lg">🌾</span>
+            <span className="whitespace-nowrap leading-none">SDV Farms</span>
           </NextLink>
-          <nav className="hidden md:flex items-center gap-2 lg:gap-3 flex-wrap min-w-0" aria-label="Main">
-            <NextLink href="/properties" className={linkClass('properties')}>{t.properties}</NextLink>
-            <NextLink href="/services" className={linkClass('services')}>{t.services}</NextLink>
-            <NextLink href="/buyer-request" className={linkClass('buyer-request')}>{t.landRequest}</NextLink>
-            {user ? (
-              <NextLink
-                href={
-                  user.user_metadata?.role === 'admin'  ? '/admin'     :
-                  user.user_metadata?.role === 'seller' ? '/seller'    : '/dashboard'
-                }
-                className="text-sm font-semibold bg-turmeric-500/20 border border-turmeric-400/30 text-turmeric-300 hover:bg-turmeric-500/30 px-3 py-1 rounded-full transition-colors"
-              >
-                {user.user_metadata?.role === 'admin'  ? '⚙️ Admin'         :
-                 user.user_metadata?.role === 'seller' ? '🌾 My Listings'   : '🏡 My Dashboard'}
-              </NextLink>
-            ) : (
-              <NextLink href={REGISTER_LIST_LAND} className="text-sm font-medium text-white/75 hover:text-turmeric-300 transition-colors">
-                {t.listLand}
-              </NextLink>
-            )}
-            <span className="hidden lg:inline w-px h-4 shrink-0 mx-0.5 bg-white/25" aria-hidden />
-            {homeSectionLinks.map(item => (
-              <NextLink key={item.href} href={item.href} className={`hidden lg:inline ${hashLinkClass}`}>
-                {item.label}
-              </NextLink>
-            ))}
+
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <NextLink
               href="/#contact"
-              className="hidden lg:inline-block btn-gold text-xs font-semibold py-1.5 px-4 rounded-full"
+              className="hidden md:inline-flex items-center justify-center btn-gold text-xs font-semibold py-2 px-4 rounded-full whitespace-nowrap leading-none"
             >
               {t.bookVisit}
             </NextLink>
-          </nav>
-        </div>
-
-        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
           {user ? (
             <div className="relative hidden sm:block">
               <button
@@ -141,28 +115,30 @@ export default function SiteHeader({ active: activeProp = null }) {
                       <span className="font-semibold text-sm text-gray-800 truncate">
                         {user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0]}
                       </span>
-                      {user.user_metadata?.role && (
-                        <span className={`text-xs font-medium rounded-full px-2 py-0.5 capitalize shrink-0 ${
-                          user.user_metadata.role === 'admin'  ? 'bg-purple-100 text-purple-700' :
-                          user.user_metadata.role === 'seller' ? 'bg-turmeric-100 text-turmeric-700' :
-                          'bg-green-100 text-green-700'
-                        }`}>
-                          {user.user_metadata.role === 'admin' ? '⚙️ Admin' :
-                           user.user_metadata.role === 'seller' ? '🌾 Seller' : '🏡 Buyer'}
-                        </span>
-                      )}
+                        {user.user_metadata?.role && (
+                          <span className={`text-xs font-medium rounded-full px-2 py-0.5 capitalize shrink-0 ${
+                            user.user_metadata.role === 'admin'  ? 'bg-purple-100 text-purple-700' :
+                            user.user_metadata.role === 'staff'   ? 'bg-amber-100 text-amber-800' :
+                            user.user_metadata.role === 'seller' ? 'bg-turmeric-100 text-turmeric-700' :
+                            'bg-green-100 text-green-700'
+                          }`}>
+                            {user.user_metadata.role === 'admin' ? '⚙️ Admin' :
+                             user.user_metadata.role === 'staff' ? '📋 Staff' :
+                             user.user_metadata.role === 'seller' ? '🌾 Seller' : '🏡 Buyer'}
+                          </span>
+                        )}
                     </div>
                   </div>
                   <NextLink
                     href={
-                      user.user_metadata?.role === 'admin' ? '/admin' :
+                      isAdminOrStaff(user.user_metadata?.role) ? '/admin' :
                         user.user_metadata?.role === 'seller' ? '/seller' : '/dashboard'
                     }
                     onClick={() => setUserMenu(false)}
                     className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
                   >
                     <LayoutDashboard size={14} />
-                    {user.user_metadata?.role === 'admin' ? t.adminPanel :
+                    {isAdminOrStaff(user.user_metadata?.role) ? t.adminPanel :
                       user.user_metadata?.role === 'seller' ? t.myListings : t.myDashboard}
                   </NextLink>
                   <button
@@ -193,7 +169,46 @@ export default function SiteHeader({ active: activeProp = null }) {
           >
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
+          </div>
         </div>
+
+        {/* Row 2 — Phase 1 + routes (left) · home sections (right) */}
+        <nav
+          className="hidden md:flex md:flex-wrap md:items-center md:justify-between md:gap-x-6 md:gap-y-2 border-t border-white/10 py-2.5 px-0.5 bg-black/15 min-w-0"
+          aria-label="Main"
+        >
+          <div className="flex flex-wrap items-center gap-x-3 lg:gap-x-4 min-w-0">
+            <span className="inline-flex items-center rounded-full border border-turmeric-400/35 bg-turmeric-500/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-turmeric-200 shrink-0 leading-none">
+              {t.phase1}
+            </span>
+            <NextLink href="/properties" className={`whitespace-nowrap leading-none ${linkClass('properties')}`}>{t.properties}</NextLink>
+            <NextLink href="/services" className={`whitespace-nowrap leading-none ${linkClass('services')}`}>{t.services}</NextLink>
+            <NextLink href="/buyer-request" className={`whitespace-nowrap leading-none ${linkClass('buyer-request')}`}>{t.landRequest}</NextLink>
+            {user ? (
+              <NextLink
+                href={
+                  isAdminOrStaff(user.user_metadata?.role)  ? '/admin'     :
+                  user.user_metadata?.role === 'seller' ? '/seller'    : '/dashboard'
+                }
+                className="whitespace-nowrap leading-none text-sm font-semibold bg-turmeric-500/20 border border-turmeric-400/30 text-turmeric-300 hover:bg-turmeric-500/30 px-3 py-1 rounded-full transition-colors"
+              >
+                {isAdminOrStaff(user.user_metadata?.role) ? (user.user_metadata?.role === 'staff' ? '📋 Ops' : '⚙️ Admin')         :
+                 user.user_metadata?.role === 'seller' ? '🌾 My Listings'   : '🏡 My Dashboard'}
+              </NextLink>
+            ) : (
+              <NextLink href={REGISTER_LIST_LAND} className="whitespace-nowrap leading-none text-sm font-medium text-white/75 hover:text-turmeric-300 transition-colors">
+                {t.listLand}
+              </NextLink>
+            )}
+          </div>
+          <div className="flex flex-wrap items-center justify-end gap-x-3 lg:gap-x-4 shrink-0">
+            {homeSectionLinks.map(item => (
+              <NextLink key={item.href} href={item.href} className={`whitespace-nowrap leading-none ${hashLinkClass}`}>
+                {item.label}
+              </NextLink>
+            ))}
+          </div>
+        </nav>
       </div>
 
       {mobileOpen && (
@@ -210,13 +225,13 @@ export default function SiteHeader({ active: activeProp = null }) {
           {user ? (
             <NextLink
               href={
-                user.user_metadata?.role === 'admin'  ? '/admin'  :
+                isAdminOrStaff(user.user_metadata?.role)  ? '/admin'  :
                 user.user_metadata?.role === 'seller' ? '/seller' : '/dashboard'
               }
               onClick={() => setMobileOpen(false)}
               className="block py-2.5 px-1 text-sm font-semibold text-turmeric-300"
             >
-              {user.user_metadata?.role === 'admin'  ? '⚙️ Admin'        :
+              {isAdminOrStaff(user.user_metadata?.role) ? (user.user_metadata?.role === 'staff' ? '📋 Ops hub' : '⚙️ Admin')        :
                user.user_metadata?.role === 'seller' ? '🌾 My Listings'  : '🏡 My Dashboard'}
             </NextLink>
           ) : (

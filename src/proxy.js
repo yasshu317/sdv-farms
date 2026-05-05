@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
+import { isAdminOrStaff } from './lib/roles'
+import { homePathForRole } from './lib/authRedirects'
 
 export async function proxy(request) {
   let supabaseResponse = NextResponse.next({ request })
@@ -29,18 +31,19 @@ export async function proxy(request) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
-  // Protect /admin — must be logged in with admin role
+  // Protect /admin — must be logged in with admin or staff role
   if (pathname.startsWith('/admin')) {
     if (!user) return NextResponse.redirect(new URL('/auth/login', request.url))
-    if (user.user_metadata?.role !== 'admin') {
+    if (!isAdminOrStaff(user.user_metadata?.role)) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
   }
 
-  // Protect /seller — must be logged in with seller or admin role
+  // Protect /seller — must be logged in with seller or admin role (staff uses /admin only)
   if (pathname.startsWith('/seller')) {
     if (!user) return NextResponse.redirect(new URL('/auth/login', request.url))
     const role = user.user_metadata?.role
+    if (role === 'staff') return NextResponse.redirect(new URL('/admin', request.url))
     if (role !== 'seller' && role !== 'admin') {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
@@ -49,7 +52,7 @@ export async function proxy(request) {
   // Redirect logged-in users away from auth pages
   if (user && (pathname.startsWith('/auth/login') || pathname.startsWith('/auth/register'))) {
     const role = user.user_metadata?.role
-    const dest = role === 'admin' ? '/admin' : role === 'seller' ? '/seller' : '/dashboard'
+    const dest = homePathForRole(role)
     return NextResponse.redirect(new URL(dest, request.url))
   }
 

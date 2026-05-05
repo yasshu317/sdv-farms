@@ -30,10 +30,11 @@ jest.mock('../lib/supabase', () => ({
 
 const empty = {
   enquiries: [],
-  profiles: [],
   plots: [],
+  sellerProperties: [],
   appointments: [],
   buyerRequests: [],
+  featureFlags: [],
 }
 
 const sampleProperty = {

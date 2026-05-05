@@ -14,7 +14,7 @@ export default async function DashboardPage(props) {
   // Redirect wrong-role users to their actual home with an explanation banner
   const role = user.user_metadata?.role
   if (role === 'seller') redirect('/seller?redirected=1')
-  if (role === 'admin')  redirect('/admin?redirected=1')
+  if (role === 'admin' || role === 'staff') redirect('/admin?redirected=1')
 
   // Fetch this user's enquiries, join property title for context
   const { data: enquiries } = await supabase

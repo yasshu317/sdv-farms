@@ -16,6 +16,9 @@ export const BUYER_REQUEST_INITIAL = {
   area_max: '',
   price_max: '',
   notes: '',
+  buyer_residence_city: '',
+  buyer_residence_state: '',
+  buyer_residence_notes: '',
 }
 
 export function mapBuyerRequestRowToForm(row) {
@@ -32,6 +35,9 @@ export function mapBuyerRequestRowToForm(row) {
     area_max: row.area_max != null ? String(row.area_max) : '',
     price_max: row.price_max != null ? String(row.price_max) : '',
     notes: row.notes || '',
+    buyer_residence_city: row.buyer_residence_city || '',
+    buyer_residence_state: row.buyer_residence_state || '',
+    buyer_residence_notes: row.buyer_residence_notes || '',
   }
 }
 
@@ -112,6 +118,31 @@ export default function BuyerLandRequestForm({
       <div>
         <label className={labelCls}>Email</label>
         <input type="email" value={form.email} onChange={set('email')} className={inputCls} placeholder="you@example.com" />
+      </div>
+
+      <div className="border-t border-white/10 pt-4">
+        <p className="text-white/60 text-xs mb-3 uppercase tracking-wider">Where you live (optional)</p>
+        <p className="text-white/40 text-[11px] mb-3">Separate from preferred search area below — helps us coordinate visits.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+          <div>
+            <label className={labelCls}>City</label>
+            <input type="text" value={form.buyer_residence_city} onChange={set('buyer_residence_city')} className={inputCls} placeholder="Your city" />
+          </div>
+          <div>
+            <label className={labelCls}>State</label>
+            <input type="text" value={form.buyer_residence_state} onChange={set('buyer_residence_state')} className={inputCls} placeholder="Your state" />
+          </div>
+        </div>
+        <div>
+          <label className={labelCls}>Residence notes</label>
+          <textarea
+            value={form.buyer_residence_notes}
+            onChange={set('buyer_residence_notes')}
+            rows={2}
+            placeholder="Landmark, pin code, preferred contact hours…"
+            className={`${inputCls} resize-none`}
+          />
+        </div>
       </div>
 
       <div className="border-t border-white/10 pt-4">
