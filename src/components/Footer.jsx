@@ -1,7 +1,9 @@
 'use client'
 import { Phone, Mail, MapPin } from 'lucide-react'
+import Link from 'next/link'
 import { useLang } from '../context/LanguageContext'
 import { content } from '../data/content'
+import BrandHeadingAccent from './BrandHeadingAccent'
 
 function PaddyDivider() {
   return (
@@ -39,7 +41,8 @@ export default function Footer() {
         {/* Brand */}
         <div className="text-center">
           <h3 className="font-display text-4xl font-bold text-turmeric-400 mb-1">SDV Farms</h3>
-          <p className="text-paddy-400 text-sm tracking-[0.25em] uppercase font-medium">Phase 1</p>
+          <BrandHeadingAccent variant="large" />
+          <p className="text-paddy-400 text-sm tracking-[0.25em] uppercase font-medium mt-1">Phase 1</p>
         </div>
 
         <PaddyDivider />
@@ -74,14 +77,34 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-white/8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div className="border-t border-white/8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className={`text-paddy-600 text-xs ${lang === 'te' ? 'telugu' : ''}`}>{t.rights}</p>
-          {process.env.NEXT_PUBLIC_APP_VERSION && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-paddy-600 text-xs font-mono">
-              <span className="w-1.5 h-1.5 rounded-full bg-paddy-500/60 inline-block" />
-              v{process.env.NEXT_PUBLIC_APP_VERSION}
-            </span>
-          )}
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs">
+            <Link
+              href="/business"
+              className="text-paddy-500 hover:text-turmeric-400 transition-colors underline-offset-4 hover:underline"
+            >
+              Business docs
+            </Link>
+            <Link
+              href="/business/flows"
+              className="text-paddy-500 hover:text-turmeric-400 transition-colors underline-offset-4 hover:underline"
+            >
+              Buyer / seller / admin flows
+            </Link>
+            <Link
+              href="/business/design"
+              className="text-paddy-500 hover:text-turmeric-400 transition-colors underline-offset-4 hover:underline"
+            >
+              Brand &amp; design
+            </Link>
+            {process.env.NEXT_PUBLIC_APP_VERSION && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-paddy-600 font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-paddy-500/60 inline-block" />
+                v{process.env.NEXT_PUBLIC_APP_VERSION}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </footer>

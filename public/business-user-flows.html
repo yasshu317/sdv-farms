@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SDV Farms — Who uses the site &amp; how (user flows)</title>
+  <meta name="description" content="Visitor, buyer, seller, admin and staff journeys for SDV Farms." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #071709;
+      --card: rgba(14, 44, 19, 0.55);
+      --line: rgba(255,255,255,0.1);
+      --text: #d9edda;
+      --muted: #84c188;
+      --gold: #f1c929;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, sans-serif;
+      background: linear-gradient(165deg, var(--bg), #0e2c13 50%, var(--bg));
+      color: var(--text);
+      line-height: 1.65;
+      min-height: 100vh;
+    }
+    .wrap { max-width: 42rem; margin: 0 auto; padding: 2rem 1.25rem 3.5rem; }
+    h1, h2 { font-family: "Playfair Display", Georgia, serif; color: #fff; }
+    h1 { font-size: clamp(1.75rem, 4.5vw, 2.35rem); margin: 0 0 1rem; line-height: 1.2; }
+    h2 { font-size: 1.35rem; margin: 2.5rem 0 1rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+    .badge {
+      font-family: Inter, sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      border: 1px solid rgba(241,201,41,0.35);
+      background: rgba(212,160,23,0.12);
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+    }
+    .eyebrow { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+    .lede { color: var(--muted); font-size: 1rem; margin-bottom: 2rem; }
+    nav.toc {
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      padding: 1rem 1.25rem;
+      background: var(--card);
+      margin-bottom: 2.5rem;
+    }
+    nav.toc p { margin: 0 0 0.5rem; font-size: 0.7rem; font-weight: 700; color: #54a459; text-transform: uppercase; letter-spacing: 0.1em; }
+    nav.toc a { color: var(--gold); text-decoration: none; margin-right: 1rem; font-size: 0.9rem; }
+    nav.toc a:hover { text-decoration: underline; }
+    ol { padding-left: 1.2rem; margin: 1rem 0; }
+    ol li { margin-bottom: 0.65rem; }
+    ol li::marker { color: var(--gold); }
+    code, .path { font-family: ui-monospace, monospace; font-size: 0.85em; background: rgba(7,23,9,0.75); color: #fde68a; padding: 0.15rem 0.4rem; border-radius: 6px; }
+    .muted { color: var(--muted); font-size: 0.9rem; }
+    .foot { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--line); font-size: 0.8rem; color: var(--muted); text-align: center; }
+    header.top { border-bottom: 1px solid var(--line); padding: 1rem 1.25rem; background: rgba(14, 44, 19, 0.85); }
+    header.top .inner { max-width: 42rem; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.75rem; align-items: center; }
+    header.top a { color: var(--gold); text-decoration: none; font-size: 0.875rem; font-weight: 600; }
+    header.top a:hover { text-decoration: underline; }
+    @media print {
+      body { background: #fff; color: #0e2c13; }
+      h1, h2 { color: #071709; }
+      .badge { color: #92400e; border-color: #d4a017; }
+      .path, code { background: #f0f7f1; color: #1a4520; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="inner">
+      <a href="/business">← Business docs</a>
+      <a href="/">Website home</a>
+    </div>
+  </header>
+  <div class="wrap">
+    <p class="eyebrow">Product guide</p>
+    <h1 id="top">How people use this website</h1>
+    <p class="lede">
+      <strong>Visitors</strong>, <strong>buyers</strong>, <strong>sellers</strong>, and <strong>admin / staff</strong> each follow a clear path.
+      This page is the business-facing flow document — share the live URL <span class="path">/business/flows</span> on your domain, or distribute this HTML from the deployed site root.
+    </p>
+
+    <nav class="toc" aria-label="On this page">
+      <p>Jump to</p>
+      <a href="#visitors">Visitors</a>
+      <a href="#buyers">Buyers</a>
+      <a href="#sellers">Sellers</a>
+      <a href="#admin">Admin &amp; staff</a>
+      <a href="#routing">Routing</a>
+    </nav>
+
+    <section id="visitors">
+      <h2>Visitors <span class="badge">No account</span></h2>
+      <p>Anyone can explore marketing content, listings, services, and contact without signing in.</p>
+      <ol>
+        <li>Home page → story, gallery, location, <strong>Book a visit</strong> / contact.</li>
+        <li><span class="path">/properties</span> — filter verified agriculture listings.</li>
+        <li>Property detail → enquire / book visit (as offered on the page).</li>
+        <li><span class="path">/buyer-request</span> — tell the team what land you need (guest or signed-in).</li>
+        <li><span class="path">/services</span> — Phase II services and enquiries for landowners.</li>
+        <li>Sign up only when a personal dashboard or seller tools are needed.</li>
+      </ol>
+    </section>
+
+    <section id="buyers">
+      <h2>Buyers <span class="badge">Role: buyer</span></h2>
+      <p>The buyer <strong>dashboard</strong> tracks property enquiries, plot interests, and land requests.</p>
+      <ol>
+        <li>Register at <span class="path">/auth/register</span> (choose Buyer) or sign in at <span class="path">/auth/login</span>.</li>
+        <li>After email verification (if required) → first home is <span class="path">/dashboard</span>.</li>
+        <li>Tabs such as <strong>Overview, Enquiries, Plot interests, Land requests</strong> show lead status (pending, contacted, visited, booked, etc.).</li>
+        <li>Keep using <span class="path">/properties</span>; actions on listings connect to the dashboard where supported.</li>
+      </ol>
+      <p class="muted">Fulfilment is done by admin/staff in the operations hub.</p>
+    </section>
+
+    <section id="sellers">
+      <h2>Sellers <span class="badge">Role: seller</span></h2>
+      <p>Sellers manage listings from the seller hub; SDV reviews and approves before go-live.</p>
+      <ol>
+        <li><strong>List your land</strong> → <span class="path">/auth/register?flow=seller</span> (seller-specific signup).</li>
+        <li>Eligibility check blocks restricted land types (e.g. Poramboke, Forest, etc.).</li>
+        <li>After verify + login → <span class="path">/seller</span>.</li>
+        <li>Create <span class="path">/seller/property/new</span>; edit via <span class="path">/seller/property/[id]/edit</span>.</li>
+        <li>Active listing limits and review rules apply in-product.</li>
+      </ol>
+    </section>
+
+    <section id="admin">
+      <h2>Admin &amp; staff <span class="badge">admin · staff</span></h2>
+      <p>Operations share <span class="path">/admin</span>. Access is role-gated; sellers use <span class="path">/seller</span>, not admin.</p>
+      <ol>
+        <li>Sign in as <strong>admin</strong> or <strong>staff</strong> → land on <span class="path">/admin</span>.</li>
+        <li>Work enquiries, buyer requests, appointments, seller properties (review/edit), plots/verification, and other ops tabs exposed in the live admin UI.</li>
+        <li>Admin-only tools may include user management, feature flags, and full listing control — match what you see at <span class="path">/admin</span>.</li>
+      </ol>
+    </section>
+
+    <section id="routing">
+      <h2>After login — default home</h2>
+      <ul class="muted" style="list-style: disc; padding-left: 1.3rem;">
+        <li><strong>Buyer</strong> (default) → <span class="path">/dashboard</span></li>
+        <li><strong>Seller</strong> → <span class="path">/seller</span></li>
+        <li><strong>Admin / staff</strong> → <span class="path">/admin</span></li>
+      </ul>
+    </section>
+
+    <div class="foot">
+      SDV Farms — user-flow reference for business stakeholders. For brand colours &amp; logo see <span class="path">/business/design</span> or <span class="path">/business-design-guide.html</span>.
+    </div>
+  </div>
+</body>
+</html>

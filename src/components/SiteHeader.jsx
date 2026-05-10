@@ -9,6 +9,7 @@ import { content } from '../data/content'
 import { createClient } from '../lib/supabase'
 import { REGISTER_LIST_LAND } from '../lib/routes'
 import { isAdminOrStaff } from '../lib/roles'
+import BrandHeadingAccent from './BrandHeadingAccent'
 
 /**
  * Sticky top bar for inner pages: consistent paths to Properties, Services,
@@ -84,7 +85,10 @@ export default function SiteHeader({ active: activeProp = null }) {
             title="SDV Farms — Home"
           >
             <span aria-hidden className="text-lg">🌾</span>
-            <span className="whitespace-nowrap leading-none">SDV Farms</span>
+            <span className="inline-flex flex-col items-stretch min-w-0">
+              <span className="whitespace-nowrap leading-none">SDV Farms</span>
+              <BrandHeadingAccent variant="navbar" />
+            </span>
           </NextLink>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">

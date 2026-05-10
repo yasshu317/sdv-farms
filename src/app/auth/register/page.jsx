@@ -3,6 +3,7 @@ import { Suspense, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '../../../lib/supabase'
+import BrandHeadingAccent from '../../../components/BrandHeadingAccent'
 
 const DISALLOWED_LAND_TYPES = [
   'Restricted land', 'Poramboke', 'Assigned land', 'Forest land',
@@ -178,9 +179,12 @@ function RegisterForm() {
       <div className="w-full max-w-md">
 
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 text-white hover:text-turmeric-300 transition-colors">
-            <span className="text-3xl">🌾</span>
-            <span className="font-display text-2xl font-bold">SDV Farms</span>
+          <Link href="/" className="inline-flex flex-col items-center gap-1 text-white hover:text-turmeric-300 transition-colors">
+            <span className="inline-flex items-center gap-2">
+              <span className="text-3xl">🌾</span>
+              <span className="font-display text-2xl font-bold">SDV Farms</span>
+            </span>
+            <BrandHeadingAccent variant="compact" />
           </Link>
           <p className="text-white/50 text-sm mt-2">{subtitle}</p>
         </div>

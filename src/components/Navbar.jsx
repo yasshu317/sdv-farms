@@ -10,7 +10,7 @@ import { createClient } from '../lib/supabase'
 import { REGISTER_LIST_LAND } from '../lib/routes'
 import { isAdminOrStaff } from '../lib/roles'
 import { NAV_SCROLL_OFFSET } from '../lib/nav-scroll'
-import HomeStatsBar from './HomeStatsBar'
+import BrandHeadingAccent from './BrandHeadingAccent'
 
 const navLinkClass = (scrolled, telugu) =>
   `text-sm font-medium transition-colors hover:text-turmeric-500 ${
@@ -70,8 +70,7 @@ export default function Navbar() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Row 1 — brand | optically centered story links | actions */}
-        <div className="relative flex items-center justify-between gap-3 min-h-[3.5rem] py-2 md:min-h-[3.75rem] md:py-2.5">
+        <div className="flex items-center justify-between min-h-[3.25rem] gap-2 sm:gap-3 min-w-0 py-2 md:py-2.5 md:min-h-0">
           <NextLink
             href="/"
             aria-label="SDV Farms — Home"
@@ -83,52 +82,87 @@ export default function Navbar() {
             }`}
           >
             <span className="text-lg mr-0.5 leading-none" aria-hidden>🌾</span>
-            <span className="font-display font-bold text-lg sm:text-xl whitespace-nowrap leading-none">SDV Farms</span>
+            <span className="inline-flex flex-col items-stretch gap-0 min-w-0">
+              <span className="font-display font-bold text-lg sm:text-xl whitespace-nowrap leading-none">SDV Farms</span>
+              <BrandHeadingAccent variant="navbar" />
+            </span>
           </NextLink>
 
-          <div className="pointer-events-none absolute left-1/2 top-1/2 hidden max-w-[min(100%,36rem)] -translate-x-1/2 -translate-y-1/2 md:block">
-            <div className="pointer-events-auto flex items-center justify-center gap-x-3 md:gap-x-4 lg:gap-x-6 px-2 md:px-4">
-              {scrollSectionLinks.slice(0, 4).map(l => (
-                <Link
-                  key={l.to}
-                  to={l.to}
-                  smooth
-                  duration={500}
-                  offset={NAV_SCROLL_OFFSET}
-                  className={`cursor-pointer whitespace-nowrap leading-none ${navLinkClass(scrolled, telugu)}`}
-                >
-                  {l.label}
-                </Link>
-              ))}
-            </div>
-          </div>
+          <div className="hidden md:flex items-center gap-x-2 lg:gap-x-3 flex-1 min-w-0 justify-end flex-wrap gap-y-2">
+            <NextLink
+              href="/properties"
+              className={`shrink-0 whitespace-nowrap leading-none text-sm font-medium transition-colors hover:text-turmeric-500 ${
+                scrolled ? 'text-paddy-900' : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]'
+              } ${telugu ? 'telugu text-xs' : ''}`}
+            >
+              {t.properties}
+            </NextLink>
+            <NextLink
+              href="/services"
+              className={`shrink-0 whitespace-nowrap leading-none text-sm font-medium transition-colors hover:text-turmeric-500 ${
+                scrolled ? 'text-paddy-900' : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]'
+              } ${telugu ? 'telugu text-xs' : ''}`}
+            >
+              {t.services}
+            </NextLink>
+            <NextLink
+              href="/buyer-request"
+              className={`shrink-0 whitespace-nowrap leading-none text-sm font-medium transition-colors hover:text-turmeric-500 ${
+                scrolled ? 'text-paddy-900' : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]'
+              } ${telugu ? 'telugu text-xs' : ''}`}
+            >
+              {t.landRequest}
+            </NextLink>
+            <NextLink
+              href={REGISTER_LIST_LAND}
+              className={`shrink-0 whitespace-nowrap leading-none text-sm font-medium transition-colors hover:text-turmeric-500 ${
+                scrolled ? 'text-paddy-900' : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]'
+              } ${telugu ? 'telugu text-xs' : ''}`}
+            >
+              {t.listLand}
+            </NextLink>
 
-          <div className="relative z-10 flex items-center justify-end gap-2 lg:gap-3 shrink-0">
+            <span
+              className={`hidden lg:inline w-px h-4 shrink-0 mx-0.5 ${scrolled ? 'bg-paddy-200' : 'bg-white/35'}`}
+              aria-hidden
+            />
+
+            {scrollSectionLinks.map(l => (
+              <Link
+                key={l.to}
+                to={l.to}
+                smooth
+                duration={500}
+                offset={NAV_SCROLL_OFFSET}
+                className={`shrink-0 cursor-pointer whitespace-nowrap leading-none ${navLinkClass(scrolled, telugu)}`}
+              >
+                {l.label}
+              </Link>
+            ))}
+
             <button
               type="button"
               onClick={toggle}
-              className={`text-xs font-semibold border-2 rounded-full px-3 py-1.5 transition-all leading-none ${
+              className={`text-xs font-semibold border-2 rounded-full px-2.5 py-1.5 lg:px-3 transition-all leading-none shrink-0 ${
                 scrolled
                   ? 'border-paddy-600 bg-white text-paddy-800 shadow-sm hover:bg-paddy-700 hover:text-white hover:border-paddy-700'
                   : 'border-white/40 text-white/90 hover:bg-white/15'
               }`}
             >
-              <span className="hidden sm:inline">{lang === 'en' ? 'తెలుగు' : 'English'}</span>
-              <span className="sm:hidden">{lang === 'en' ? 'తె' : 'EN'}</span>
+              {lang === 'en' ? 'తెలుగు' : 'English'}
             </button>
 
-            <div className="hidden md:flex items-center gap-2 lg:gap-3">
             {user ? (
-              <div className="relative">
+              <div className="relative shrink-0">
                 <button
                   type="button"
                   onClick={() => setUserMenu(m => !m)}
-                  className={`flex items-center gap-2 text-sm font-medium border rounded-full px-3 py-1.5 transition-all leading-none ${
+                  className={`flex items-center gap-1.5 sm:gap-2 text-sm font-medium border rounded-full px-2.5 py-1.5 transition-all leading-none ${
                     scrolled ? 'border-paddy-400 bg-white text-paddy-900 shadow-sm hover:bg-paddy-50' : 'border-white/30 text-white hover:bg-white/10'
                   }`}
                 >
                   <User size={14} className="shrink-0" />
-                  <span className="max-w-[80px] truncate">{user.user_metadata?.full_name?.split(' ')[0] || 'Account'}</span>
+                  <span className="max-w-[72px] lg:max-w-[80px] truncate">{user.user_metadata?.full_name?.split(' ')[0] || 'Account'}</span>
                 </button>
                 {userMenu && (
                   <div className="absolute right-0 top-10 bg-white border border-gray-100 rounded-2xl shadow-xl py-2 w-52 z-50">
@@ -175,9 +209,12 @@ export default function Navbar() {
                 )}
               </div>
             ) : (
-              <NextLink href="/auth/login" className={`text-sm font-semibold border-2 rounded-full px-3 py-1.5 transition-all leading-none ${
-                scrolled ? 'border-paddy-600 bg-white text-paddy-800 shadow-sm hover:bg-paddy-600 hover:text-white' : 'border-white/40 text-white/90 hover:bg-white/15'
-              } ${telugu ? 'telugu' : ''}`}>
+              <NextLink
+                href="/auth/login"
+                className={`shrink-0 text-sm font-semibold border-2 rounded-full px-2.5 py-1.5 lg:px-3 transition-all leading-none ${
+                  scrolled ? 'border-paddy-600 bg-white text-paddy-800 shadow-sm hover:bg-paddy-600 hover:text-white' : 'border-white/40 text-white/90 hover:bg-white/15'
+                } ${telugu ? 'telugu' : ''}`}
+              >
                 {t.signIn}
               </NextLink>
             )}
@@ -187,13 +224,32 @@ export default function Navbar() {
               smooth
               duration={500}
               offset={NAV_SCROLL_OFFSET}
-              className="btn-gold py-2 px-4 lg:px-5 text-sm whitespace-nowrap leading-none"
+              className="btn-gold py-1.5 px-3 lg:py-2 lg:px-4 text-xs lg:text-sm whitespace-nowrap leading-none shrink-0"
             >
               {t.bookVisit}
             </Link>
-            </div>
+          </div>
 
-            <button type="button" className="md:hidden p-1 -mr-0.5 rounded-lg text-white/90 hover:bg-white/10" onClick={() => setOpen(o => !o)} aria-expanded={open} aria-label={open ? 'Close menu' : 'Open menu'}>
+          <div className="flex md:hidden items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              onClick={toggle}
+              className={`text-xs font-semibold border-2 rounded-full px-2.5 py-1.5 transition-all leading-none ${
+                scrolled
+                  ? 'border-paddy-600 bg-white text-paddy-800 shadow-sm hover:bg-paddy-700 hover:text-white hover:border-paddy-700'
+                  : 'border-white/40 text-white/90 hover:bg-white/15'
+              }`}
+            >
+              <span className="hidden sm:inline">{lang === 'en' ? 'తెలుగు' : 'English'}</span>
+              <span className="sm:hidden">{lang === 'en' ? 'తె' : 'EN'}</span>
+            </button>
+            <button
+              type="button"
+              className="p-1 -mr-0.5 rounded-lg hover:bg-white/10"
+              onClick={() => setOpen(o => !o)}
+              aria-expanded={open}
+              aria-label={open ? 'Close menu' : 'Open menu'}
+            >
               {open ? (
                 <X className={scrolled ? 'text-paddy-900' : 'text-white'} size={24} />
               ) : (
@@ -202,96 +258,23 @@ export default function Navbar() {
             </button>
           </div>
         </div>
-
-        {/* Row 2 — Phase 1 + routes (left) · Gallery / Contact (right) */}
-        <div
-          className={`hidden md:flex md:flex-wrap md:items-center md:justify-between md:gap-x-6 md:gap-y-2 border-t py-2.5 px-0.5 ${
-            scrolled ? 'border-paddy-100 bg-paddy-100/55' : 'border-white/10 bg-black/20'
-          }`}
-        >
-          <div className="flex flex-wrap items-center gap-x-3 lg:gap-x-5 gap-y-1.5 min-w-0">
-            <span
-              className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider shrink-0 leading-none ${
-                scrolled
-                  ? 'border-turmeric-400/50 bg-turmeric-100/90 text-turmeric-900'
-                  : 'border-turmeric-400/40 bg-turmeric-500/15 text-turmeric-200'
-              }`}
-            >
-              {t.phase1}
-            </span>
-            <NextLink
-              href={REGISTER_LIST_LAND}
-              className={`text-sm font-medium transition-colors hover:text-turmeric-400 whitespace-nowrap leading-none ${
-                scrolled ? 'text-paddy-900' : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.85)]'
-              } ${telugu ? 'telugu text-xs' : ''}`}
-            >
-              {t.listLand}
-            </NextLink>
-            <NextLink
-              href="/properties"
-              className={`text-sm font-medium transition-colors hover:text-turmeric-400 whitespace-nowrap leading-none ${
-                scrolled ? 'text-paddy-900' : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.85)]'
-              } ${telugu ? 'telugu text-xs' : ''}`}
-            >
-              {t.properties}
-            </NextLink>
-            <NextLink
-              href="/buyer-request"
-              className={`text-sm font-medium transition-colors hover:text-turmeric-400 whitespace-nowrap leading-none ${
-                scrolled ? 'text-paddy-900' : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.85)]'
-              } ${telugu ? 'telugu text-xs' : ''}`}
-            >
-              {t.landRequest}
-            </NextLink>
-            <NextLink
-              href="/services"
-              className={`text-sm font-medium transition-colors hover:text-turmeric-400 whitespace-nowrap leading-none ${
-                scrolled ? 'text-paddy-900' : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.85)]'
-              } ${telugu ? 'telugu text-xs' : ''}`}
-            >
-              {t.services}
-            </NextLink>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-end gap-x-4 lg:gap-x-5 shrink-0">
-            {scrollSectionLinks.slice(4).map(l => (
-              <Link
-                key={l.to}
-                to={l.to}
-                smooth
-                duration={500}
-                offset={NAV_SCROLL_OFFSET}
-                className={`cursor-pointer text-xs sm:text-sm font-medium transition-colors hover:text-turmeric-400 whitespace-nowrap leading-none ${
-                  scrolled ? 'text-paddy-800' : 'text-white/85 [text-shadow:0_1px_2px_rgba(0,0,0,0.75)]'
-                } ${telugu ? 'telugu text-[11px] sm:text-xs' : ''}`}
-              >
-                {l.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        <HomeStatsBar scrolled={scrolled} />
       </div>
 
       {open && (
         <div className="md:hidden bg-white border-t border-turmeric-100 shadow-lg px-4 pb-5 pt-2">
-          <p className={`text-[10px] font-semibold uppercase tracking-widest text-paddy-400 px-1 ${telugu ? 'telugu' : ''}`}>
-            {t.phase1}
-          </p>
-          <NextLink
-            href={REGISTER_LIST_LAND}
-            onClick={() => setOpen(false)}
-            className={`block py-3 text-paddy-800 font-medium border-b border-gray-50 hover:text-turmeric-600 transition-colors ${telugu ? 'telugu' : ''}`}
-          >
-            {t.listLand}
-          </NextLink>
           <NextLink
             href="/properties"
             onClick={() => setOpen(false)}
             className={`block py-3 text-paddy-800 font-medium border-b border-gray-50 hover:text-turmeric-600 transition-colors ${telugu ? 'telugu' : ''}`}
           >
             {t.properties}
+          </NextLink>
+          <NextLink
+            href="/services"
+            onClick={() => setOpen(false)}
+            className={`block py-3 text-paddy-800 font-medium border-b border-gray-50 hover:text-turmeric-600 transition-colors ${telugu ? 'telugu' : ''}`}
+          >
+            {t.services}
           </NextLink>
           <NextLink
             href="/buyer-request"
@@ -301,11 +284,11 @@ export default function Navbar() {
             {t.landRequest}
           </NextLink>
           <NextLink
-            href="/services"
+            href={REGISTER_LIST_LAND}
             onClick={() => setOpen(false)}
             className={`block py-3 text-paddy-800 font-medium border-b border-gray-50 hover:text-turmeric-600 transition-colors ${telugu ? 'telugu' : ''}`}
           >
-            {t.services}
+            {t.listLand}
           </NextLink>
           <div className="my-2 border-t border-gray-100" role="separator" />
           <p className={`text-[10px] font-semibold uppercase tracking-widest text-paddy-400 pt-1 pb-0.5 px-1 ${telugu ? 'telugu' : ''}`}>

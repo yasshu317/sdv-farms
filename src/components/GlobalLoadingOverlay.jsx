@@ -112,14 +112,15 @@ export default function GlobalLoadingOverlay() {
             style={{ animationDuration: '0.85s' }}
             aria-hidden
           />
-          {/* eslint-disable-next-line @next/next/no-img-element -- /icon is a dynamic route; Image not needed */}
+          {/* Static SVG — /icon ImageResponse often omits emoji in some browsers, showing only a green square */}
+          {/* eslint-disable-next-line @next/next/no-img-element -- small static SVG; avoids broken dynamic PNG */}
           <img
-            src="/icon"
+            src="/brand/sdv-farms-mark.svg"
             alt=""
             width={56}
             height={56}
             decoding="async"
-            className="relative z-10 h-14 w-14 rounded-lg object-cover shadow-sm"
+            className="relative z-10 h-14 w-14 rounded-lg object-contain shadow-sm bg-paddy-950/90"
           />
         </div>
         <p className="text-sm font-medium text-paddy-800">Loading…</p>

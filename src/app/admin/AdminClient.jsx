@@ -8,6 +8,7 @@ import StatusBadge from '../../components/ui/StatusBadge'
 import { adminField, storageLinkLabel } from '../../lib/adminDisplay'
 import { isAdminOnly } from '../../lib/roles'
 import { formatAcresFromSqYards } from '../../lib/plotDisplay'
+import BrandHeadingAccent from '../../components/BrandHeadingAccent'
 
 const ENQUIRY_STATUSES = ['pending', 'contacted', 'visited', 'booked', 'closed']
 const PLOT_STATUSES    = ['available', 'reserved', 'sold']
@@ -426,7 +427,10 @@ export default function AdminClient({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-xl">🌾</span>
-            <span className="font-display font-bold text-white text-lg">SDV Farms</span>
+            <div className="inline-flex flex-col items-stretch leading-tight">
+              <span className="font-display font-bold text-white text-lg">SDV Farms</span>
+              <BrandHeadingAccent variant="navbar" className="max-w-[7rem] opacity-95" />
+            </div>
             <span className="bg-turmeric-500/20 text-turmeric-300 text-xs px-2 py-0.5 rounded-full font-medium border border-turmeric-500/30">
               {isStaffViewer ? 'Staff' : 'Admin'}
             </span>

@@ -30,7 +30,8 @@
     "resend": "^6.12.2"
   },
   "overrides": {
-    "serialize-javascript": ">=7.0.5"
+    "serialize-javascript": ">=7.0.5",
+    "axios": ">=1.16.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
