@@ -1,5 +1,7 @@
 import Link from 'next/link'
 
+import SdvFarmsWordmark from '../../../components/brand/SdvFarmsWordmark.jsx'
+
 export const metadata = {
   title: 'Business & brand overview — SDV Farms',
   description:
@@ -86,10 +88,10 @@ export default function BusinessDesignPage() {
               <p className="text-xs font-semibold text-turmeric-400 uppercase tracking-wider mb-3">Logo</p>
               <div className="flex items-center gap-4 flex-wrap">
                 <img src="/brand/sdv-farms-mark.svg" alt="SDV Farms mark" className="h-16 w-16 rounded-xl shadow-lg" />
-                <img src="/brand/sdv-farms-wordmark.svg" alt="SDV Farms wordmark" className="h-10 max-w-[200px]" />
+                <SdvFarmsWordmark className="h-10 max-w-[min(100%,220px)] w-auto" />
               </div>
               <p className="text-paddy-500 text-xs mt-3">
-                Use mark for app icons and favours; wordmark on light backgrounds. Assets live in{' '}
+                Use mark for app icons and favicons; wordmark on light backgrounds. Assets live in{' '}
                 <code className="text-turmeric-400/90">/public/brand/</code>.
               </p>
             </div>

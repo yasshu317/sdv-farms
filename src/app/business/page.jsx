@@ -9,8 +9,8 @@ export default function BusinessHubPage() {
   const cards = [
     {
       href: '/business/flows',
-      title: 'Who uses the site & how',
-      desc: 'Step-by-step flows for visitors, buyers, sellers, admin, and staff — the main reference for onboarding and pitches.',
+      title: 'Who uses the site & how (detailed)',
+      desc: 'Public URLs, buyer/seller dashboards tab-by-tab, every /admin operations tab, statuses, and admin vs staff — onboarding and handoffs.',
       cta: 'Open user-flow guide',
     },
     {

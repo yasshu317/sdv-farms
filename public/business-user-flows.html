@@ -84,7 +84,7 @@
     <h1 id="top">How people use this website</h1>
     <p class="lede">
       <strong>Visitors</strong>, <strong>buyers</strong>, <strong>sellers</strong>, and <strong>admin / staff</strong> each follow a clear path.
-      This page is the business-facing flow document — share the live URL <span class="path">/business/flows</span> on your domain, or distribute this HTML from the deployed site root.
+      The canonical <strong>detailed</strong> guide is the live page <span class="path">/business/flows</span> (bookmark on your domain). This HTML is a portable excerpt for email — always open it from the deployed site root so fonts load.
     </p>
 
     <nav class="toc" aria-label="On this page">
@@ -93,54 +93,74 @@
       <a href="#buyers">Buyers</a>
       <a href="#sellers">Sellers</a>
       <a href="#admin">Admin &amp; staff</a>
+      <a href="#admin-tabs">Ops hub tabs</a>
       <a href="#routing">Routing</a>
     </nav>
 
     <section id="visitors">
       <h2>Visitors <span class="badge">No account</span></h2>
-      <p>Anyone can explore marketing content, listings, services, and contact without signing in.</p>
+      <p>No login required unless the user wants dashboards or seller tools.</p>
       <ol>
-        <li>Home page → story, gallery, location, <strong>Book a visit</strong> / contact.</li>
-        <li><span class="path">/properties</span> — filter verified agriculture listings.</li>
-        <li>Property detail → enquire / book visit (as offered on the page).</li>
-        <li><span class="path">/buyer-request</span> — tell the team what land you need (guest or signed-in).</li>
-        <li><span class="path">/services</span> — Phase II services and enquiries for landowners.</li>
-        <li>Sign up only when a personal dashboard or seller tools are needed.</li>
+        <li><span class="path">/</span> — storytelling, gallery, map/contact anchors, language toggle, seller CTA.</li>
+        <li><span class="path">/properties</span> — faceted search (state, soil, land type, acres, price).</li>
+        <li><span class="path">/properties/[id]</span> — PDP, media, book visit / enquire widgets.</li>
+        <li><span class="path">/buyer-request</span> — capture requirements; works guest or signed-in.</li>
+        <li><span class="path">/services</span> — Phase II service marketing + booking forms.</li>
+        <li><span class="path">/auth/*</span> — registration with buyer/seller split or seller shortcut <span class="path">?flow=seller</span>.</li>
       </ol>
     </section>
 
     <section id="buyers">
       <h2>Buyers <span class="badge">Role: buyer</span></h2>
-      <p>The buyer <strong>dashboard</strong> tracks property enquiries, plot interests, and land requests.</p>
+      <p>The buyer <strong>dashboard</strong> (<span class="path">/dashboard</span>) is the CRM-style view for the buyer herself — operations still control statuses in <span class="path">/admin</span>.</p>
       <ol>
         <li>Register at <span class="path">/auth/register</span> (choose Buyer) or sign in at <span class="path">/auth/login</span>.</li>
-        <li>After email verification (if required) → first home is <span class="path">/dashboard</span>.</li>
-        <li>Tabs such as <strong>Overview, Enquiries, Plot interests, Land requests</strong> show lead status (pending, contacted, visited, booked, etc.).</li>
-        <li>Keep using <span class="path">/properties</span>; actions on listings connect to the dashboard where supported.</li>
+        <li>After email verification (if required) → default home <span class="path">/dashboard</span>.</li>
+        <li><strong>Overview</strong> — account summary, quick call/browse/post-request actions, “journey” strip (registered → enquired → site visit → booked).</li>
+        <li><strong>Enquiries</strong> — threads/messages tied to listings; statuses <em>pending, contacted, visited, booked, closed</em>.</li>
+        <li><strong>Plot interests</strong> — specific plots earmarked inside layouts.</li>
+        <li><strong>Land requests</strong> — outbound brief from <span class="path">/buyer-request</span>; statuses <em>open, in_progress, matched, closed</em>; <em>Edit</em> while open → <span class="path">/buyer-request/[id]/edit</span>.</li>
+        <li>Continue shopping <span class="path">/properties</span>; listing CTAs funnel into the dashboards above.</li>
       </ol>
-      <p class="muted">Fulfilment is done by admin/staff in the operations hub.</p>
+      <p class="muted">Ops updates enquiry/request/plot rows from the hub — buyers mostly read-only except forms they own.</p>
     </section>
 
     <section id="sellers">
       <h2>Sellers <span class="badge">Role: seller</span></h2>
-      <p>Sellers manage listings from the seller hub; SDV reviews and approves before go-live.</p>
+      <p>Sellers manage listings from the seller hub (<span class="path">/seller</span>); SDV staff approve before public visibility.</p>
       <ol>
-        <li><strong>List your land</strong> → <span class="path">/auth/register?flow=seller</span> (seller-specific signup).</li>
-        <li>Eligibility check blocks restricted land types (e.g. Poramboke, Forest, etc.).</li>
-        <li>After verify + login → <span class="path">/seller</span>.</li>
-        <li>Create <span class="path">/seller/property/new</span>; edit via <span class="path">/seller/property/[id]/edit</span>.</li>
-        <li>Active listing limits and review rules apply in-product.</li>
+        <li><strong>List your land</strong> → <span class="path">/auth/register?flow=seller</span> (skips buyer/seller picker).</li>
+        <li>Eligibility check blocks Poramboke, Forest ceiling land, assigned/inam types, civil dispute land, etc.</li>
+        <li>Credentials + email verification → dashboard <span class="path">/seller</span>.</li>
+        <li><strong>Quota</strong> — max <strong>two</strong> active listings counting pending + approved simultaneously.</li>
+        <li><span class="path">/seller/property/new</span> wizard for cadastral + media uploads; pending listings stay editable.</li>
+        <li>Approved listings link out to live PDP; views aggregate on cards.</li>
+        <li><strong>Appointments</strong> tab lists site visits referencing seller inventory.</li>
       </ol>
     </section>
 
     <section id="admin">
-      <h2>Admin &amp; staff <span class="badge">admin · staff</span></h2>
-      <p>Operations share <span class="path">/admin</span>. Access is role-gated; sellers use <span class="path">/seller</span>, not admin.</p>
+      <h2>Admin vs staff <span class="badge">Roles</span></h2>
+      <p><strong>Admin</strong> and <strong>staff</strong> both use <span class="path">/admin</span>. Staff accounts <em>omit</em> the <strong>Users</strong> tab; only admins can list org users and PATCH roles via <span class="path">/api/admin/users</span>.</p>
       <ol>
-        <li>Sign in as <strong>admin</strong> or <strong>staff</strong> → land on <span class="path">/admin</span>.</li>
-        <li>Work enquiries, buyer requests, appointments, seller properties (review/edit), plots/verification, and other ops tabs exposed in the live admin UI.</li>
-        <li>Admin-only tools may include user management, feature flags, and full listing control — match what you see at <span class="path">/admin</span>.</li>
+        <li>Buyer/seller JWTs hitting <span class="path">/admin</span> bounce to dashboards (middleware).</li>
+        <li>Everyone with ops access triages enquiries, plots, appointments, buyer requests, service bookings, listings, flags.</li>
       </ol>
+    </section>
+
+    <section id="admin-tabs">
+      <h2>Operations hub — tabs <span class="badge">/admin</span></h2>
+      <ul style="list-style:none;padding:0;margin:0;">
+        <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Enquiries</strong> — property lead inbox; statuses pending → contacted → visited → booked/closed.</li>
+        <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Users</strong> — (<em>admin-only</em>) directory + role tooling.</li>
+        <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Plots</strong> — inventory + verification (pending / in_review / verified / rejected / na); plot sale states available/reserved/sold.</li>
+        <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Properties</strong> — seller uploads, approvals, edits, admin-created inventory (<span class="path">/admin/property/new</span>).</li>
+        <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Appointments</strong> — site visit roster (pending, confirmed, cancelled, completed…).</li>
+        <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Requests</strong> — buyer land-request pipeline (open/in_progress/matched/closed).</li>
+        <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Flags</strong> — feature-flag JSON surfaced through <span class="path">/api/feature-flags</span>.</li>
+        <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Services</strong> — `/api/service-booking` payloads for Phase II field services.</li>
+      </ul>
+      <p class="muted">Exact controls evolve — treat the deployed UI + Supabase rows as authoritative.</p>
     </section>
 
     <section id="routing">
