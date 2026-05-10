@@ -6,6 +6,7 @@ import { Phone } from 'lucide-react'
 import { useLang } from '../context/LanguageContext'
 import { content } from '../data/content'
 import { NAV_SCROLL_OFFSET } from '../lib/nav-scroll'
+import BrandHeadingAccent from './BrandHeadingAccent'
 
 // ─── Decoration data — ALL values pre-computed at module level ───────────────
 const MANGO_DATA = [
@@ -293,7 +294,8 @@ export default function Hero() {
         <h1 className="font-display text-6xl sm:text-8xl font-bold text-white mb-1 tracking-tight leading-none">
           {t.title}
         </h1>
-        <p className="text-turmeric-400 text-lg sm:text-xl font-semibold mb-2 tracking-widest uppercase">
+        <BrandHeadingAccent variant="hero" />
+        <p className="text-turmeric-400 text-lg sm:text-xl font-semibold mb-2 mt-2 tracking-widest uppercase">
           ✦ {t.phase} ✦
         </p>
 

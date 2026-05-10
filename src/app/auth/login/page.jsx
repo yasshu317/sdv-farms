@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '../../../lib/supabase'
 import { homePathForRole } from '../../../lib/authRedirects'
+import BrandHeadingAccent from '../../../components/BrandHeadingAccent'
 
 const URL_ERROR_MESSAGES = {
   auth_callback_error: 'Email confirmation failed or link has expired. Please try signing in, or register again.',
@@ -52,7 +53,10 @@ function LoginForm() {
            style={{ background: bg }}>
         <div className="flex flex-col items-center gap-4 animate-pulse">
           <span className="text-6xl">🌾</span>
-          <p className="text-white font-display text-xl font-bold">SDV Farms</p>
+          <div className="flex flex-col items-center">
+            <p className="text-white font-display text-xl font-bold">SDV Farms</p>
+            <BrandHeadingAccent variant="compact" />
+          </div>
         </div>
         <div className="flex items-center gap-2 text-white/60 text-sm">
           <svg className="animate-spin w-4 h-4 text-turmeric-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -130,9 +134,12 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center px-4" style={{ background: bg }}>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 text-white hover:text-turmeric-300 transition-colors">
-            <span className="text-3xl">🌾</span>
-            <span className="font-display text-2xl font-bold">SDV Farms</span>
+          <Link href="/" className="inline-flex flex-col items-center gap-1 text-white hover:text-turmeric-300 transition-colors">
+            <span className="inline-flex items-center gap-2">
+              <span className="text-3xl">🌾</span>
+              <span className="font-display text-2xl font-bold">SDV Farms</span>
+            </span>
+            <BrandHeadingAccent variant="compact" />
           </Link>
           <p className="text-white/50 text-sm mt-2">Sign in to your account</p>
         </div>
