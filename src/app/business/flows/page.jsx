@@ -341,6 +341,9 @@ export default function BusinessFlowsPage() {
             items={[
               'Review queues for pending uploads, edits, anomalies.',
               'Inline edit + Supabase-synced validators; admins can mint net-new inventory via `/admin/property/new`.',
+              <>
+                Admins only: bulk-create approved listings from a spreadsheet — <Path>/admin/property/import</Path> (downloads a template with a sample row; uploads <strong className="text-paddy-200 print:text-paddy-900">.xlsx</strong> capped by product limits — same location validation as manual Add Property).
+              </>,
               'Seller interest tags (urgent sale, ready, interested…) help prioritization.',
             ]}
           />
