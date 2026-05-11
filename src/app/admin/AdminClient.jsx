@@ -798,12 +798,20 @@ export default function AdminClient({
                 <p className="text-xs text-gray-400 mt-0.5">{stats.propPending} pending review</p>
               </div>
               {!isStaffViewer && (
-              <NextLink
-                href="/admin/property/new"
-                className="flex items-center gap-1.5 bg-paddy-700 hover:bg-paddy-800 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors"
-              >
-                <Plus size={14} /> Add Property
-              </NextLink>
+              <div className="flex flex-wrap items-center gap-2 justify-end">
+                <NextLink
+                  href="/admin/property/import"
+                  className="flex items-center gap-1.5 border border-gray-200 hover:border-paddy-300 hover:bg-gray-50 text-gray-700 text-sm font-medium px-4 py-2 rounded-xl transition-colors"
+                >
+                  Import Excel
+                </NextLink>
+                <NextLink
+                  href="/admin/property/new"
+                  className="flex items-center gap-1.5 bg-paddy-700 hover:bg-paddy-800 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors"
+                >
+                  <Plus size={14} /> Add Property
+                </NextLink>
+              </div>
               )}
             </div>
             {properties.length === 0 ? (
