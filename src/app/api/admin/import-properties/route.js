@@ -26,7 +26,7 @@ export async function GET() {
     return Response.json({ error: 'Forbidden — admin import is restricted to admins' }, { status: 403 })
   }
 
-  const buf = buildTemplateBuffer()
+  const buf = await buildTemplateBuffer()
   return new Response(buf, {
     headers: {
       'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -36,7 +36,7 @@ export async function GET() {
   })
 }
 
-const ACCEPT_EXT = /\.(xlsx|xls)$/i
+const ACCEPT_EXT = /\.xlsx$/i
 
 export async function POST(req) {
   const ctx = await requireAdminOnly()
@@ -58,7 +58,7 @@ export async function POST(req) {
 
   const name = typeof file.name === 'string' ? file.name : 'upload.xlsx'
   if (!ACCEPT_EXT.test(name)) {
-    return Response.json({ error: 'Upload must be .xlsx or .xls' }, { status: 400 })
+    return Response.json({ error: 'Upload must be .xlsx (Excel 2007+). Legacy .xls is not supported.' }, { status: 400 })
   }
 
   const ab = await file.arrayBuffer()
@@ -70,9 +70,13 @@ export async function POST(req) {
 
   let parsed
   try {
-    parsed = parseImportBuffer(buffer)
+    parsed = await parseImportBuffer(buffer)
   } catch (e) {
     return Response.json({ error: `Could not read spreadsheet: ${e.message ?? String(e)}` }, { status: 400 })
+  }
+
+  if (parsed.loadError) {
+    return Response.json({ error: parsed.loadError }, { status: 400 })
   }
 
   const { rows, rowNumbers, parseWarnings } = parsed

@@ -161,7 +161,7 @@ export default function AdminPropertyBulkImport() {
               id="bulk-import-file"
               name="file"
               type="file"
-              accept=".xlsx,.xls"
+              accept=".xlsx"
               className="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-paddy-700 file:text-white file:cursor-pointer"
             />
 

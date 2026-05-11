@@ -1,5 +1,6 @@
-import * as XLSX from 'xlsx'
+import ExcelJS from 'exceljs'
 import locations from '../data/locations.json'
+import { worksheetToMatrix } from './excelWorksheetMatrix.js'
 
 export const MAX_IMPORT_ROWS = 100
 
@@ -233,36 +234,55 @@ const TEMPLATE_SAMPLE_ROW = [
 ]
 
 /** Build template .xlsx: Properties (headers + sample + empty rows) + How to fill (instructions). */
-export function buildTemplateBuffer() {
-  const headerAndSample = [TEMPLATE_DISPLAY_HEADERS, TEMPLATE_SAMPLE_ROW]
-  const emptyRows = Array.from({ length: 6 }, () => TEMPLATE_DISPLAY_HEADERS.map(() => ''))
-  const propMatrix = [...headerAndSample, ...emptyRows]
+export async function buildTemplateBuffer() {
+  const wb = new ExcelJS.Workbook()
 
-  const wb = XLSX.utils.book_new()
+  const prop = wb.addWorksheet(TEMPLATE_SHEET_DATA)
+  prop.addRow(TEMPLATE_DISPLAY_HEADERS)
+  prop.addRow(TEMPLATE_SAMPLE_ROW)
+  for (let i = 0; i < 6; i += 1) {
+    prop.addRow(Array(TEMPLATE_DISPLAY_HEADERS.length).fill(''))
+  }
+  TEMPLATE_DISPLAY_HEADERS.forEach((h, idx) => {
+    prop.getColumn(idx + 1).width =
+      idx >= 15 ? 28 : Math.max(14, String(h).length + 2)
+  })
 
-  const wsProps = XLSX.utils.aoa_to_sheet(propMatrix)
-  wsProps['!cols'] = TEMPLATE_DISPLAY_HEADERS.map((h, i) => ({ wch: i >= 15 ? 28 : Math.max(14, String(h).length + 2) }))
+  const help = wb.addWorksheet(TEMPLATE_SHEET_HELP)
+  for (const row of TEMPLATE_HELP_LINES) {
+    help.addRow(Array.isArray(row) ? [...row] : [row])
+  }
+  help.getColumn(1).width = 92
 
-  XLSX.utils.book_append_sheet(wb, wsProps, TEMPLATE_SHEET_DATA)
-
-  const wsHelp = XLSX.utils.aoa_to_sheet(TEMPLATE_HELP_LINES.map(r => (Array.isArray(r) ? r : [r])))
-  wsHelp['!cols'] = [{ wch: 92 }]
-  XLSX.utils.book_append_sheet(wb, wsHelp, TEMPLATE_SHEET_HELP)
-
-  return XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' })
+  const ab = await wb.xlsx.writeBuffer()
+  return Buffer.from(ab)
 }
 
 /**
  * @param {Buffer} buffer
  * @returns {{ rows: object[], parseWarnings: string[] }}
  */
-export function parseImportBuffer(buffer) {
-  const wb = XLSX.read(buffer, { type: 'buffer', cellDates: false, dense: false })
-  const name = pickDataSheetName(wb.SheetNames)
+export async function parseImportBuffer(buffer) {
+  const wb = new ExcelJS.Workbook()
+  try {
+    await wb.xlsx.load(buffer)
+  } catch {
+    return {
+      rows: [],
+      rowNumbers: [],
+      parseWarnings: [],
+      sheetName: null,
+      loadError:
+        'Invalid or unsupported spreadsheet (use .xlsx format saved from Excel / Google Sheets).',
+    }
+  }
+
+  const names = wb.worksheets.map(w => w.name)
+  const name = pickDataSheetName(names)
   if (!name) return { rows: [], rowNumbers: [], parseWarnings: ['Workbook has no sheets'], sheetName: null }
 
-  const sheet = wb.Sheets[name]
-  const matrix = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', blankrows: false })
+  const worksheet = wb.getWorksheet(name) ?? wb.worksheets[0]
+  const matrix = worksheetToMatrix(worksheet, TEMPLATE_DISPLAY_HEADERS.length)
 
   const parseWarnings = []
   if (!matrix.length) return { rows: [], rowNumbers: [], parseWarnings: ['Sheet is empty'], sheetName: name }

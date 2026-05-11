@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals'
-import * as XLSX from 'xlsx'
+import ExcelJS from 'exceljs'
 import {
   TEMPLATE_SHEET_DATA,
   TEMPLATE_SHEET_HELP,
@@ -39,23 +39,25 @@ describe('pickDataSheetName', () => {
 })
 
 describe('buildTemplateBuffer + parseImportBuffer', () => {
-  it('emits a workbook with Properties and How to fill tabs', () => {
-    const buf = buildTemplateBuffer()
+  it('emits a workbook with Properties and How to fill tabs', async () => {
+    const buf = await buildTemplateBuffer()
     expect(Buffer.isBuffer(buf)).toBe(true)
-    const wb = XLSX.read(buf, { type: 'buffer' })
-    expect(wb.SheetNames).toContain(TEMPLATE_SHEET_DATA)
-    expect(wb.SheetNames).toContain(TEMPLATE_SHEET_HELP)
+    const wb = new ExcelJS.Workbook()
+    await wb.xlsx.load(buf)
+    const names = wb.worksheets.map(w => w.name)
+    expect(names).toContain(TEMPLATE_SHEET_DATA)
+    expect(names).toContain(TEMPLATE_SHEET_HELP)
   })
 
-  it('parses the Properties sheet and yields the sample data row (empty rows skipped)', () => {
-    const buf = buildTemplateBuffer()
-    const { rows, rowNumbers, parseWarnings } = parseImportBuffer(buf)
+  it('parses the Properties sheet and yields the sample data row (empty rows skipped)', async () => {
+    const buf = await buildTemplateBuffer()
+    const { rows, rowNumbers, parseWarnings } = await parseImportBuffer(buf)
     expect(parseWarnings.length).toBe(0)
     expect(rows).toHaveLength(1)
     expect(rowNumbers[0]).toBe(2)
     expect(rows[0].state).toBe('Telangana')
     expect(rows[0].village).toBe('Bhongir')
-    expect(rows[0].area_acres).toBe('4.5')
+    expect(parseNum(String(rows[0].area_acres))).toBe(4.5)
   })
 })
 
