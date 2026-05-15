@@ -11,6 +11,8 @@ import {
   LAND_USED_TYPES,
   LAND_SOIL_TYPES,
   DOC_TYPE_BY_STATE,
+  OWNER_RELATIONS,
+  SELLER_INTEREST_OPTIONS,
   INITIAL_FORM,
   urlsToInitialItems,
 } from '../../app/seller/property/propertyFormConstants'
@@ -95,12 +97,14 @@ export default function SellerPropertyForm({ variant, propertyId, initialForm })
           village: form.village,
           zip_code: form.zip_code,
           farmer_name: form.farmer_name || user.user_metadata?.full_name,
+          owner_relation: form.owner_relation || null,
           land_used_type: form.land_used_type,
           land_soil_type: form.land_soil_type,
           land_doc_type: form.land_doc_type,
           road_access: form.road_access,
           area_acres: Number(form.area_acres),
           expected_price: Number(form.expected_price),
+          seller_interest: form.seller_interest || null,
           doc_urls: form.doc_urls,
           photo_urls: form.photo_urls,
         })
@@ -142,12 +146,14 @@ export default function SellerPropertyForm({ variant, propertyId, initialForm })
       village: form.village,
       zip_code: form.zip_code,
       farmer_name: form.farmer_name || user.user_metadata?.full_name,
+      owner_relation: form.owner_relation || null,
       land_used_type: form.land_used_type,
       land_soil_type: form.land_soil_type,
       land_doc_type: form.land_doc_type,
       road_access: form.road_access,
       area_acres: Number(form.area_acres),
       expected_price: Number(form.expected_price),
+      seller_interest: form.seller_interest || null,
       doc_urls: form.doc_urls,
       photo_urls: form.photo_urls,
     })
@@ -318,6 +324,15 @@ export default function SellerPropertyForm({ variant, propertyId, initialForm })
                     />
                   </div>
                 </div>
+                <div>
+                  <label className={labelCls}>Your Relation to Owner</label>
+                  <select value={form.owner_relation} onChange={set('owner_relation')} className={inputCls}>
+                    <option value="" className="bg-gray-800">Select relation…</option>
+                    {OWNER_RELATIONS.map(r => (
+                      <option key={r} value={r} className="bg-gray-800">{r}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             )}
 
@@ -406,6 +421,25 @@ export default function SellerPropertyForm({ variant, propertyId, initialForm })
                     Road / Bata access available
                   </span>
                 </label>
+                <div>
+                  <label className={labelCls}>Sale Intent</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {SELLER_INTEREST_OPTIONS.map(opt => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setForm(f => ({ ...f, seller_interest: f.seller_interest === opt.value ? '' : opt.value }))}
+                        className={`py-2.5 rounded-xl border text-xs font-medium transition-all ${
+                          form.seller_interest === opt.value
+                            ? 'border-turmeric-400 bg-turmeric-500/10 text-white'
+                            : 'border-white/15 text-white/60 hover:border-white/30'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 

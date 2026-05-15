@@ -46,6 +46,14 @@ const PHASE2_SERVICES = [
     accent: 'from-emerald-900/30 to-paddy-900/40',
     tagColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/20',
   },
+  {
+    icon: '🧪',
+    titleKey: 'fertilizersTitle',
+    descKey: 'fertilizersDesc',
+    tag: 'Crop-specific',
+    accent: 'from-orange-900/30 to-paddy-900/40',
+    tagColor: 'bg-orange-500/20 text-orange-300 border-orange-500/20',
+  },
 ]
 
 const PHASE3_ITEMS = [
@@ -55,7 +63,7 @@ const PHASE3_ITEMS = [
   { icon: '📈', key: 'marketingTitle',  desc: 'Market your produce at best prices' },
 ]
 
-const SERVICE_KEYS = ['fencing', 'borewell', 'drip', 'farming_plan', 'plants']
+const SERVICE_KEYS = ['fencing', 'borewell', 'drip', 'farming_plan', 'plants', 'fertilizers']
 
 export default function ServicesPage() {
   const { lang } = useLang()

@@ -12,7 +12,7 @@ import RoleRedirectBanner from '../../components/RoleRedirectBanner'
 const SELLER_STATUSES = ['pending', 'approved']
 const MAX_LISTINGS = 2
 
-export default function SellerClient({ user, properties, appointments }) {
+export default function SellerClient({ user, properties, appointments, wishlistCountById = {} }) {
   const router = useRouter()
   const [tab, setTab] = useState('listings')
   const [showPicker, setShowPicker] = useState(false)
@@ -44,6 +44,7 @@ export default function SellerClient({ user, properties, appointments }) {
   const pendingCount  = properties.filter(p => p.status === 'pending').length
   const approvedCount = properties.filter(p => p.status === 'approved').length
   const totalViews    = properties.reduce((acc, p) => acc + (p.views || 0), 0)
+  const totalInterested = Object.values(wishlistCountById).reduce((s, c) => s + c, 0)
 
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #071709 0%, #0a1f0c 40%, #0d2510 100%)' }}>
@@ -100,11 +101,12 @@ export default function SellerClient({ user, properties, appointments }) {
         </div>
 
         {/* ── Stats ── */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-4 gap-4 mb-8">
           {[
-            { icon: '🕐', label: 'Pending Review',  value: pendingCount,  color: 'text-yellow-300' },
-            { icon: '✅', label: 'Live / Approved', value: approvedCount, color: 'text-paddy-300'   },
-            { icon: '👁', label: 'Total Views',     value: totalViews,    color: 'text-turmeric-400' },
+            { icon: '🕐', label: 'Pending Review',  value: pendingCount,     color: 'text-yellow-300' },
+            { icon: '✅', label: 'Live / Approved', value: approvedCount,    color: 'text-paddy-300'   },
+            { icon: '👁', label: 'Total Views',     value: totalViews,       color: 'text-turmeric-400' },
+            { icon: '♥',  label: 'Interested',      value: totalInterested,  color: 'text-red-300' },
           ].map(s => (
             <div key={s.label} className="bg-white/4 border border-white/8 rounded-2xl py-5 px-3 text-center">
               <p className="text-xl mb-1">{s.icon}</p>
@@ -204,7 +206,7 @@ export default function SellerClient({ user, properties, appointments }) {
                       </div>
 
                       {/* ── Quick metrics ── */}
-                      <div className="grid grid-cols-3 gap-3 text-center mb-5">
+                      <div className="grid grid-cols-4 gap-3 text-center mb-5">
                         <div className="bg-white/5 rounded-xl py-2 px-1">
                           <p className="text-white font-semibold">{fmt(p.area_acres)}</p>
                           <p className="text-white/40 text-xs">Acres</p>
@@ -216,6 +218,10 @@ export default function SellerClient({ user, properties, appointments }) {
                         <div className="bg-white/5 rounded-xl py-2 px-1">
                           <p className="text-white font-semibold">{p.views ?? 0}</p>
                           <p className="text-white/40 text-xs">Views</p>
+                        </div>
+                        <div className="bg-white/5 rounded-xl py-2 px-1">
+                          <p className="text-red-300 font-semibold">{wishlistCountById[p.id] ?? 0}</p>
+                          <p className="text-white/40 text-xs">Interested</p>
                         </div>
                       </div>
 

@@ -95,17 +95,18 @@
       <a href="#admin">Admin &amp; staff</a>
       <a href="#admin-tabs">Ops hub tabs</a>
       <a href="#routing">Routing</a>
+      <a href="#changelog">Recent changes</a>
     </nav>
 
     <section id="visitors">
       <h2>Visitors <span class="badge">No account</span></h2>
       <p>No login required unless the user wants dashboards or seller tools.</p>
       <ol>
-        <li><span class="path">/</span> — storytelling, gallery, map/contact anchors, language toggle, seller CTA.</li>
-        <li><span class="path">/properties</span> — faceted search (state, soil, land type, acres, price).</li>
-        <li><span class="path">/properties/[id]</span> — PDP, media, book visit / enquire widgets.</li>
+        <li><span class="path">/</span> — storytelling, gallery, map/contact anchors, language toggle, seller CTA. Includes <strong>Sample Documents</strong> section (Sale Deed, Lease Agreement, Pahani guide, Registration) in EN &amp; Telugu.</li>
+        <li><span class="path">/properties</span> — cascade filters: State &rarr; District &rarr; Mandal, plus soil type, land type, acres, price. Property cards have a ♥ Save button (adds to buyer wishlist, max&nbsp;2).</li>
+        <li><span class="path">/properties/[id]</span> — PDP, media, book visit / enquire / save widgets. If no appointment slot suits, buyer can submit "Notify Me" (ops contacts within 48&nbsp;hrs).</li>
         <li><span class="path">/buyer-request</span> — capture requirements; works guest or signed-in.</li>
-        <li><span class="path">/services</span> — Phase II service marketing + booking forms.</li>
+        <li><span class="path">/services</span> — Phase II service marketing + booking forms. <strong>6 services</strong>: fencing, borewell, drip, farming plan, plants, Fertilizers &amp; Nutrition.</li>
         <li><span class="path">/auth/*</span> — registration with buyer/seller split or seller shortcut <span class="path">?flow=seller</span>.</li>
       </ol>
     </section>
@@ -133,8 +134,8 @@
         <li>Eligibility check blocks Poramboke, Forest ceiling land, assigned/inam types, civil dispute land, etc.</li>
         <li>Credentials + email verification → dashboard <span class="path">/seller</span>.</li>
         <li><strong>Quota</strong> — max <strong>two</strong> active listings counting pending + approved simultaneously.</li>
-        <li><span class="path">/seller/property/new</span> wizard for cadastral + media uploads; pending listings stay editable.</li>
-        <li>Approved listings link out to live PDP; views aggregate on cards.</li>
+        <li><span class="path">/seller/property/new</span> wizard — Step&nbsp;0 now captures <strong>Relation to Owner</strong> (Self/Wife/Son/Daughter etc.); Step&nbsp;1 captures <strong>Sale Intent</strong> (Urgent Sale &middot; Ready to Sell &middot; Interested/Open). Media uploads required before submit.</li>
+        <li>Approved listings link out to live PDP; views and <strong>Interested</strong> count (from saved buyers) aggregate on each card.</li>
         <li><strong>Appointments</strong> tab lists site visits referencing seller inventory.</li>
       </ol>
     </section>
@@ -151,14 +152,15 @@
     <section id="admin-tabs">
       <h2>Operations hub — tabs <span class="badge">/admin</span></h2>
       <ul style="list-style:none;padding:0;margin:0;">
-        <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Enquiries</strong> — property lead inbox; statuses pending → contacted → visited → booked/closed.</li>
+        <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Enquiries</strong> — property lead inbox; statuses pending &rarr; contacted &rarr; visited &rarr; booked/closed.</li>
         <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Users</strong> — (<em>admin-only</em>) directory + role tooling.</li>
         <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Plots</strong> — inventory + verification (pending / in_review / verified / rejected / na); plot sale states available/reserved/sold.</li>
         <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Properties</strong> — seller uploads, approvals, edits; admins add one-off listings (<span class="path">/admin/property/new</span>) or bulk-import <span class="path">/admin/property/import</span> (.xlsx template + sample row; staff skip Add/Import).</li>
         <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Appointments</strong> — site visit roster (pending, confirmed, cancelled, completed…).</li>
         <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Requests</strong> — buyer land-request pipeline (open/in_progress/matched/closed).</li>
         <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Flags</strong> — feature-flag JSON surfaced through <span class="path">/api/feature-flags</span>.</li>
-        <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Services</strong> — `/api/service-booking` payloads for Phase II field services.</li>
+        <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Services</strong> — <span class="path">/api/service-booking</span> payloads for all 6 Phase II field services (fencing, borewell, drip, farming plan, plants, fertilizers/nutrition).</li>
+        <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Feedback</strong> — business feedback submitted via <span class="path">POST /api/feedback</span> (public, no auth). Fields: business name, contact, type, message, rating. Status: new &rarr; read &rarr; replied &rarr; archived. Admin adds internal notes.</li>
       </ul>
       <p class="muted">Exact controls evolve — treat the deployed UI + Supabase rows as authoritative.</p>
     </section>
@@ -170,6 +172,20 @@
         <li><strong>Seller</strong> → <span class="path">/seller</span></li>
         <li><strong>Admin / staff</strong> → <span class="path">/admin</span></li>
       </ul>
+    </section>
+
+    <section id="changelog" style="margin-top:2.5rem">
+      <h2>Recent changes <span class="badge">Phase 11+</span></h2>
+      <ol>
+        <li><strong>Sample Documents section</strong> — new homepage section with Sale Deed, Lease Agreement, Pahani guide &amp; Registration process; EN + Telugu.</li>
+        <li><strong>District &amp; Mandal cascade filters</strong> — Browse Properties: State &rarr; District &rarr; Mandal.</li>
+        <li><strong>Wishlist on listing cards</strong> — ♥ Save button on property cards; buyers can save up to 2 listings (prompts login if anonymous).</li>
+        <li><strong>Seller "Interested" count</strong> — per-listing + total count in seller dashboard from <code>buyer_wishlist</code>.</li>
+        <li><strong>Relation to Owner &amp; Sale Intent</strong> — SellerPropertyForm Step 0 adds "Relation to Owner" (Self/Wife/Son etc.); Step 1 adds "Sale Intent" toggle.</li>
+        <li><strong>Appointment "Notify Me"</strong> — fallback in AppointmentPicker: buyer submits email, ops alerted to contact within 48 hrs.</li>
+        <li><strong>Fertilizers &amp; Nutrition</strong> — 6th Phase II service added to <span class="path">/services</span> and booking API.</li>
+        <li><strong>Admin Feedback tab</strong> — 9th ops tab. Businesses submit via <span class="path">POST /api/feedback</span>; admin reviews, updates status, adds notes. Orange badge on unread count.</li>
+      </ol>
     </section>
 
     <div class="foot">
