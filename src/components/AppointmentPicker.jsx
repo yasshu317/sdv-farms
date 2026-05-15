@@ -38,6 +38,39 @@ export default function AppointmentPicker({ propertyId, type = 'buyer', userEmai
   const [payError, setPayError] = useState('')
   const [payDone, setPayDone]   = useState(false)
 
+  const [notifyMode, setNotifyMode]   = useState(false)
+  const [notifyEmail, setNotifyEmail] = useState(userEmail || '')
+  const [notifyName, setNotifyName]   = useState('')
+  const [notifyDone, setNotifyDone]   = useState(false)
+  const [notifyLoading, setNotifyLoading] = useState(false)
+
+  async function handleNotifyMe(e) {
+    e.preventDefault()
+    if (!notifyEmail.trim()) return
+    setNotifyLoading(true)
+    try {
+      await fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: 'info@sdvfarms.in',
+          subject: 'Site Visit Notify Me — SDV Farms',
+          html: `<p>A buyer could not find a suitable slot and wants to be contacted:</p>
+            <ul>
+              <li><strong>Name:</strong> ${notifyName || '—'}</li>
+              <li><strong>Email:</strong> ${notifyEmail}</li>
+              <li><strong>Property:</strong> ${propertyId || '—'}</li>
+              <li><strong>Type:</strong> ${type}</li>
+            </ul>`,
+        }),
+      })
+    } catch (_) {
+      // best-effort
+    }
+    setNotifyLoading(false)
+    setNotifyDone(true)
+  }
+
   async function handleBook() {
     if (!date || !slot) { setError('Please select a date and time slot'); return }
     setError('')
@@ -118,6 +151,68 @@ export default function AppointmentPicker({ propertyId, type = 'buyer', userEmai
     )
   }
 
+  if (notifyMode) {
+    if (notifyDone) {
+      return (
+        <div className="text-center py-6">
+          <div className="text-3xl mb-2">📬</div>
+          <h3 className="text-white font-semibold text-base mb-1">We&apos;ll reach out!</h3>
+          <p className="text-white/55 text-sm">SDV Farms will contact you within 48 hours to arrange a visit.</p>
+          {onCancel && (
+            <button onClick={onCancel} className="mt-4 text-white/40 hover:text-white/60 text-xs transition-colors">
+              Close ×
+            </button>
+          )}
+        </div>
+      )
+    }
+    return (
+      <form onSubmit={handleNotifyMe} className="space-y-4">
+        <div className="text-center mb-2">
+          <p className="text-white/80 font-medium text-sm">Can&apos;t find a suitable slot?</p>
+          <p className="text-white/45 text-xs mt-0.5">Leave your details and we&apos;ll contact you within 48 hours.</p>
+        </div>
+        <div>
+          <label className="block text-white/70 text-sm mb-1.5">Your Name</label>
+          <input
+            type="text"
+            value={notifyName}
+            onChange={e => setNotifyName(e.target.value)}
+            placeholder="Full name"
+            className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/35 focus:outline-none focus:border-turmeric-400 transition-colors text-sm"
+          />
+        </div>
+        <div>
+          <label className="block text-white/70 text-sm mb-1.5">Email *</label>
+          <input
+            type="email"
+            required
+            value={notifyEmail}
+            onChange={e => setNotifyEmail(e.target.value)}
+            placeholder="your@email.com"
+            className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/35 focus:outline-none focus:border-turmeric-400 transition-colors text-sm"
+          />
+        </div>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => setNotifyMode(false)}
+            className="flex-1 bg-white/10 hover:bg-white/15 text-white font-medium py-3 rounded-xl transition-colors text-sm"
+          >
+            ← Back
+          </button>
+          <button
+            type="submit"
+            disabled={notifyLoading || !notifyEmail.trim()}
+            className="flex-1 bg-turmeric-500 hover:bg-turmeric-600 disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition-colors text-sm"
+          >
+            {notifyLoading ? 'Sending…' : 'Notify Me'}
+          </button>
+        </div>
+      </form>
+    )
+  }
+
   return (
     <div className="space-y-5">
       <div>
@@ -159,6 +254,13 @@ export default function AppointmentPicker({ propertyId, type = 'buyer', userEmai
           {date === getMinDate() && (
             <p className="text-white/35 text-xs mt-2">Slots within 2 hours of now are unavailable</p>
           )}
+          <button
+            type="button"
+            onClick={() => setNotifyMode(true)}
+            className="mt-3 text-turmeric-400/80 hover:text-turmeric-300 text-xs transition-colors underline underline-offset-2 w-full text-center"
+          >
+            Can&apos;t find a suitable slot? Notify me →
+          </button>
         </div>
       )}
 

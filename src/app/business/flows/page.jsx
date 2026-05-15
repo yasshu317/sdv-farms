@@ -60,6 +60,7 @@ export default function BusinessFlowsPage() {
     ['#admin-hub', 'Operations hub (/admin)'],
     ['#statuses', 'Statuses & workflows'],
     ['#routing', 'Routing after login'],
+    ['#changelog', 'Recent changes'],
   ]
 
   return (
@@ -115,25 +116,25 @@ export default function BusinessFlowsPage() {
           <BulletList
             items={[
               <>
-                <strong>Visitor</strong> — marketing home, filtered listings, property detail with book / enquire, land
-                request form, Phase II services, language toggle, login/register.
+                <strong>Visitor</strong> — marketing home (incl. Sample Documents section), filtered listings with
+                state/district/mandal cascade, property detail with book/enquire/save, land request form, Phase II
+                services (incl. Fertilizers &amp; Nutrition), language toggle, login/register.
               </>,
               <>
-                <strong>Buyer</strong> — <Path>/dashboard</Path> tracks enquiries from listings, plot interests inside a layout,
-                and “land requests” submitted via <Path>/buyer-request</Path>.
+                <strong>Buyer</strong> — <Path>/dashboard</Path> tracks enquiries, plot interests, and land requests.
+                On <Path>/properties</Path> buyers can save (♥) listings; saved count is visible to the seller.
               </>,
               <>
-                <strong>Seller</strong> — <Path>/seller</Path> manages up to <strong>two</strong> active (pending +
-                approved) listings, uploads docs/photos; <strong>Appointments</strong> tab sees visits tied to their
-                properties.
+                <strong>Seller</strong> — <Path>/seller</Path> manages up to <strong>two</strong> active listings;
+                property form captures <strong>Relation to Owner</strong> and <strong>Sale Intent</strong>; each card
+                shows an <strong>Interested</strong> count from saved buyers.
               </>,
               <>
-                <strong>Admin</strong> — full ops at <Path>/admin</Path> plus <strong>Users</strong> tab and role changes
-                via API.
+                <strong>Admin</strong> — full ops at <Path>/admin</Path> (9 tabs) plus <strong>Users</strong> tab and
+                role changes via API. New <strong>Feedback</strong> tab for business feedback submissions.
               </>,
               <>
-                <strong>Staff</strong> — same <Path>/admin</Path> shell; <strong>Users</strong> tab is hidden (no org-wide
-                user management).
+                <strong>Staff</strong> — same <Path>/admin</Path> shell; <strong>Users</strong> tab hidden.
               </>,
             ]}
           />
@@ -145,6 +146,7 @@ export default function BusinessFlowsPage() {
           <BulletList
             items={[
               'Marketing story: approvals, phases, gallery, maps / contact anchors.',
+              'Sample Documents section: Sale Deed, Lease Agreement, Pahani guide, Registration process — available in English and Telugu with a WhatsApp CTA.',
               'Primary CTAs: browse listings (scroll + nav), Book a visit, Sign in.',
               '"List your land" in the navbar routes sellers into the seller registration shortcut.',
               'Assistant / chat launcher (if enabled) surfaces scripted FAQ links.',
@@ -154,8 +156,8 @@ export default function BusinessFlowsPage() {
           <SubHeading>Listings — <Path>/properties</Path></SubHeading>
           <BulletList
             items={[
-              'Filter by state, soil, land type, acreage bands, optional price ceilings.',
-              'Each card links to detail; optional quick actions like book visit flow from listings UI.',
+              'Filter by state, then cascade to district and mandal; also soil type, land type, acreage bands, optional price ceiling.',
+              'Each card has Book Visit, Enquire (WhatsApp), and a ♥ Save button — saving adds the property to the buyer’s wishlist (max 2 saves; prompts sign-in if logged out).',
               'Empty state prompts sellers to list land if inventory is thin.',
             ]}
           />
@@ -166,7 +168,8 @@ export default function BusinessFlowsPage() {
               'Shows verified listing narrative, imagery, geography, booking affordances.',
               'Buyers/guests can trigger enquiry / WhatsApp CTAs depending on wiring.',
               'Signed-in sellers may see edit links reserved for admins on some shells — default buyer path stays read/browse.',
-              'Site visits: appointment/booking UX when surfaced on page.',
+              'Site visits: appointment/booking UX when surfaced on page. If no suitable slot is found, a “Notify Me” fallback lets the buyer submit their email; ops is alerted to contact within 48 hours.',
+              'Save / wishlist button (♥) on detail page; buyers can save up to 2 properties.',
             ]}
           />
 
@@ -182,7 +185,7 @@ export default function BusinessFlowsPage() {
           <SubHeading>Services — <Path>/services</Path></SubHeading>
           <BulletList
             items={[
-              'Marketing copy for Phase II land-owner services (fencing, borewell, drip irrigation, agronomy packs, saplings).',
+              'Marketing copy for Phase II land-owner services: fencing, borewell, drip irrigation, agronomy packs, saplings, and <strong>Fertilizers &amp; Nutrition</strong> (6 services total).',
               'Per-service enquiry/booking dialogs send records to `/api/service-booking` (ops triages inside admin Services tab).',
               'Phase III “notify me” capture for roadmap interest.',
             ]}
@@ -256,7 +259,7 @@ export default function BusinessFlowsPage() {
           <BulletList
             items={[
               <>Concurrent <strong>active</strong> listings (draft/pending plus live) capped at <strong>two</strong> — UI blocks “Add Property” when full.</>,
-              'Seller sees pending vs approved counts plus aggregate listing views.',
+              'Seller sees pending vs approved counts, aggregate views, and total Interested count (from saved buyers).',
               'Pending listings expose inline Edit → `/seller/property/[id]/edit`; approved listings deep-link to live public PDP in a new tab.',
             ]}
           />
@@ -264,7 +267,7 @@ export default function BusinessFlowsPage() {
           <SubHeading>Flows</SubHeading>
           <BulletList
             items={[
-              <>Creation wizard <Path>/seller/property/new</Path> gathers cadastral/location/meta, uploads (photos/doc URLs), validations before submit.</>,
+              <>Creation wizard <Path>/seller/property/new</Path> gathers cadastral/location/meta, uploads (photos/doc URLs), validations before submit. Step 0 now captures <strong>Relation to Owner</strong> (Self/Wife/Son/Daughter etc.); Step 1 captures <strong>Sale Intent</strong> (Urgent Sale · Ready to Sell · Interested/Open).</>,
               'Once submitted listing sits in pending until admins approve or request changes.',
               'Email banners remind sellers when listings go live (server emails).',
             ]}
@@ -300,14 +303,23 @@ export default function BusinessFlowsPage() {
         {/* ── Admin tabs detail ──────────────────────────────────── */}
         <FlowSection id="admin-hub" title="Operations hub — tab by tab" badge="/admin">
           <p className="text-paddy-300 print:text-paddy-700 text-sm">
-            Tab order in the ops shell: <strong className="text-paddy-100 print:text-paddy-900">Enquiries</strong> →{' '}
-            <strong className="text-paddy-100 print:text-paddy-900">Users</strong> (admin only) →{' '}
-            <strong className="text-paddy-100 print:text-paddy-900">Plots</strong> →{' '}
-            <strong className="text-paddy-100 print:text-paddy-900">Properties</strong> →{' '}
-            <strong className="text-paddy-100 print:text-paddy-900">Appointments</strong> →{' '}
-            <strong className="text-paddy-100 print:text-paddy-900">Requests</strong> →{' '}
-            <strong className="text-paddy-100 print:text-paddy-900">Flags</strong> →{' '}
-            <strong className="text-paddy-100 print:text-paddy-900">Services</strong>.
+            Tab order in the ops shell: <strong className="text-paddy-100 print:text-paddy-900">Enquiries</strong>{' '}
+            &rarr;{' '}
+            <strong className="text-paddy-100 print:text-paddy-900">Users</strong> (admin only){' '}
+            &rarr;{' '}
+            <strong className="text-paddy-100 print:text-paddy-900">Plots</strong>{' '}
+            &rarr;{' '}
+            <strong className="text-paddy-100 print:text-paddy-900">Properties</strong>{' '}
+            &rarr;{' '}
+            <strong className="text-paddy-100 print:text-paddy-900">Appointments</strong>{' '}
+            &rarr;{' '}
+            <strong className="text-paddy-100 print:text-paddy-900">Requests</strong>{' '}
+            &rarr;{' '}
+            <strong className="text-paddy-100 print:text-paddy-900">Flags</strong>{' '}
+            &rarr;{' '}
+            <strong className="text-paddy-100 print:text-paddy-900">Services</strong>{' '}
+            &rarr;{' '}
+            <strong className="text-paddy-100 print:text-paddy-900">Feedback</strong>.
           </p>
           <SubHeading>Enquiries</SubHeading>
           <BulletList
@@ -377,8 +389,18 @@ export default function BusinessFlowsPage() {
           <SubHeading>Services</SubHeading>
           <BulletList
             items={[
-              'Operational review of inbound `/api/service-booking` payloads (fence/borewell/drip/etc.).',
+              'Operational review of inbound `/api/service-booking` payloads for all 6 Phase II services (fencing, borewell, drip, farming plan, plants, fertilizers/nutrition).',
               'Exports / refreshes analogous to enquiries table — staff confirm fulfillment or escalate.',
+            ]}
+          />
+
+          <SubHeading>Feedback</SubHeading>
+          <BulletList
+            items={[
+              'Businesses submit feedback via POST /api/feedback (public endpoint — no auth required).',
+              <>Fields: Business Name, Contact Name, Email, Phone, Feedback Type (general / suggestion / complaint / partnership / other), Message, optional 1–5 star rating.</>,
+              'Admin/staff review in this tab: change status (new → read → replied → archived) and add internal notes.',
+              'Unread feedback count shown as an orange badge on the Feedback tab button.',
             ]}
           />
         </FlowSection>
@@ -402,6 +424,7 @@ export default function BusinessFlowsPage() {
                   ['Buyer land requests', 'open · in_progress · matched · closed'],
                   ['Buyer SDVF checkpoints (where used)', 'checking · approved · rejected'],
                   ['Listing lifecycle (seller view)', 'pending · approved (+ rejected/archived variants if enabled)'],
+                  ['Business feedback', 'new · read · replied · archived'],
                 ].map(([a, b]) => (
                   <tr key={a} className="bg-paddy-950/40 print:bg-white">
                     <td className="p-3 font-semibold text-white print:text-paddy-900">{a}</td>
@@ -433,8 +456,54 @@ export default function BusinessFlowsPage() {
           </p>
         </FlowSection>
 
+        {/* ── Changelog ─────────────────────────── */}
+        <FlowSection id="changelog" title="Recent changes" badge="v Phase 11+">
+          <BulletList
+            items={[
+              <>
+                <strong>Sample Documents section</strong> — new homepage section between Contact and Location with 4 reference
+                document cards (Sale Deed, Lease Agreement, Pahani/Adangal guide, Registration process); EN + Telugu.
+              </>,
+              <>
+                <strong>District &amp; Mandal filters</strong> — Browse Properties now cascades: State → District → Mandal.
+                Selecting a state reveals its districts; selecting a district reveals its mandals.
+              </>,
+              <>
+                <strong>Wishlist on listing cards</strong> — property cards on <Path>/properties</Path> have a ♥/♡ Save button.
+                Buyers can save up to 2 properties. Saving prompts login when anonymous.
+              </>,
+              <>
+                <strong>Seller “Interested” count</strong> — seller dashboard shows per-listing and total Interested
+                counts sourced from <code className="text-turmeric-400">buyer_wishlist</code>.
+              </>,
+              <>
+                <strong>Relation to Owner field</strong> — SellerPropertyForm Step 0 now has a “Your Relation to Owner”
+                select (Self, Wife, Daughter, Son, Mother, Father, G.Mother, G.Father). DB: <code className="text-turmeric-400">owner_relation</code> column added to <code className="text-turmeric-400">seller_properties</code>.
+              </>,
+              <>
+                <strong>Sale Intent field</strong> — SellerPropertyForm Step 1 toggle for Urgent Sale / Ready to Sell /
+                Interested (maps to existing <code className="text-turmeric-400">seller_interest</code> column).
+              </>,
+              <>
+                <strong>Appointment “Notify Me”</strong> — after selecting a date in <code className="text-turmeric-400">AppointmentPicker</code>, a
+                “Can’t find a slot? Notify me” link appears. Buyer submits name + email; ops receives an alert email
+                and contacts within 48 hours.
+              </>,
+              <>
+                <strong>Fertilizers &amp; Nutrition service</strong> — 6th Phase II service card added to <Path>/services</Path>
+                (key: <code className="text-turmeric-400">fertilizers</code>), wired to service booking API. EN + Telugu content.
+              </>,
+              <>
+                <strong>Admin Feedback tab</strong> — 9th tab in <Path>/admin</Path>. Businesses POST to
+                <code className="text-turmeric-400">/api/feedback</code> (public, no auth); admin/staff review, update status, add
+                internal notes. Orange badge shows unread count.
+              </>,
+            ]}
+          />
+        </FlowSection>
+
         <section className="border-t border-white/10 pt-10 mt-12 print:border-paddy-200">
-          <h2 className="font-display text-xl text-turmeric-400 mb-3 print:text-paddy-800">Sharing & exports</h2>
+          <h2 className="font-display text-xl text-turmeric-400 mb-3 print:text-paddy-800">Sharing &amp; exports</h2>
           <ul className="text-paddy-300 text-sm space-y-2 print:text-paddy-700">
             <li>
               <strong>Interactive:</strong>{' '}

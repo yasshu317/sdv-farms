@@ -9,6 +9,14 @@ export const DOC_TYPE_BY_STATE = {
   Karnataka: 'RTC',
 }
 
+export const OWNER_RELATIONS = ['Self', 'Wife', 'Daughter', 'Son', 'Mother', 'Father', 'G.Mother', 'G.Father']
+
+export const SELLER_INTEREST_OPTIONS = [
+  { value: 'urgent_sale',   label: 'Urgent Sale' },
+  { value: 'ready_to_sale', label: 'Ready to Sell' },
+  { value: 'interested',    label: 'Interested / Open' },
+]
+
 export const INITIAL_FORM = {
   state: '',
   district: '',
@@ -16,6 +24,7 @@ export const INITIAL_FORM = {
   village: '',
   zip_code: '',
   farmer_name: '',
+  owner_relation: '',
   land_used_type: '',
   land_soil_type: '',
   land_doc_type: '',
@@ -37,6 +46,7 @@ export function mapSellerPropertyRowToForm(row) {
     village: row.village || '',
     zip_code: row.zip_code || '',
     farmer_name: row.farmer_name || '',
+    owner_relation: row.owner_relation || '',
     land_used_type: row.land_used_type || '',
     land_soil_type: row.land_soil_type || '',
     land_doc_type: row.land_doc_type || '',

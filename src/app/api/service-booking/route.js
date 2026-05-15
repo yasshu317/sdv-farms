@@ -35,6 +35,7 @@ export async function POST(req) {
       drip:         'Drip Irrigation',
       farming_plan: 'Farming Plan',
       plants:       'Quality Plants',
+      fertilizers:  'Fertilizers & Nutrition',
     }
     await fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? ''}/api/notify`, {
       method: 'POST',

@@ -1,9 +1,11 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import SiteHeader from '../../components/SiteHeader'
 import FilterPanel from '../../components/ui/FilterPanel'
+import { createClient } from '../../lib/supabase'
 import locations from '../../data/locations.json'
 import { REGISTER_LIST_LAND } from '../../lib/routes'
 
@@ -11,11 +13,20 @@ const SOIL_TYPES  = ['Black', 'Red', 'Sandy', 'Mixed']
 const LAND_TYPES  = ['Agriculture', 'Estate Agriculture', 'Industrial', 'Commercial', 'Residential']
 const ALL_STATES  = Object.keys(locations)
 
-function PropertyCard({ p }) {
+function PropertyCard({ p, user, isWishlisted, onToggleWishlist, wishlistLoading }) {
+  const router     = useRouter()
   const photo      = p.photo_urls?.[0]
   const totalPrice = (p.area_acres * p.expected_price).toLocaleString('en-IN')
   const detailHref = `/properties/${p.id}`
+  const isOwner    = user && p.seller_id === user.id
   const whatsapp   = `https://wa.me/917780312525?text=Hi%2C+I'm+interested+in+${p.property_id || p.id}+at+${encodeURIComponent([p.village, p.district].filter(Boolean).join(', '))}`
+
+  function handleWishlist(e) {
+    e.preventDefault()
+    if (!user) { router.push('/auth/login'); return }
+    if (isOwner) return
+    onToggleWishlist(p.id, isWishlisted)
+  }
 
   return (
     <div className="group bg-white/5 hover:bg-white/8 border border-white/10 hover:border-turmeric-400/30 rounded-2xl overflow-hidden transition-all flex flex-col">
@@ -60,7 +71,7 @@ function PropertyCard({ p }) {
         </div>
       </Link>
 
-      {/* ── Quick action bar — no need to open detail page first ── */}
+      {/* ── Quick action bar ── */}
       <div className="flex gap-2 px-4 pb-4">
         <Link
           href={`${detailHref}?book=1`}
@@ -68,6 +79,20 @@ function PropertyCard({ p }) {
         >
           📅 Book Visit
         </Link>
+        {!isOwner && (
+          <button
+            onClick={handleWishlist}
+            disabled={wishlistLoading}
+            title={isWishlisted ? 'Remove from saved' : 'Save property'}
+            className={`px-3 rounded-xl border text-sm transition-all disabled:opacity-50 ${
+              isWishlisted
+                ? 'bg-paddy-500/20 border-paddy-400/40 text-paddy-300'
+                : 'bg-white/8 hover:bg-white/15 border-white/15 text-white/70'
+            }`}
+          >
+            {isWishlisted ? '♥' : '♡'}
+          </button>
+        )}
         <a
           href={whatsapp}
           target="_blank" rel="noopener noreferrer"
@@ -80,16 +105,52 @@ function PropertyCard({ p }) {
   )
 }
 
-export default function PropertiesClient({ properties }) {
+export default function PropertiesClient({ properties, user = null, wishlistIds: initialWishlistIds = [] }) {
   const [filterValues, setFilterValues] = useState({
-    state: '', soil: [], land_type: '', acres: {}, price: {},
+    state: '', district: '', mandal: '', soil: [], land_type: '', acres: {}, price: {},
   })
+  const [wishlistIds, setWishlistIds] = useState(() => new Set(initialWishlistIds))
+  const [wishlistLoading, setWishlistLoading] = useState(false)
+
+  const handleToggleWishlist = useCallback(async (propertyId, currentlyWishlisted) => {
+    setWishlistLoading(true)
+    const supabase = createClient()
+    if (currentlyWishlisted) {
+      await supabase.from('buyer_wishlist').delete().eq('buyer_id', user.id).eq('property_id', propertyId)
+      setWishlistIds(prev => { const s = new Set(prev); s.delete(propertyId); return s })
+    } else {
+      const { count } = await supabase
+        .from('buyer_wishlist')
+        .select('id', { count: 'exact', head: true })
+        .eq('buyer_id', user.id)
+      if (count >= 2) {
+        alert('You can save up to 2 properties. Remove one to add this.')
+        setWishlistLoading(false)
+        return
+      }
+      await supabase.from('buyer_wishlist').insert({ buyer_id: user.id, property_id: propertyId })
+      setWishlistIds(prev => new Set([...prev, propertyId]))
+    }
+    setWishlistLoading(false)
+  }, [user])
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
 
-  // Always show all states from locations.json — not just states that have listings
+  const districts = filterValues.state ? Object.keys(locations[filterValues.state] || {}) : []
+  const mandals   = filterValues.state && filterValues.district
+    ? (locations[filterValues.state]?.[filterValues.district] || [])
+    : []
+
   const filters = [
     { id: 'state', label: 'State', type: 'select', value: filterValues.state,
       options: ALL_STATES.map(s => ({ value: s, label: s })) },
+    ...(districts.length ? [{
+      id: 'district', label: 'District', type: 'select', value: filterValues.district,
+      options: districts.map(d => ({ value: d, label: d })),
+    }] : []),
+    ...(mandals.length ? [{
+      id: 'mandal', label: 'Mandal', type: 'select', value: filterValues.mandal,
+      options: mandals.map(m => ({ value: m, label: m })),
+    }] : []),
     { id: 'soil', label: 'Soil Type', type: 'checkboxes', value: filterValues.soil,
       options: SOIL_TYPES.map(s => ({ value: s, label: s })) },
     { id: 'land_type', label: 'Land Type', type: 'select', value: filterValues.land_type,
@@ -101,15 +162,23 @@ export default function PropertiesClient({ properties }) {
   ]
 
   function handleFilterChange(id, val) {
-    setFilterValues(f => ({ ...f, [id]: val }))
+    if (id === 'state') {
+      setFilterValues(f => ({ ...f, state: val, district: '', mandal: '' }))
+    } else if (id === 'district') {
+      setFilterValues(f => ({ ...f, district: val, mandal: '' }))
+    } else {
+      setFilterValues(f => ({ ...f, [id]: val }))
+    }
   }
 
   function handleReset() {
-    setFilterValues({ state: '', soil: [], land_type: '', acres: {}, price: {} })
+    setFilterValues({ state: '', district: '', mandal: '', soil: [], land_type: '', acres: {}, price: {} })
   }
 
   const filtered = useMemo(() => properties.filter(p => {
-    if (filterValues.state && p.state !== filterValues.state) return false
+    if (filterValues.state    && p.state    !== filterValues.state)    return false
+    if (filterValues.district && p.district !== filterValues.district) return false
+    if (filterValues.mandal   && p.mandal   !== filterValues.mandal)   return false
     if (filterValues.soil.length && !filterValues.soil.includes(p.land_soil_type)) return false
     if (filterValues.land_type && p.land_used_type !== filterValues.land_type) return false
     if (filterValues.acres.min && p.area_acres < Number(filterValues.acres.min)) return false
@@ -118,7 +187,8 @@ export default function PropertiesClient({ properties }) {
     return true
   }), [properties, filterValues])
 
-  const hasActiveFilters = filterValues.state || filterValues.soil.length || filterValues.land_type ||
+  const hasActiveFilters = filterValues.state || filterValues.district || filterValues.mandal ||
+    filterValues.soil.length || filterValues.land_type ||
     filterValues.acres.min || filterValues.acres.max || filterValues.price.max
 
   return (
@@ -231,7 +301,16 @@ export default function PropertiesClient({ properties }) {
             ) : (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {filtered.map(p => <PropertyCard key={p.id} p={p} />)}
+                  {filtered.map(p => (
+                    <PropertyCard
+                      key={p.id}
+                      p={p}
+                      user={user}
+                      isWishlisted={wishlistIds.has(p.id)}
+                      onToggleWishlist={handleToggleWishlist}
+                      wishlistLoading={wishlistLoading}
+                    />
+                  ))}
                 </div>
                 <div className="mt-10 text-center border-t border-white/8 pt-8">
                   <p className="text-white/40 text-sm mb-3">Didn't find the right land?</p>

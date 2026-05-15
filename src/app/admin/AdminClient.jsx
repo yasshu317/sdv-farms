@@ -2,7 +2,7 @@
 import { useState, Fragment, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '../../lib/supabase'
-import { LogOut, Users, FileText, MapPin, RefreshCw, Home, Calendar, MessageSquare, ShieldCheck, Search, Plus, Flag } from 'lucide-react'
+import { LogOut, Users, FileText, MapPin, RefreshCw, Home, Calendar, MessageSquare, ShieldCheck, Search, Plus, Flag, Star } from 'lucide-react'
 import NextLink from 'next/link'
 import StatusBadge from '../../components/ui/StatusBadge'
 import { adminField, storageLinkLabel } from '../../lib/adminDisplay'
@@ -88,6 +88,7 @@ export default function AdminClient({
     ['requests',    'Requests',    MessageSquare],
     ['flags',       'Flags',       Flag],
     ['services',    'Services',    Users],
+    ['feedback',    'Feedback',    Star],
   ]
   const visibleTabs = canManageUsers ? TAB_DEFS : TAB_DEFS.filter(([id]) => id !== 'users')
 
@@ -111,6 +112,11 @@ export default function AdminClient({
   const [roleFilter, setRoleFilter]       = useState('all')
   const [serviceBookings, setServiceBookings] = useState(null)
   const [svcLoading, setSvcLoading]       = useState(false)
+
+  const [feedback, setFeedback]           = useState(null)
+  const [feedbackLoading, setFeedbackLoading] = useState(false)
+  const [expandedFeedbackId, setExpandedFeedbackId] = useState(null)
+  const [feedbackNoteEdit, setFeedbackNoteEdit]     = useState({})
 
   const [featureFlags, setFeatureFlags]   = useState(initialFeatureFlags ?? [])
   const [payloadTexts, setPayloadTexts]   = useState(() => payloadTextMap(initialFeatureFlags))
@@ -222,6 +228,35 @@ export default function AdminClient({
     const supabase = createClient()
     await supabase.from('service_bookings').update({ status }).eq('id', id)
     setServiceBookings(prev => prev.map(s => s.id === id ? { ...s, status } : s))
+    setSaving(null)
+  }
+
+  async function loadFeedback() {
+    if (feedbackLoading) return
+    setFeedbackLoading(true)
+    const supabase = createClient()
+    const { data } = await supabase
+      .from('business_feedback')
+      .select('*')
+      .order('created_at', { ascending: false })
+    setFeedback(data ?? [])
+    setFeedbackLoading(false)
+  }
+
+  async function updateFeedbackStatus(id, status) {
+    setSaving(id)
+    const supabase = createClient()
+    await supabase.from('business_feedback').update({ status }).eq('id', id)
+    setFeedback(prev => prev.map(f => f.id === id ? { ...f, status } : f))
+    setSaving(null)
+  }
+
+  async function saveFeedbackNote(id) {
+    const notes = (feedbackNoteEdit[id] ?? '').trim()
+    setSaving(id)
+    const supabase = createClient()
+    await supabase.from('business_feedback').update({ admin_notes: notes || null, status: 'read' }).eq('id', id)
+    setFeedback(prev => prev.map(f => f.id === id ? { ...f, admin_notes: notes || null, status: f.status === 'new' ? 'read' : f.status } : f))
     setSaving(null)
   }
 
@@ -418,6 +453,7 @@ export default function AdminClient({
     propApproved: properties.filter(p => p.status === 'approved').length,
     apptPending:  appointments.filter(a => a.status === 'pending').length,
     reqOpen:      buyerRequests.filter(r => r.status === 'open' || r.status === 'in_progress').length,
+    feedbackNew:  feedback ? feedback.filter(f => f.status === 'new').length : 0,
   }
 
   return (
@@ -478,6 +514,7 @@ export default function AdminClient({
                 setTab(id)
                 if (id === 'users' && allUsers === null) loadUsers()
                 if (id === 'services' && serviceBookings === null) loadServiceBookings()
+                if (id === 'feedback' && feedback === null) loadFeedback()
                 if (id === 'flags') {
                   setFlagBanner('')
                   reloadFeatureFlags()
@@ -494,6 +531,9 @@ export default function AdminClient({
               )}
               {id === 'requests' && stats.reqOpen > 0 && (
                 <span className="bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">{stats.reqOpen}</span>
+              )}
+              {id === 'feedback' && stats.feedbackNew > 0 && (
+                <span className="bg-orange-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">{stats.feedbackNew}</span>
               )}
             </button>
           ))}
@@ -1487,6 +1527,186 @@ export default function AdminClient({
             )}
           </div>
         )}
+        {/* Business Feedback */}
+        {tab === 'feedback' && (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
+              <div>
+                <h2 className="font-semibold text-gray-800">
+                  Business Feedback
+                  {feedback && <span className="text-gray-400 font-normal text-sm ml-2">({feedback.length})</span>}
+                </h2>
+                <p className="text-xs text-gray-400 mt-0.5">Feedback submitted by businesses via the feedback form</p>
+              </div>
+              <button
+                onClick={loadFeedback}
+                disabled={feedbackLoading}
+                className="text-xs border border-gray-200 text-gray-500 hover:text-paddy-700 hover:border-paddy-300 rounded-lg px-3 py-1.5 transition-colors flex items-center gap-1"
+              >
+                <RefreshCw size={12} className={feedbackLoading ? 'animate-spin' : ''} /> Refresh
+              </button>
+            </div>
+
+            {/* Status summary pills */}
+            {feedback && feedback.length > 0 && (
+              <div className="px-6 py-3 border-b border-gray-50 flex gap-3 flex-wrap">
+                {[
+                  { status: 'new',      label: 'New',      color: 'bg-orange-50 text-orange-600 border-orange-100' },
+                  { status: 'read',     label: 'Read',     color: 'bg-blue-50 text-blue-600 border-blue-100' },
+                  { status: 'replied',  label: 'Replied',  color: 'bg-green-50 text-green-600 border-green-100' },
+                  { status: 'archived', label: 'Archived', color: 'bg-gray-50 text-gray-500 border-gray-200' },
+                ].map(({ status, label, color }) => (
+                  <span key={status} className={`text-xs font-semibold px-3 py-1 rounded-full border ${color}`}>
+                    {feedback.filter(f => f.status === status).length} {label}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {feedbackLoading && !feedback ? (
+              <div className="text-center py-12">
+                <RefreshCw size={20} className="animate-spin text-paddy-400 mx-auto mb-2" />
+                <p className="text-gray-400 text-sm">Loading feedback…</p>
+              </div>
+            ) : !feedback || feedback.length === 0 ? (
+              <div className="text-center py-16 px-6">
+                <Star size={32} className="text-gray-200 mx-auto mb-3" />
+                <p className="text-gray-500 text-sm font-medium mb-1">No feedback yet</p>
+                <p className="text-gray-400 text-xs max-w-sm mx-auto">
+                  Businesses can submit feedback via <code className="bg-gray-100 px-1 rounded">POST /api/feedback</code>
+                </p>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-50">
+                {feedback.map(fb => {
+                  const isExpanded = expandedFeedbackId === fb.id
+                  const TYPE_COLORS = {
+                    general:     'bg-gray-100 text-gray-600',
+                    suggestion:  'bg-blue-50 text-blue-700',
+                    complaint:   'bg-red-50 text-red-700',
+                    partnership: 'bg-purple-50 text-purple-700',
+                    other:       'bg-gray-100 text-gray-600',
+                  }
+                  const STATUS_COLORS = {
+                    new:      'bg-orange-100 text-orange-700',
+                    read:     'bg-blue-100 text-blue-700',
+                    replied:  'bg-green-100 text-green-700',
+                    archived: 'bg-gray-100 text-gray-500',
+                  }
+                  return (
+                    <div key={fb.id} className="px-6 py-4 hover:bg-gray-50/50 transition-colors">
+                      <div className="flex items-start gap-4">
+                        {/* Rating stars */}
+                        <div className="flex-shrink-0 pt-0.5">
+                          {fb.rating ? (
+                            <div className="flex gap-0.5">
+                              {[1,2,3,4,5].map(n => (
+                                <Star
+                                  key={n}
+                                  size={13}
+                                  className={n <= fb.rating ? 'text-turmeric-500 fill-turmeric-500' : 'text-gray-200 fill-gray-200'}
+                                />
+                              ))}
+                            </div>
+                          ) : (
+                            <Star size={13} className="text-gray-200" />
+                          )}
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <span className="font-semibold text-gray-800 text-sm">{fb.business_name}</span>
+                            {fb.contact_name && (
+                              <span className="text-xs text-gray-400">· {fb.contact_name}</span>
+                            )}
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full capitalize ${TYPE_COLORS[fb.feedback_type] ?? TYPE_COLORS.other}`}>
+                              {fb.feedback_type}
+                            </span>
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full capitalize ${STATUS_COLORS[fb.status] ?? STATUS_COLORS.new}`}>
+                              {fb.status}
+                            </span>
+                            <span className="text-xs text-gray-400 ml-auto whitespace-nowrap">
+                              {new Date(fb.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </span>
+                          </div>
+
+                          {/* Contact info */}
+                          <div className="flex flex-wrap gap-3 mb-2 text-xs text-gray-400">
+                            {fb.email && <a href={`mailto:${fb.email}`} className="hover:text-paddy-600">{fb.email}</a>}
+                            {fb.phone && <a href={`tel:${fb.phone}`} className="hover:text-paddy-600">{fb.phone}</a>}
+                          </div>
+
+                          {/* Message preview / full */}
+                          <p className={`text-sm text-gray-600 ${isExpanded ? '' : 'line-clamp-2'}`}>
+                            {fb.message}
+                          </p>
+
+                          {/* Admin notes preview */}
+                          {!isExpanded && fb.admin_notes && (
+                            <p className="text-xs text-gray-400 mt-1 italic line-clamp-1">
+                              Note: {fb.admin_notes}
+                            </p>
+                          )}
+
+                          {/* Expanded section */}
+                          {isExpanded && (
+                            <div className="mt-3 space-y-3">
+                              <div>
+                                <label className="text-[10px] uppercase text-gray-400 block mb-1">Admin Notes (internal)</label>
+                                <textarea
+                                  rows={3}
+                                  value={feedbackNoteEdit[fb.id] ?? fb.admin_notes ?? ''}
+                                  onChange={e => setFeedbackNoteEdit(prev => ({ ...prev, [fb.id]: e.target.value }))}
+                                  placeholder="Add internal notes…"
+                                  className="w-full text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white resize-none focus:outline-none focus:border-paddy-400"
+                                />
+                              </div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <button
+                                  type="button"
+                                  disabled={saving === fb.id}
+                                  onClick={() => saveFeedbackNote(fb.id)}
+                                  className="text-xs bg-white border border-paddy-200 text-paddy-800 font-medium px-3 py-1.5 rounded-lg hover:bg-paddy-50 disabled:opacity-50"
+                                >
+                                  Save note
+                                </button>
+                                <select
+                                  value={fb.status}
+                                  onChange={e => updateFeedbackStatus(fb.id, e.target.value)}
+                                  disabled={saving === fb.id}
+                                  className="text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-600 focus:outline-none focus:border-paddy-400 bg-white disabled:opacity-50"
+                                >
+                                  {['new', 'read', 'replied', 'archived'].map(s => (
+                                    <option key={s} value={s}>{s}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            </div>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setExpandedFeedbackId(isExpanded ? null : fb.id)
+                              if (!isExpanded) {
+                                setFeedbackNoteEdit(prev => ({ ...prev, [fb.id]: fb.admin_notes ?? '' }))
+                                if (fb.status === 'new') updateFeedbackStatus(fb.id, 'read')
+                              }
+                            }}
+                            className="text-xs text-paddy-600 hover:text-paddy-800 mt-2 font-medium"
+                          >
+                            {isExpanded ? 'Collapse' : 'View & manage'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
       </main>
     </div>
   )
