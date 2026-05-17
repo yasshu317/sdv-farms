@@ -17,29 +17,26 @@ export default async function AdminPage() {
     { data: sellerProperties },
     { data: appointments },
     { data: buyerRequests },
+    brnRes,
+    ffRes,
   ] = await Promise.all([
     supabase.from('enquiries').select('*').order('created_at', { ascending: false }),
     supabase.from('plots').select('*').order('plot_number'),
     supabase.from('seller_properties').select('*').order('created_at', { ascending: false }),
     supabase.from('appointments').select('*').order('appointment_date', { ascending: true }),
     supabase.from('buyer_requests').select('*').order('created_at', { ascending: false }),
+    supabase.from('buyer_request_notes').select('*').order('created_at', { ascending: false }),
+    supabase.from('feature_flags').select('*').order('sort_order', { ascending: true }).order('key', { ascending: true }),
   ])
 
-  const brnRes = await supabase.from('buyer_request_notes').select('*').order('created_at', { ascending: false })
   const buyerRequestNotes = brnRes.error ? [] : (brnRes.data ?? [])
+  const featureFlags = ffRes.error ? [] : (ffRes.data ?? [])
 
   const notesByRequestId = {}
   for (const n of buyerRequestNotes) {
     if (!notesByRequestId[n.buyer_request_id]) notesByRequestId[n.buyer_request_id] = []
     notesByRequestId[n.buyer_request_id].push(n)
   }
-
-  const ffRes = await supabase
-    .from('feature_flags')
-    .select('*')
-    .order('sort_order', { ascending: true })
-    .order('key', { ascending: true })
-  const featureFlags = ffRes.error ? [] : (ffRes.data ?? [])
 
   return (
     <AdminClient

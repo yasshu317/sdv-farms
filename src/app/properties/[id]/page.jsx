@@ -9,19 +9,19 @@ export default async function PropertyDetailPage({ params }) {
   const { id } = await params
   const supabase = await createClient()
 
-  const { data: property, error } = await supabase
-    .from('seller_properties')
-    .select('*')
-    .eq('id', id)
-    .eq('status', 'approved')
-    .single()
+  // Fetch property and user session in parallel
+  const [
+    { data: property, error },
+    { data: { user } },
+  ] = await Promise.all([
+    supabase.from('seller_properties').select('*').eq('id', id).eq('status', 'approved').single(),
+    supabase.auth.getUser(),
+  ])
 
   if (error || !property) redirect('/properties')
 
   // Increment view count (fire and forget)
   supabase.from('seller_properties').update({ views: (property.views || 0) + 1 }).eq('id', id).then(() => {})
-
-  const { data: { user } } = await supabase.auth.getUser()
 
   // Check if wishlisted
   let wishlisted = false

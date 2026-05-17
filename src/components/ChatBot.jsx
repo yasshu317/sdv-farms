@@ -69,7 +69,7 @@ export default function ChatBot() {
 
   useEffect(() => {
     if (mode === 'closed' || propertyCount > 0) return
-    fetch('/api/property-count')
+    fetch('/api/property-count', { next: { revalidate: 60 } })
       .then(r => r.json())
       .then(d => setPropertyCount(d.count ?? 0))
       .catch(() => setPropertyCount(0))
@@ -77,7 +77,7 @@ export default function ChatBot() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [allMessages])
+  }, [threadMessages])
 
   useEffect(() => {
     if (mode === 'chat') setTimeout(() => inputRef.current?.focus(), 100)

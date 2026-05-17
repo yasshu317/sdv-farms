@@ -16,25 +16,27 @@ export default async function DashboardPage(props) {
   if (role === 'seller') redirect('/seller?redirected=1')
   if (role === 'admin' || role === 'staff') redirect('/admin?redirected=1')
 
-  // Fetch this user's enquiries, join property title for context
-  const { data: enquiries } = await supabase
-    .from('enquiries')
-    .select('*, properties(id, title, location)')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-
-  // Fetch this user's plot interests
-  const { data: interests } = await supabase
-    .from('plot_interests')
-    .select('*, plots(plot_number, area_sqyds, price_per_sqyd, status)')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-
-  const { data: landRequests } = await supabase
-    .from('buyer_requests')
-    .select('*')
-    .eq('buyer_id', user.id)
-    .order('created_at', { ascending: false })
+  const [
+    { data: enquiries },
+    { data: interests },
+    { data: landRequests },
+  ] = await Promise.all([
+    supabase
+      .from('enquiries')
+      .select('*, properties(id, title, location)')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('plot_interests')
+      .select('*, plots(plot_number, area_sqyds, price_per_sqyd, status)')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('buyer_requests')
+      .select('*')
+      .eq('buyer_id', user.id)
+      .order('created_at', { ascending: false }),
+  ])
 
   const initialTab = searchParams?.tab === 'land-requests' ? 'land-requests' : 'overview'
 

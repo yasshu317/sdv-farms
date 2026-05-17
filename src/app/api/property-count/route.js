@@ -9,7 +9,10 @@ export async function GET() {
       .from('seller_properties')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'approved')
-    return Response.json({ count: count ?? 0 })
+    return Response.json(
+      { count: count ?? 0 },
+      { headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' } },
+    )
   } catch {
     return Response.json({ count: 0 })
   }
