@@ -128,7 +128,7 @@
 
     <section id="sellers">
       <h2>Sellers <span class="badge">Role: seller</span></h2>
-      <p>Sellers manage listings from the seller hub (<span class="path">/seller</span>); SDV staff approve before public visibility.</p>
+      <p>Sellers manage listings from the seller hub (<span class="path">/seller</span>); SDV staff approve before public visibility. Sellers can also visit <span class="path">/dashboard</span> to browse and enquire as a buyer — both roles work on the same account.</p>
       <ol>
         <li><strong>List your land</strong> → <span class="path">/auth/register?flow=seller</span> (skips buyer/seller picker).</li>
         <li>Eligibility check blocks Poramboke, Forest ceiling land, assigned/inam types, civil dispute land, etc.</li>
@@ -137,6 +137,7 @@
         <li><span class="path">/seller/property/new</span> wizard — Step&nbsp;0 now captures <strong>Relation to Owner</strong> (Self/Wife/Son/Daughter etc.); Step&nbsp;1 captures <strong>Sale Intent</strong> (Urgent Sale &middot; Ready to Sell &middot; Interested/Open). Media uploads required before submit.</li>
         <li>Approved listings link out to live PDP; views and <strong>Interested</strong> count (from saved buyers) aggregate on each card.</li>
         <li><strong>Appointments</strong> tab lists site visits referencing seller inventory.</li>
+        <li>Nav shows both <strong>My Listings</strong> and <strong>Browse &amp; Buy</strong> links. A banner on <span class="path">/dashboard</span> reminds sellers they are in buyer mode.</li>
       </ol>
     </section>
 
@@ -160,7 +161,8 @@
         <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Requests</strong> — buyer land-request pipeline (open/in_progress/matched/closed).</li>
         <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Flags</strong> — feature-flag JSON surfaced through <span class="path">/api/feature-flags</span>.</li>
         <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Services</strong> — <span class="path">/api/service-booking</span> payloads for all 6 Phase II field services (fencing, borewell, drip, farming plan, plants, fertilizers/nutrition).</li>
-        <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Feedback</strong> — business feedback submitted via <span class="path">POST /api/feedback</span> (public, no auth). Fields: business name, contact, type, message, rating. Status: new &rarr; read &rarr; replied &rarr; archived. Admin adds internal notes.</li>
+        <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Feedback</strong> — business feedback submitted via <span class="path">/feedback</span> public page (or <span class="path">POST /api/feedback</span>). Fields: business name, contact, type, message, rating. Status: new &rarr; read &rarr; replied &rarr; archived. Admin adds internal notes.</li>
+        <li style="margin-bottom:0.75rem"><strong style="color:var(--gold)">Testimonials</strong> — ops create/edit/approve testimonial cards and win stats with optional photo upload. Approved entries appear on the homepage (cached 2 min).</li>
       </ul>
       <p class="muted">Exact controls evolve — treat the deployed UI + Supabase rows as authoritative.</p>
     </section>
@@ -169,13 +171,13 @@
       <h2>After login — default home</h2>
       <ul class="muted" style="list-style: disc; padding-left: 1.3rem;">
         <li><strong>Buyer</strong> (default) → <span class="path">/dashboard</span></li>
-        <li><strong>Seller</strong> → <span class="path">/seller</span></li>
+        <li><strong>Seller</strong> → <span class="path">/seller</span> <em>(may also navigate to <span class="path">/dashboard</span> for buyer features — not blocked)</em></li>
         <li><strong>Admin / staff</strong> → <span class="path">/admin</span></li>
       </ul>
     </section>
 
     <section id="changelog" style="margin-top:2.5rem">
-      <h2>Recent changes <span class="badge">Phase 11+</span></h2>
+      <h2>Recent changes <span class="badge">Phase 11–14</span></h2>
       <ol>
         <li><strong>Sample Documents section</strong> — new homepage section with Sale Deed, Lease Agreement, Pahani guide &amp; Registration process; EN + Telugu.</li>
         <li><strong>District &amp; Mandal cascade filters</strong> — Browse Properties: State &rarr; District &rarr; Mandal.</li>
@@ -184,7 +186,11 @@
         <li><strong>Relation to Owner &amp; Sale Intent</strong> — SellerPropertyForm Step 0 adds "Relation to Owner" (Self/Wife/Son etc.); Step 1 adds "Sale Intent" toggle.</li>
         <li><strong>Appointment "Notify Me"</strong> — fallback in AppointmentPicker: buyer submits email, ops alerted to contact within 48 hrs.</li>
         <li><strong>Fertilizers &amp; Nutrition</strong> — 6th Phase II service added to <span class="path">/services</span> and booking API.</li>
-        <li><strong>Admin Feedback tab</strong> — 9th ops tab. Businesses submit via <span class="path">POST /api/feedback</span>; admin reviews, updates status, adds notes. Orange badge on unread count.</li>
+        <li><strong>Admin Feedback tab + public /feedback page</strong> — 9th ops tab. Businesses submit via public <span class="path">/feedback</span> UI; admin reviews, updates status, adds notes. Orange badge on unread count.</li>
+        <li><strong>Maintenance mode flag</strong> — <code>maintenance_mode</code> feature flag blocks non-admin users with a full-screen page; admin/staff see a dismissible banner.</li>
+        <li><strong>Gemini AI chatbot</strong> — chat falls back to Gemini 2.0 for questions outside FAQ rules. Requires <code>GEMINI_API_KEY</code> env var.</li>
+        <li><strong>Dynamic Testimonials &amp; Wins</strong> — admin Testimonials tab (10th) to add/edit/approve cards with photo upload; approved entries appear on the homepage.</li>
+        <li><strong>Dual buyer / seller role</strong> — sellers can visit <span class="path">/dashboard</span> without being redirected. Nav shows both "My Listings" and "Browse &amp; Buy". Contextual banner confirms buyer mode.</li>
       </ol>
     </section>
 

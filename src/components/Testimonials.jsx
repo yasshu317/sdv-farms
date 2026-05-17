@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState, useRef } from 'react'
+import Link from 'next/link'
 import { useLang } from '../context/LanguageContext'
 import Image from 'next/image'
 
@@ -139,6 +140,16 @@ export default function Testimonials() {
               {testimonials.map(item => (
                 <TestimonialCard key={item.id} item={item} />
               ))}
+            </div>
+
+            {/* CTA */}
+            <div className="mt-10 text-center">
+              <Link
+                href="/testimonial"
+                className="inline-flex items-center gap-2 border border-turmeric-400/30 hover:border-turmeric-400/70 text-turmeric-300 hover:text-turmeric-200 text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
+              >
+                ✍️ {lang === 'te' ? 'మీ అనుభవం పంచుకోండి' : 'Share your experience'}
+              </Link>
             </div>
           </>
         )}

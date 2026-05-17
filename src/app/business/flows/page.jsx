@@ -127,11 +127,13 @@ export default function BusinessFlowsPage() {
               <>
                 <strong>Seller</strong> — <Path>/seller</Path> manages up to <strong>two</strong> active listings;
                 property form captures <strong>Relation to Owner</strong> and <strong>Sale Intent</strong>; each card
-                shows an <strong>Interested</strong> count from saved buyers.
+                shows an <strong>Interested</strong> count from saved buyers. Sellers can also visit <Path>/dashboard</Path>
+                to browse and enquire as a buyer — both roles are available to the same account.
               </>,
               <>
-                <strong>Admin</strong> — full ops at <Path>/admin</Path> (9 tabs) plus <strong>Users</strong> tab and
-                role changes via API. New <strong>Feedback</strong> tab for business feedback submissions.
+                <strong>Admin</strong> — full ops at <Path>/admin</Path> (10 tabs): Properties, Users, Enquiries, Bookings,
+                Land Requests, Services, Feature Flags, Notes, Feedback, Testimonials. Role changes via API.
+                Sitewide <strong>maintenance mode</strong> is controlled by a feature flag.
               </>,
               <>
                 <strong>Staff</strong> — same <Path>/admin</Path> shell; <strong>Users</strong> tab hidden.
@@ -444,20 +446,22 @@ export default function BusinessFlowsPage() {
               Buyer (or unspecified role fallback) → <Path>/dashboard</Path>
             </li>
             <li>
-              Seller → <Path>/seller</Path>
+              Seller → <Path>/seller</Path> <em>(default landing; seller may also navigate to <Path>/dashboard</Path>
+              to use buyer features — no redirect blocks them)</em>
             </li>
             <li>
               Admin or Staff → <Path>/admin</Path>
             </li>
           </ul>
           <p className="text-sm">
-            Mirrors <code className="text-turmeric-400">homePathForRole</code> in auth callback + middleware redirects
-            (buyer trying /seller irrelevant, seller trying /dashboard bounces via server guard, etc.).
+            Mirrors <code className="text-turmeric-400">homePathForRole</code> in auth callback. Sellers see both
+            "My Listings" and "Browse &amp; Buy" links in the nav; a contextual banner on <Path>/dashboard</Path>
+            confirms they are in buyer mode and links back to their listings.
           </p>
         </FlowSection>
 
         {/* ── Changelog ─────────────────────────── */}
-        <FlowSection id="changelog" title="Recent changes" badge="v Phase 11+">
+        <FlowSection id="changelog" title="Recent changes" badge="v Phase 11–13">
           <BulletList
             items={[
               <>
@@ -496,7 +500,27 @@ export default function BusinessFlowsPage() {
               <>
                 <strong>Admin Feedback tab</strong> — 9th tab in <Path>/admin</Path>. Businesses POST to
                 <code className="text-turmeric-400">/api/feedback</code> (public, no auth); admin/staff review, update status, add
-                internal notes. Orange badge shows unread count.
+                internal notes. Orange badge shows unread count. Public submission UI at <Path>/feedback</Path>.
+              </>,
+              <>
+                <strong>Maintenance mode flag</strong> — <code className="text-turmeric-400">maintenance_mode</code> feature flag.
+                When enabled, non-admin users see a full-screen maintenance page;
+                admin/staff users see a dismissible banner but retain full access.
+              </>,
+              <>
+                <strong>Gemini AI chatbot</strong> — chat widget falls back to Gemini 2.0 for questions not covered by
+                local FAQ rules. Bot history is forwarded to the API for multi-turn context. Typing indicator shown
+                while AI responds. Requires <code className="text-turmeric-400">GEMINI_API_KEY</code> env var.
+              </>,
+              <>
+                <strong>Dynamic Testimonials &amp; Wins</strong> — admin Testimonials tab (10th) lets ops create, edit,
+                approve, and reorder testimonial cards and win stats with optional photo upload.
+                Approved entries surface on the homepage via <Path>/api/testimonials</Path> (cached 2 min).
+              </>,
+              <>
+                <strong>Dual buyer / seller role</strong> — sellers are no longer redirected away from <Path>/dashboard</Path>.
+                Nav shows both "My Listings" and "Browse &amp; Buy". A contextual banner on the buyer dashboard
+                reminds sellers which mode they are in. No DB schema change required.
               </>,
             ]}
           />

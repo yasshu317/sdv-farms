@@ -520,7 +520,8 @@ export default function AdminClient({
     propApproved: properties.filter(p => p.status === 'approved').length,
     apptPending:  appointments.filter(a => a.status === 'pending').length,
     reqOpen:      buyerRequests.filter(r => r.status === 'open' || r.status === 'in_progress').length,
-    feedbackNew:  feedback ? feedback.filter(f => f.status === 'new').length : 0,
+    feedbackNew:       feedback     ? feedback.filter(f => f.status === 'new').length : 0,
+    testimonialsPending: testimonials ? testimonials.filter(t => t.status === 'pending').length : 0,
   }
 
   return (
@@ -602,6 +603,9 @@ export default function AdminClient({
               )}
               {id === 'feedback' && stats.feedbackNew > 0 && (
                 <span className="bg-orange-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">{stats.feedbackNew}</span>
+              )}
+              {id === 'testimonials' && stats.testimonialsPending > 0 && (
+                <span className="bg-purple-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">{stats.testimonialsPending}</span>
               )}
             </button>
           ))}
