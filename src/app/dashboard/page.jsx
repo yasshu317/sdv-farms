@@ -11,9 +11,7 @@ export default async function DashboardPage(props) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  // Redirect wrong-role users to their actual home with an explanation banner
   const role = user.user_metadata?.role
-  if (role === 'seller') redirect('/seller?redirected=1')
   if (role === 'admin' || role === 'staff') redirect('/admin?redirected=1')
 
   const [

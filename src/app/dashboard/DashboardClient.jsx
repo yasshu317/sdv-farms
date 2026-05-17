@@ -82,6 +82,16 @@ export default function DashboardClient({ user, enquiries, interests, landReques
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-4">
         <RoleRedirectBanner />
         <EmailVerificationBanner user={user} />
+        {user?.role === 'seller' && (
+          <div className="flex items-center justify-between gap-3 bg-turmeric-500/10 border border-turmeric-400/25 rounded-xl px-4 py-3 mt-3">
+            <p className="text-turmeric-200 text-sm">
+              You&apos;re browsing as a <strong>buyer</strong> — enquiries and land requests submitted here are tracked separately from your listings.
+            </p>
+            <Link href="/seller" className="shrink-0 text-xs font-semibold text-turmeric-300 hover:text-turmeric-200 border border-turmeric-400/30 rounded-full px-3 py-1 transition-colors">
+              My Listings →
+            </Link>
+          </div>
+        )}
       </div>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">

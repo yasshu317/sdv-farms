@@ -187,10 +187,7 @@ export default function Navbar() {
                       </div>
                     </div>
                     <NextLink
-                      href={
-                        isAdminOrStaff(user.user_metadata?.role) ? '/admin' :
-                        user.user_metadata?.role === 'seller' ? '/seller' : '/dashboard'
-                      }
+                      href={isAdminOrStaff(user.user_metadata?.role) ? '/admin' : user.user_metadata?.role === 'seller' ? '/seller' : '/dashboard'}
                       onClick={() => setUserMenu(false)}
                       className={`flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors ${telugu ? 'telugu' : ''}`}
                     >
@@ -198,6 +195,16 @@ export default function Navbar() {
                       {isAdminOrStaff(user.user_metadata?.role) ? t.adminPanel :
                        user.user_metadata?.role === 'seller' ? t.myListings : t.myDashboard}
                     </NextLink>
+                    {user.user_metadata?.role === 'seller' && (
+                      <NextLink
+                        href="/dashboard"
+                        onClick={() => setUserMenu(false)}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        <LayoutDashboard size={14} />
+                        🏡 Browse &amp; Buy
+                      </NextLink>
+                    )}
                     <button
                       type="button"
                       onClick={handleLogout}

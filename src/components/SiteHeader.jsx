@@ -189,16 +189,26 @@ export default function SiteHeader({ active: activeProp = null }) {
             <NextLink href="/services" className={`whitespace-nowrap leading-none ${linkClass('services')}`}>{t.services}</NextLink>
             <NextLink href="/buyer-request" className={`whitespace-nowrap leading-none ${linkClass('buyer-request')}`}>{t.landRequest}</NextLink>
             {user ? (
-              <NextLink
-                href={
-                  isAdminOrStaff(user.user_metadata?.role)  ? '/admin'     :
-                  user.user_metadata?.role === 'seller' ? '/seller'    : '/dashboard'
-                }
-                className="whitespace-nowrap leading-none text-sm font-semibold bg-turmeric-500/20 border border-turmeric-400/30 text-turmeric-300 hover:bg-turmeric-500/30 px-3 py-1 rounded-full transition-colors"
-              >
-                {isAdminOrStaff(user.user_metadata?.role) ? (user.user_metadata?.role === 'staff' ? '📋 Ops' : '⚙️ Admin')         :
-                 user.user_metadata?.role === 'seller' ? '🌾 My Listings'   : '🏡 My Dashboard'}
-              </NextLink>
+              <div className="flex items-center gap-1.5">
+                {isAdminOrStaff(user.user_metadata?.role) ? (
+                  <NextLink href="/admin" className="whitespace-nowrap leading-none text-sm font-semibold bg-turmeric-500/20 border border-turmeric-400/30 text-turmeric-300 hover:bg-turmeric-500/30 px-3 py-1 rounded-full transition-colors">
+                    {user.user_metadata?.role === 'staff' ? '📋 Ops' : '⚙️ Admin'}
+                  </NextLink>
+                ) : user.user_metadata?.role === 'seller' ? (
+                  <>
+                    <NextLink href="/seller" className="whitespace-nowrap leading-none text-sm font-semibold bg-turmeric-500/20 border border-turmeric-400/30 text-turmeric-300 hover:bg-turmeric-500/30 px-3 py-1 rounded-full transition-colors">
+                      🌾 My Listings
+                    </NextLink>
+                    <NextLink href="/dashboard" className="whitespace-nowrap leading-none text-sm font-medium border border-white/15 text-white/70 hover:text-white hover:border-white/30 px-3 py-1 rounded-full transition-colors">
+                      🏡 Buy
+                    </NextLink>
+                  </>
+                ) : (
+                  <NextLink href="/dashboard" className="whitespace-nowrap leading-none text-sm font-semibold bg-turmeric-500/20 border border-turmeric-400/30 text-turmeric-300 hover:bg-turmeric-500/30 px-3 py-1 rounded-full transition-colors">
+                    🏡 My Dashboard
+                  </NextLink>
+                )}
+              </div>
             ) : (
               <NextLink href={REGISTER_LIST_LAND} className="whitespace-nowrap leading-none text-sm font-medium text-white/75 hover:text-turmeric-300 transition-colors">
                 {t.listLand}
@@ -227,17 +237,21 @@ export default function SiteHeader({ active: activeProp = null }) {
             {t.landRequest}
           </NextLink>
           {user ? (
-            <NextLink
-              href={
-                isAdminOrStaff(user.user_metadata?.role)  ? '/admin'  :
-                user.user_metadata?.role === 'seller' ? '/seller' : '/dashboard'
-              }
-              onClick={() => setMobileOpen(false)}
-              className="block py-2.5 px-1 text-sm font-semibold text-turmeric-300"
-            >
-              {isAdminOrStaff(user.user_metadata?.role) ? (user.user_metadata?.role === 'staff' ? '📋 Ops hub' : '⚙️ Admin')        :
-               user.user_metadata?.role === 'seller' ? '🌾 My Listings'  : '🏡 My Dashboard'}
-            </NextLink>
+            <>
+              <NextLink
+                href={isAdminOrStaff(user.user_metadata?.role) ? '/admin' : user.user_metadata?.role === 'seller' ? '/seller' : '/dashboard'}
+                onClick={() => setMobileOpen(false)}
+                className="block py-2.5 px-1 text-sm font-semibold text-turmeric-300"
+              >
+                {isAdminOrStaff(user.user_metadata?.role) ? (user.user_metadata?.role === 'staff' ? '📋 Ops hub' : '⚙️ Admin') :
+                 user.user_metadata?.role === 'seller' ? '🌾 My Listings' : '🏡 My Dashboard'}
+              </NextLink>
+              {user.user_metadata?.role === 'seller' && (
+                <NextLink href="/dashboard" onClick={() => setMobileOpen(false)} className="block py-2.5 px-1 text-sm font-medium text-white/70 hover:text-turmeric-300">
+                  🏡 Browse &amp; Buy
+                </NextLink>
+              )}
+            </>
           ) : (
             <NextLink href={REGISTER_LIST_LAND} onClick={() => setMobileOpen(false)} className="block py-2.5 px-1 text-sm font-medium text-white/80 hover:text-turmeric-300">
               {t.listLand}
