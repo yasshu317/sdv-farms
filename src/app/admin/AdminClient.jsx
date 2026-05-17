@@ -1573,7 +1573,15 @@ export default function AdminClient({
                 <Star size={32} className="text-gray-200 mx-auto mb-3" />
                 <p className="text-gray-500 text-sm font-medium mb-1">No feedback yet</p>
                 <p className="text-gray-400 text-xs max-w-sm mx-auto">
-                  Businesses can submit feedback via <code className="bg-gray-100 px-1 rounded">POST /api/feedback</code>
+                  Share the feedback form with businesses:{' '}
+                  <a
+                    href="/feedback"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-turmeric-600 hover:underline font-medium"
+                  >
+                    /feedback
+                  </a>
                 </p>
               </div>
             ) : (
