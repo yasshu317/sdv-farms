@@ -9,7 +9,8 @@ import { isAdminOrStaff } from '../lib/roles'
  *  - Admin / staff     → see a dismissible banner but can still use the site
  */
 export default function MaintenanceGuard({ children }) {
-  const [state, setState] = useState('loading') // 'loading' | 'live' | 'maintenance' | 'admin-banner'
+  // Start optimistically showing the site — only switch if maintenance is confirmed ON
+  const [state, setState] = useState('live') // 'live' | 'maintenance' | 'admin-banner'
   const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
@@ -40,8 +41,6 @@ export default function MaintenanceGuard({ children }) {
     })()
     return () => { cancelled = true }
   }, [])
-
-  if (state === 'loading') return null
 
   if (state === 'maintenance') {
     return (
