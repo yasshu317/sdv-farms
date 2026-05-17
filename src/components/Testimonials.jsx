@@ -53,8 +53,10 @@ function WinCard({ item }) {
 
 export default function Testimonials() {
   const { lang } = useLang()
-  const [items, setItems] = useState([])
-  const [loaded, setLoaded] = useState(false)
+  const [items, setItems]         = useState([])
+  const [avgRating, setAvgRating] = useState(null)
+  const [ratingCount, setRatingCount] = useState(0)
+  const [loaded, setLoaded]       = useState(false)
   const scrollRef = useRef(null)
   const [canLeft, setCanLeft]   = useState(false)
   const [canRight, setCanRight] = useState(true)
@@ -62,7 +64,12 @@ export default function Testimonials() {
   useEffect(() => {
     fetch('/api/testimonials')
       .then(r => r.json())
-      .then(d => { setItems(d.testimonials ?? []); setLoaded(true) })
+      .then(d => {
+        setItems(d.testimonials ?? [])
+        setAvgRating(d.avgRating ?? null)
+        setRatingCount(d.ratingCount ?? 0)
+        setLoaded(true)
+      })
       .catch(() => setLoaded(true))
   }, [])
 
@@ -106,9 +113,35 @@ export default function Testimonials() {
                 <p className="text-turmeric-400 text-xs font-semibold uppercase tracking-widest mb-2">
                   {lang === 'te' ? 'వినియోగదారుల అభిప్రాయాలు' : 'What our customers say'}
                 </p>
-                <h2 className="font-display text-2xl sm:text-3xl font-bold text-white">
+                <h2 className="font-display text-2xl sm:text-3xl font-bold text-white mb-3">
                   {lang === 'te' ? 'విశ్వాసం మాకు మూలధనం' : 'Trusted by investors across India'}
                 </h2>
+                {avgRating !== null && ratingCount > 0 && (
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex gap-0.5">
+                      {[1,2,3,4,5].map(n => {
+                        const fill = Math.min(1, Math.max(0, avgRating - (n - 1)))
+                        if (fill >= 1) return <span key={n} className="text-turmeric-400 text-base leading-none">★</span>
+                        if (fill > 0) return (
+                          <span key={n} className="relative text-base leading-none inline-block">
+                            <span className="text-white/15">★</span>
+                            <span
+                              className="absolute inset-0 text-turmeric-400 overflow-hidden"
+                              style={{ width: `${fill * 100}%` }}
+                            >★</span>
+                          </span>
+                        )
+                        return <span key={n} className="text-white/15 text-base leading-none">★</span>
+                      })}
+                    </div>
+                    <span className="text-turmeric-300 font-bold text-sm">{avgRating}</span>
+                    <span className="text-white/35 text-xs">
+                      {lang === 'te'
+                        ? `${ratingCount} రేటింగ్‌లు ఆధారంగా`
+                        : `based on ${ratingCount} rating${ratingCount !== 1 ? 's' : ''}`}
+                    </span>
+                  </div>
+                )}
               </div>
               <div className="flex gap-2 shrink-0">
                 <button

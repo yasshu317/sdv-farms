@@ -35,20 +35,35 @@ export async function POST(request) {
 export async function GET() {
   try {
     const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('testimonials')
-      .select('id, type, name, role, location, message, rating, avatar_url, win_icon, win_stat, sort_order')
-      .eq('status', 'approved')
-      .order('sort_order', { ascending: true })
-      .order('created_at', { ascending: true })
+
+    const [{ data, error }, { data: ratingRows }] = await Promise.all([
+      supabase
+        .from('testimonials')
+        .select('id, type, name, role, location, message, rating, avatar_url, win_icon, win_stat, sort_order')
+        .eq('status', 'approved')
+        .order('sort_order', { ascending: true })
+        .order('created_at', { ascending: true }),
+      // aggregate: all approved testimonial-type entries that have a rating
+      supabase
+        .from('testimonials')
+        .select('rating')
+        .eq('status', 'approved')
+        .eq('type', 'testimonial')
+        .not('rating', 'is', null),
+    ])
 
     if (error) throw error
 
+    const ratings  = (ratingRows ?? []).map(r => r.rating).filter(Boolean)
+    const avgRating = ratings.length
+      ? Math.round((ratings.reduce((s, r) => s + r, 0) / ratings.length) * 10) / 10
+      : null
+
     return Response.json(
-      { testimonials: data ?? [] },
+      { testimonials: data ?? [], avgRating, ratingCount: ratings.length },
       { headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=600' } },
     )
   } catch {
-    return Response.json({ testimonials: [] })
+    return Response.json({ testimonials: [], avgRating: null, ratingCount: 0 })
   }
 }
