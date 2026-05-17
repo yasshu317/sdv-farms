@@ -2,7 +2,8 @@
 import { useState, Fragment, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '../../lib/supabase'
-import { LogOut, Users, FileText, MapPin, RefreshCw, Home, Calendar, MessageSquare, ShieldCheck, Search, Plus, Flag, Star } from 'lucide-react'
+import { LogOut, Users, FileText, MapPin, RefreshCw, Home, Calendar, MessageSquare, ShieldCheck, Search, Plus, Flag, Star, Quote } from 'lucide-react'
+import FileUpload from '../../components/ui/FileUpload'
 import NextLink from 'next/link'
 import StatusBadge from '../../components/ui/StatusBadge'
 import { adminField, storageLinkLabel } from '../../lib/adminDisplay'
@@ -89,6 +90,7 @@ export default function AdminClient({
     ['flags',       'Flags',       Flag],
     ['services',    'Services',    Users],
     ['feedback',    'Feedback',    Star],
+    ['testimonials','Testimonials',Quote],
   ]
   const visibleTabs = canManageUsers ? TAB_DEFS : TAB_DEFS.filter(([id]) => id !== 'users')
 
@@ -117,6 +119,12 @@ export default function AdminClient({
   const [feedbackLoading, setFeedbackLoading] = useState(false)
   const [expandedFeedbackId, setExpandedFeedbackId] = useState(null)
   const [feedbackNoteEdit, setFeedbackNoteEdit]     = useState({})
+
+  const [testimonials, setTestimonials]   = useState(null)
+  const [testimonialsLoading, setTestimonialsLoading] = useState(false)
+  const [testimonialsForm, setTestimonialsForm] = useState(null) // null = closed, {} = new, row = edit
+  const [testimonialsSaving, setTestimonialsSaving] = useState(false)
+  const TESTIMONIAL_BLANK = { type: 'testimonial', name: '', role: '', location: '', message: '', rating: '', avatar_url: '', win_icon: '🏆', win_stat: '', sort_order: '0' }
 
   const [featureFlags, setFeatureFlags]   = useState(initialFeatureFlags ?? [])
   const [payloadTexts, setPayloadTexts]   = useState(() => payloadTextMap(initialFeatureFlags))
@@ -257,6 +265,65 @@ export default function AdminClient({
     const supabase = createClient()
     await supabase.from('business_feedback').update({ admin_notes: notes || null, status: 'read' }).eq('id', id)
     setFeedback(prev => prev.map(f => f.id === id ? { ...f, admin_notes: notes || null, status: f.status === 'new' ? 'read' : f.status } : f))
+    setSaving(null)
+  }
+
+  async function loadTestimonials() {
+    if (testimonialsLoading) return
+    setTestimonialsLoading(true)
+    const supabase = createClient()
+    const { data } = await supabase
+      .from('testimonials')
+      .select('*')
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: false })
+    setTestimonials(data ?? [])
+    setTestimonialsLoading(false)
+  }
+
+  async function saveTestimonial() {
+    const f = testimonialsForm
+    if (!f?.name?.trim() || !f?.message?.trim()) return
+    setTestimonialsSaving(true)
+    const supabase = createClient()
+    const payload = {
+      type:       f.type || 'testimonial',
+      name:       f.name.trim(),
+      role:       f.role?.trim() || null,
+      location:   f.location?.trim() || null,
+      message:    f.message.trim(),
+      rating:     f.type === 'testimonial' && f.rating ? Number(f.rating) : null,
+      avatar_url: f.type === 'testimonial' ? (f.avatar_url || null) : null,
+      win_icon:   f.type === 'win' ? (f.win_icon || '🏆') : null,
+      win_stat:   f.type === 'win' ? (f.win_stat?.trim() || null) : null,
+      status:     f.status || 'pending',
+      sort_order: Number(f.sort_order) || 0,
+    }
+    if (f.id) {
+      await supabase.from('testimonials').update(payload).eq('id', f.id)
+      setTestimonials(prev => prev.map(t => t.id === f.id ? { ...t, ...payload } : t))
+    } else {
+      const { data } = await supabase.from('testimonials').insert(payload).select().single()
+      if (data) setTestimonials(prev => [data, ...(prev ?? [])])
+    }
+    setTestimonialsSaving(false)
+    setTestimonialsForm(null)
+  }
+
+  async function deleteTestimonial(id) {
+    if (!confirm('Delete this testimonial permanently?')) return
+    setSaving(id)
+    const supabase = createClient()
+    await supabase.from('testimonials').delete().eq('id', id)
+    setTestimonials(prev => prev.filter(t => t.id !== id))
+    setSaving(null)
+  }
+
+  async function patchTestimonial(id, patch) {
+    setSaving(id)
+    const supabase = createClient()
+    await supabase.from('testimonials').update(patch).eq('id', id)
+    setTestimonials(prev => prev.map(t => t.id === id ? { ...t, ...patch } : t))
     setSaving(null)
   }
 
@@ -515,6 +582,7 @@ export default function AdminClient({
                 if (id === 'users' && allUsers === null) loadUsers()
                 if (id === 'services' && serviceBookings === null) loadServiceBookings()
                 if (id === 'feedback' && feedback === null) loadFeedback()
+                if (id === 'testimonials' && testimonials === null) loadTestimonials()
                 if (id === 'flags') {
                   setFlagBanner('')
                   reloadFeatureFlags()
@@ -1710,6 +1778,208 @@ export default function AdminClient({
                     </div>
                   )
                 })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Testimonials */}
+        {tab === 'testimonials' && (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
+              <div>
+                <h2 className="font-semibold text-gray-800">Testimonials &amp; Wins ({testimonials?.length ?? 0})</h2>
+                <p className="text-xs text-gray-400 mt-0.5">Manage what appears on the homepage</p>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={loadTestimonials} className="flex items-center gap-1.5 text-xs text-gray-500 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50">
+                  <RefreshCw size={12} className={testimonialsLoading ? 'animate-spin' : ''} /> Refresh
+                </button>
+                <button onClick={() => setTestimonialsForm({ ...TESTIMONIAL_BLANK })} className="flex items-center gap-1.5 text-xs bg-paddy-700 text-white rounded-lg px-3 py-1.5 hover:bg-paddy-800">
+                  <Plus size={12} /> Add new
+                </button>
+              </div>
+            </div>
+
+            {/* Add / Edit form */}
+            {testimonialsForm && (
+              <div className="border-b border-gray-100 bg-gray-50 px-6 py-5">
+                <h3 className="text-sm font-semibold text-gray-700 mb-4">{testimonialsForm.id ? 'Edit' : 'Add'} Testimonial / Win</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Type */}
+                  <div className="sm:col-span-2 flex gap-3">
+                    {['testimonial', 'win'].map(t => (
+                      <button key={t} type="button"
+                        onClick={() => setTestimonialsForm(f => ({ ...f, type: t }))}
+                        className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition-colors capitalize ${testimonialsForm.type === t ? 'bg-paddy-700 text-white border-paddy-700' : 'border-gray-200 text-gray-600 hover:border-paddy-400'}`}
+                      >{t}</button>
+                    ))}
+                  </div>
+
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Name *</label>
+                    <input value={testimonialsForm.name} onChange={e => setTestimonialsForm(f => ({ ...f, name: e.target.value }))}
+                      placeholder={testimonialsForm.type === 'win' ? 'SDV Farms' : 'Ramesh K.'}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-paddy-400" />
+                  </div>
+
+                  {testimonialsForm.type === 'testimonial' && (
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Role / Title</label>
+                      <input value={testimonialsForm.role} onChange={e => setTestimonialsForm(f => ({ ...f, role: e.target.value }))}
+                        placeholder="Buyer from Bengaluru"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-paddy-400" />
+                    </div>
+                  )}
+
+                  {testimonialsForm.type === 'testimonial' && (
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Location</label>
+                      <input value={testimonialsForm.location} onChange={e => setTestimonialsForm(f => ({ ...f, location: e.target.value }))}
+                        placeholder="Hyderabad"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-paddy-400" />
+                    </div>
+                  )}
+
+                  {testimonialsForm.type === 'win' && (
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Win Stat</label>
+                      <input value={testimonialsForm.win_stat} onChange={e => setTestimonialsForm(f => ({ ...f, win_stat: e.target.value }))}
+                        placeholder="₹45L invested this month"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-paddy-400" />
+                    </div>
+                  )}
+
+                  {testimonialsForm.type === 'win' && (
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Icon (emoji)</label>
+                      <input value={testimonialsForm.win_icon} onChange={e => setTestimonialsForm(f => ({ ...f, win_icon: e.target.value }))}
+                        placeholder="🏆"
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-paddy-400" />
+                    </div>
+                  )}
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs text-gray-500 mb-1">Message / Quote *</label>
+                    <textarea value={testimonialsForm.message} onChange={e => setTestimonialsForm(f => ({ ...f, message: e.target.value }))}
+                      rows={3} placeholder="What the customer said..."
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-paddy-400 resize-none" />
+                  </div>
+
+                  {testimonialsForm.type === 'testimonial' && (
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Rating (1–5)</label>
+                      <div className="flex gap-1 mt-1">
+                        {[1,2,3,4,5].map(n => (
+                          <button key={n} type="button"
+                            onClick={() => setTestimonialsForm(f => ({ ...f, rating: String(n) }))}
+                            className={`text-lg leading-none transition-transform hover:scale-110 ${Number(testimonialsForm.rating) >= n ? 'text-turmeric-400' : 'text-gray-200'}`}
+                          >★</button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Status</label>
+                    <select value={testimonialsForm.status || 'pending'} onChange={e => setTestimonialsForm(f => ({ ...f, status: e.target.value }))}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-paddy-400">
+                      <option value="pending">Pending (hidden)</option>
+                      <option value="approved">Approved (visible)</option>
+                      <option value="archived">Archived</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-1">Sort order</label>
+                    <input type="number" value={testimonialsForm.sort_order} onChange={e => setTestimonialsForm(f => ({ ...f, sort_order: e.target.value }))}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-paddy-400" />
+                  </div>
+
+                  {testimonialsForm.type === 'testimonial' && (
+                    <div className="sm:col-span-2">
+                      <FileUpload
+                        bucket="property-photos"
+                        folder="testimonials"
+                        accept="photos"
+                        maxFiles={1}
+                        label="Photo (optional)"
+                        hint="JPG / PNG / WebP, max 10MB"
+                        variant="light"
+                        initialItems={testimonialsForm.avatar_url ? [{ name: 'Photo', url: testimonialsForm.avatar_url }] : []}
+                        onUpload={urls => setTestimonialsForm(f => ({ ...f, avatar_url: urls[0] ?? '' }))}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex gap-2 mt-4">
+                  <button onClick={saveTestimonial} disabled={testimonialsSaving || !testimonialsForm.name?.trim() || !testimonialsForm.message?.trim()}
+                    className="bg-paddy-700 hover:bg-paddy-800 disabled:opacity-50 text-white text-sm font-medium px-5 py-2 rounded-xl transition-colors">
+                    {testimonialsSaving ? 'Saving…' : (testimonialsForm.id ? 'Save changes' : 'Add testimonial')}
+                  </button>
+                  <button onClick={() => setTestimonialsForm(null)} className="text-sm text-gray-500 border border-gray-200 px-4 py-2 rounded-xl hover:bg-gray-50">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* List */}
+            {testimonialsLoading && !testimonials ? (
+              <p className="text-center py-12 text-gray-400 text-sm">Loading…</p>
+            ) : !testimonials || testimonials.length === 0 ? (
+              <div className="text-center py-16 px-6">
+                <Quote size={32} className="text-gray-200 mx-auto mb-3" />
+                <p className="text-gray-500 text-sm font-medium mb-1">No testimonials yet</p>
+                <p className="text-gray-400 text-xs">Click &ldquo;Add new&rdquo; to create the first one.</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-50">
+                {testimonials.map(t => (
+                  <div key={t.id} className="px-6 py-4 flex items-start gap-4">
+                    {/* Avatar / icon */}
+                    <div className="shrink-0 w-10 h-10 rounded-full overflow-hidden bg-turmeric-50 border border-turmeric-100 flex items-center justify-center text-lg">
+                      {t.type === 'win'
+                        ? <span>{t.win_icon || '🏆'}</span>
+                        : t.avatar_url
+                          ? <img src={t.avatar_url} alt={t.name} className="w-full h-full object-cover" />
+                          : <span className="text-turmeric-400 text-sm font-bold">{t.name?.[0]?.toUpperCase()}</span>
+                      }
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-gray-800 text-sm">{t.name}</span>
+                        {t.role && <span className="text-gray-400 text-xs">· {t.role}</span>}
+                        {t.location && <span className="text-gray-400 text-xs">· {t.location}</span>}
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                          t.status === 'approved' ? 'bg-green-50 text-green-700' :
+                          t.status === 'archived' ? 'bg-gray-100 text-gray-500' :
+                          'bg-yellow-50 text-yellow-700'
+                        }`}>{t.status}</span>
+                        <span className="text-xs bg-paddy-50 text-paddy-600 px-2 py-0.5 rounded-full capitalize">{t.type}</span>
+                      </div>
+                      {t.rating > 0 && (
+                        <div className="text-turmeric-400 text-xs mt-0.5">{'★'.repeat(t.rating)}{'☆'.repeat(5 - t.rating)}</div>
+                      )}
+                      {t.type === 'win' && t.win_stat && (
+                        <p className="text-paddy-700 text-sm font-medium mt-1">{t.win_stat}</p>
+                      )}
+                      <p className="text-gray-600 text-sm mt-1 line-clamp-2">{t.message}</p>
+                      <div className="flex gap-3 mt-2">
+                        <button onClick={() => patchTestimonial(t.id, { status: t.status === 'approved' ? 'pending' : 'approved' })}
+                          className={`text-xs font-medium ${t.status === 'approved' ? 'text-yellow-600 hover:text-yellow-700' : 'text-green-600 hover:text-green-700'}`}>
+                          {t.status === 'approved' ? 'Unpublish' : 'Approve'}
+                        </button>
+                        <button onClick={() => setTestimonialsForm({ ...t, rating: String(t.rating ?? ''), sort_order: String(t.sort_order ?? 0) })}
+                          className="text-xs text-paddy-600 hover:text-paddy-800 font-medium">Edit</button>
+                        <button onClick={() => deleteTestimonial(t.id)}
+                          className="text-xs text-red-400 hover:text-red-600">Delete</button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>

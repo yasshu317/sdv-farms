@@ -8,7 +8,7 @@ export function isValidStoragePrefix(bucket, prefix) {
     return prefix === 'admin' || /^docs\/[0-9]+$/.test(prefix)
   }
   if (bucket === 'property-photos') {
-    return prefix === 'admin' || /^photos\/[0-9]+$/.test(prefix)
+    return prefix === 'admin' || prefix === 'testimonials' || /^photos\/[0-9]+$/.test(prefix)
   }
   return false
 }

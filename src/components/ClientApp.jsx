@@ -12,6 +12,7 @@ import FeaturedProperties from './FeaturedProperties'
 import Gallery from './Gallery'
 import EnquiryForm from './EnquiryForm'
 import SampleDocuments from './SampleDocuments'
+import Testimonials from './Testimonials'
 import Location from './Location'
 import Footer from './Footer'
 import WhatsAppButton from './WhatsAppButton'
@@ -30,6 +31,7 @@ export default function ClientApp() {
         <ProjectHighlights />
         <FeaturedProperties />
         <Gallery />
+        <Testimonials />
         <EnquiryForm />
         <SampleDocuments />
         <Location />
