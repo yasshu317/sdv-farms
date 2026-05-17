@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import SiteHeader from '../../components/SiteHeader'
 import { createClient } from '../../lib/supabase'
@@ -9,6 +9,14 @@ const bg = 'linear-gradient(160deg, #071709 0%, #1a4520 60%, #286d2f 100%)'
 
 export default function BuyerRequestPage() {
   const [success, setSuccess] = useState(false)
+  const [betaEnabled, setBetaEnabled] = useState(false)
+
+  useEffect(() => {
+    fetch('/api/feature-flags')
+      .then(r => r.json())
+      .then(j => setBetaEnabled(!!j?.flags?.buyer_land_request_beta?.enabled))
+      .catch(() => {})
+  }, [])
 
   async function handleCreate(form) {
     const supabase = createClient()
@@ -72,8 +80,20 @@ export default function BuyerRequestPage() {
             <span className="mx-1.5">·</span>
             <span className="text-white/55">Request</span>
           </p>
-          <h1 className="text-white font-display text-2xl font-bold mt-3">Post a Land Request</h1>
+          <div className="flex items-center justify-center gap-2 mt-3">
+            <h1 className="text-white font-display text-2xl font-bold">Post a Land Request</h1>
+            {betaEnabled && (
+              <span className="inline-flex items-center gap-1 bg-turmeric-500/20 border border-turmeric-400/40 text-turmeric-300 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">
+                Beta
+              </span>
+            )}
+          </div>
           <p className="text-white/50 text-sm mt-1">Tell us what you&apos;re looking for — we&apos;ll find a match</p>
+          {betaEnabled && (
+            <p className="mt-2 text-turmeric-400/70 text-xs bg-turmeric-500/10 border border-turmeric-400/20 rounded-xl px-4 py-2 inline-block">
+              You are seeing an early preview of new features on this page.
+            </p>
+          )}
         </div>
 
         <div className="bg-white/8 backdrop-blur-sm border border-white/15 rounded-3xl p-8">

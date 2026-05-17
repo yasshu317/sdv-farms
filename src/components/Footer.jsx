@@ -81,6 +81,12 @@ export default function Footer() {
           <p className={`text-paddy-600 text-xs ${lang === 'te' ? 'telugu' : ''}`}>{t.rights}</p>
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs">
             <Link
+              href="/feedback"
+              className="text-turmeric-500/70 hover:text-turmeric-400 transition-colors underline-offset-4 hover:underline font-medium"
+            >
+              Give feedback
+            </Link>
+            <Link
               href="/business"
               className="text-paddy-500 hover:text-turmeric-400 transition-colors underline-offset-4 hover:underline"
             >

@@ -1,6 +1,7 @@
 import './globals.css'
 import PWARegister from '../components/PWARegister'
 import GlobalLoadingOverlay from '../components/GlobalLoadingOverlay'
+import MaintenanceGuard from '../components/MaintenanceGuard'
 
 export const metadata = {
   title: 'SDV Farms – Phase 1 | Secure Land Investment',
@@ -47,7 +48,7 @@ export default function RootLayout({ children }) {
       <body>
         <GlobalLoadingOverlay />
         <PWARegister />
-        {children}
+        <MaintenanceGuard>{children}</MaintenanceGuard>
       </body>
     </html>
   )

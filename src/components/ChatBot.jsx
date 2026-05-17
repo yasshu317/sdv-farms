@@ -55,6 +55,7 @@ export default function ChatBot() {
   const [input, setInput]             = useState('')
   const [propertyCount, setPropertyCount] = useState(0)
   const [threadMessages, setThreadMessages] = useState([])
+  const [aiTyping, setAiTyping]       = useState(false)
   const messagesEndRef                = useRef(null)
   const inputRef                      = useRef(null)
 
@@ -82,31 +83,74 @@ export default function ChatBot() {
     if (mode === 'chat') setTimeout(() => inputRef.current?.focus(), 100)
   }, [mode])
 
-  function injectReply(userText, replyText) {
-    const now = Date.now()
+  function addUserMessage(text) {
+    const id = `u-${Date.now()}`
     setThreadMessages(prev => [
       ...prev,
-      { id: `u-${now}`, role: 'user',      content: userText,  parts: [{ type: 'text', text: userText }] },
-      { id: `a-${now}`, role: 'assistant', content: replyText, parts: [{ type: 'text', text: replyText }] },
+      { id, role: 'user', content: text, parts: [{ type: 'text', text }] },
+    ])
+    return id
+  }
+
+  function addAssistantMessage(text) {
+    const id = `a-${Date.now()}`
+    setThreadMessages(prev => [
+      ...prev,
+      { id, role: 'assistant', content: text, parts: [{ type: 'text', text }] },
     ])
   }
 
-  const handleSubmit = e => {
-    e.preventDefault()
-    const text = input?.trim()
-    if (!text) return
-    setInput('')
-    const faq = matchFAQ(text, lang, propertyCount)
-    injectReply(text, faq ?? c.fallback)
+  async function askGemini(userText, currentHistory) {
+    setAiTyping(true)
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userText, history: currentHistory, lang }),
+      })
+      const data = await res.json()
+      addAssistantMessage(data.reply || c.fallback)
+    } catch {
+      addAssistantMessage(c.fallback)
+    } finally {
+      setAiTyping(false)
+    }
   }
 
-  const handleQuickQuestion = q => {
+  const handleSubmit = async e => {
+    e.preventDefault()
+    const text = input?.trim()
+    if (!text || aiTyping) return
+    setInput('')
+
+    const faq = matchFAQ(text, lang, propertyCount)
+    if (faq) {
+      addUserMessage(text)
+      addAssistantMessage(faq)
+      return
+    }
+
+    // Unknown question → ask Gemini
+    addUserMessage(text)
+    const historySnapshot = [...threadMessages]
+    await askGemini(text, historySnapshot)
+  }
+
+  const handleQuickQuestion = async q => {
     if (q.link) {
       router.push(q.link)
       return
     }
-    const faq = matchFAQ(q.label, lang, propertyCount)
-    injectReply(q.label, faq ?? c.fallback)
+    const text = q.label
+    const faq = matchFAQ(text, lang, propertyCount)
+    if (faq) {
+      addUserMessage(text)
+      addAssistantMessage(faq)
+      return
+    }
+    addUserMessage(text)
+    const historySnapshot = [...threadMessages]
+    await askGemini(text, historySnapshot)
   }
 
   return (
@@ -175,6 +219,19 @@ export default function ChatBot() {
               </div>
             ))}
 
+            {aiTyping && (
+              <div className="flex gap-2 flex-row">
+                <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 bg-turmeric-100 border border-turmeric-200">
+                  <span className="text-xs">🌾</span>
+                </div>
+                <div className="bg-white border border-turmeric-100 rounded-2xl rounded-tl-sm shadow-sm px-4 py-2.5 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-paddy-400 rounded-full animate-bounce [animation-delay:0ms]" />
+                  <span className="w-1.5 h-1.5 bg-paddy-400 rounded-full animate-bounce [animation-delay:150ms]" />
+                  <span className="w-1.5 h-1.5 bg-paddy-400 rounded-full animate-bounce [animation-delay:300ms]" />
+                </div>
+              </div>
+            )}
+
             <div className="pt-2 border-t border-turmeric-100/60 mt-2">
               <p className="text-xs text-gray-400 mb-2 text-center">{c.quickQuestionsLabel}</p>
               <div className="flex flex-wrap gap-2 justify-center">
@@ -207,12 +264,13 @@ export default function ChatBot() {
               data-testid="chat-input"
               value={input}
               onChange={e => setInput(e.target.value)}
-              placeholder={c.inputPlaceholder}
-              className={`flex-1 bg-gray-100 border border-gray-300 rounded-full px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-paddy-500 transition-colors ${lang === 'te' ? 'telugu' : ''}`}
+              placeholder={aiTyping ? 'Thinking…' : c.inputPlaceholder}
+              disabled={aiTyping}
+              className={`flex-1 bg-gray-100 border border-gray-300 rounded-full px-4 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-paddy-500 transition-colors disabled:opacity-50 ${lang === 'te' ? 'telugu' : ''}`}
             />
             <button
               type="submit"
-              disabled={!input?.trim()}
+              disabled={!input?.trim() || aiTyping}
               className="w-9 h-9 bg-paddy-700 hover:bg-paddy-800 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-colors flex-shrink-0"
             >
               <Send size={15} />

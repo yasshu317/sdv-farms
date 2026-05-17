@@ -244,6 +244,9 @@ export default function SiteHeader({ active: activeProp = null }) {
             </NextLink>
           )}
 
+          <NextLink href="/feedback" onClick={() => setMobileOpen(false)} className="block py-2.5 px-1 text-sm font-medium text-turmeric-400/80 hover:text-turmeric-300">
+            Give Feedback
+          </NextLink>
           <p className="text-[10px] font-semibold uppercase tracking-widest text-white/35 pt-2 pb-0.5 px-1 border-t border-white/10 mt-2">Home page</p>
           {homeSectionLinks.map(item => (
             <NextLink
