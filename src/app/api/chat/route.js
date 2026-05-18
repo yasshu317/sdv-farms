@@ -49,8 +49,13 @@ export async function POST(req) {
       parts: [{ text: m.content }],
     }))
 
+    // Prepend a hard language instruction so Gemini always responds in the UI language
+    const langInstruction = lang === 'te'
+      ? '[IMPORTANT: Reply ONLY in Telugu (తెలుగు). Do not use English.]\n\n'
+      : '[IMPORTANT: Reply ONLY in English.]\n\n'
+
     const chat = model.startChat({ history: geminiHistory })
-    const result = await chat.sendMessage(message)
+    const result = await chat.sendMessage(langInstruction + message)
     const text = result.response.text()
 
     return Response.json({ reply: text })
