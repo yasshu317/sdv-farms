@@ -8,7 +8,7 @@ export const metadata = {
   description:
     'SDV Farms Phase 1 – Approved agricultural land near Hyderabad. Secure investment, long-term appreciation, sustainable farming income. Contact: 7780312525',
   keywords:
-    'SDV Farms, agricultural land, Hyderabad farmland, land investment, Telangana farms, government approved layout',
+    'SDV Farms, agricultural land, Hyderabad farmland, land investment, Telangana farms, verified layout',
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,

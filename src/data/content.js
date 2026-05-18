@@ -56,7 +56,7 @@ export const content = {
       phase: 'Phase 1',
       tagline: 'Secure Land • Earn Income • Build Generational Wealth',
       description:
-        'Own legally verified farmland and create a future-ready family asset. A government-approved agricultural land project designed for secure investment, long-term appreciation, and sustainable farming income.',
+        'Own legally verified farmland and create a future-ready family asset. An agricultural land project designed for secure investment, long-term appreciation, and sustainable farming income.',
       ctaVisit: 'Book a Site Visit',
       ctaCall: 'Call Now',
       phone: '7780312525',
@@ -64,7 +64,7 @@ export const content = {
     about: {
       heading: 'Project Overview',
       subheading: 'A Smart Investment in India\'s Agricultural Future',
-      body: 'SDV Farms – Phase 1 is a government-approved agricultural land project designed for secure investment, long-term appreciation, and sustainable farming income. Own legally verified farmland and create a future-ready family asset that grows with every season.',
+      body: 'SDV Farms – Phase 1 is an agricultural land project designed for secure investment, long-term appreciation, and sustainable farming income. Own legally verified farmland and create a future-ready family asset that grows with every season.',
       stats: [
         { value: '100%', label: 'Clear Title' },
         { value: '✓', label: 'Approved Layout' },
@@ -171,7 +171,7 @@ export const content = {
         { label: 'Book a site visit' },
         { label: 'Contact & Call' },
         { label: 'Available services' },
-        { label: 'Is it government approved?' },
+        { label: 'Are documents verified?' },
       ],
       menuActions: [
         { icon: '🏡', label: 'Browse Properties', link: '/properties' },
@@ -197,7 +197,7 @@ export const content = {
         location: () =>
           `📍 **SDV Farms Properties are across:**\n\n• **Telangana** — Nalgonda, Yadadri, Suryapet, and more districts\n• **Andhra Pradesh** — multiple districts\n• **Karnataka** — selected districts\n\nAll well-connected to Hyderabad. Exact coordinates and map are on our home page. WhatsApp **7780312525** for driving directions.`,
         legal: () =>
-          `✅ **Yes — SDV Farms is 100% government-approved:**\n\n• Clear title with full legal verification\n• Registered sale deed directly in the buyer's name\n• All documents (Pahani/ROR-1B/Adangal/RTC) verified before listing\n• No hidden charges — transparent pricing\n\nCall **7780312525** to review documents before any commitment.`,
+          `✅ **SDV Farms — 100% legally verified:**\n\n• Clear title with full legal verification\n• Registered sale deed directly in the buyer's name\n• All documents (Pahani/ROR-1B/Adangal/RTC) verified before listing\n• No hidden charges — transparent pricing\n\nCall **7780312525** to review documents before any commitment.`,
         help: () =>
           `👋 **Hi! Here's what I can help you with:**\n\n🏡 [Browse Properties](/properties) — filter by state, soil, area\n🌾 **Sell land** — register as a seller, free listing\n📅 **Book a site visit** — pick a date & slot on any property page\n🛠️ [Services](/services) — fencing, borewell, drip irrigation & more\n📞 **Call us** — 7780312525 (Mon–Sat, 9AM–6PM)\n\nJust type your question or tap one of the quick options below!`,
         appointment: () =>
