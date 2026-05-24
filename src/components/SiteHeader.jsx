@@ -96,7 +96,7 @@ export default function SiteHeader({ active: activeProp = null }) {
               href="/#contact"
               className="hidden md:inline-flex items-center justify-center btn-gold text-xs font-semibold py-2 px-4 rounded-full whitespace-nowrap leading-none"
             >
-              {t.bookVisit}
+              {t.talkToTeam}
             </NextLink>
           {user ? (
             <div className="relative hidden sm:block">
@@ -277,7 +277,7 @@ export default function SiteHeader({ active: activeProp = null }) {
             onClick={() => setMobileOpen(false)}
             className="block mt-2 btn-gold text-sm text-center py-2.5 rounded-xl font-semibold"
           >
-            {t.bookVisit}
+            {t.talkToTeam}
           </NextLink>
 
           {user ? (

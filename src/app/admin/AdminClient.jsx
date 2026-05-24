@@ -10,6 +10,7 @@ import { adminField, storageLinkLabel } from '../../lib/adminDisplay'
 import { isAdminOnly } from '../../lib/roles'
 import { formatAcresFromSqYards } from '../../lib/plotDisplay'
 import BrandHeadingAccent from '../../components/BrandHeadingAccent'
+import { mergeSellerVerificationMetadata, parseSellerMetadata, VERIFY_PHYSICAL_OPTIONS } from '../seller/property/propertyFormConstants'
 
 const ENQUIRY_STATUSES = ['pending', 'contacted', 'visited', 'booked', 'closed']
 const PLOT_STATUSES    = ['available', 'reserved', 'sold']
@@ -370,6 +371,26 @@ export default function AdminClient({
     const val = seller_interest || null
     await supabase.from('seller_properties').update({ seller_interest: val }).eq('id', id)
     setProperties(prev => prev.map(p => (p.id === id ? { ...p, seller_interest: val } : p)))
+    setSaving(null)
+  }
+
+  async function updatePropertyDocVerified(id, doc_verified) {
+    setSaving(id)
+    const supabase = createClient()
+    await supabase.from('seller_properties').update({ doc_verified }).eq('id', id)
+    setProperties(prev => prev.map(p => (p.id === id ? { ...p, doc_verified } : p)))
+    setSaving(null)
+  }
+
+  async function updatePropertyPhysicalVerification(id, physical) {
+    setSaving(id)
+    const supabase = createClient()
+    const prop = properties.find(pp => pp.id === id)
+    const meta = mergeSellerVerificationMetadata(prop?.metadata ?? {}, physical)
+    const { error } = await supabase.from('seller_properties').update({ metadata: meta }).eq('id', id)
+    if (!error) {
+      setProperties(prev => prev.map(p => (p.id === id ? { ...p, metadata: meta } : p)))
+    }
     setSaving(null)
   }
 
@@ -948,6 +969,9 @@ export default function AdminClient({
                           <tr className="hover:bg-gray-50/50 transition-colors">
                             <td className="px-5 py-4 font-mono text-xs text-paddy-700 font-bold">
                               {p.property_id || <span className="text-gray-300 italic">Pending</span>}
+                              {p.doc_verified ? (
+                                <span className="block text-[10px] font-semibold text-emerald-600 mt-1">Clear docs</span>
+                              ) : null}
                             </td>
                             <td className="px-5 py-4 text-gray-700">
                               <div>{p.village}, {p.mandal}</div>
@@ -1036,6 +1060,36 @@ export default function AdminClient({
                                     <p>Doc type: {adminField(p.land_doc_type)}</p>
                                     <p>Road access: {p.road_access ? 'Yes' : 'No'}</p>
                                     <p>Views: {p.views ?? 0}</p>
+                                    <p className="mt-2">
+                                      <label className="flex items-center gap-2 cursor-pointer text-gray-700">
+                                        <input
+                                          type="checkbox"
+                                          checked={!!p.doc_verified}
+                                          onChange={e => updatePropertyDocVerified(p.id, e.target.checked)}
+                                          disabled={saving === p.id}
+                                          className="w-3.5 h-3.5 accent-paddy-600"
+                                        />
+                                        <span>Documents verified (homepage “Clear”)</span>
+                                      </label>
+                                    </p>
+                                    <p className="mt-2">
+                                      <span className="text-gray-500">Physical visit:</span>{' '}
+                                      <select
+                                        value={(() => {
+                                          const phy = parseSellerMetadata(p.metadata).verification?.physical
+                                          return phy === 'verified' || phy === 'none' || phy === 'pending'
+                                            ? phy
+                                            : 'pending'
+                                        })()}
+                                        onChange={e => updatePropertyPhysicalVerification(p.id, e.target.value)}
+                                        disabled={saving === p.id}
+                                        className="text-xs border border-gray-200 rounded-lg px-2 py-1 text-gray-700 bg-white max-w-[200px] ml-1"
+                                      >
+                                        {VERIFY_PHYSICAL_OPTIONS.map(o => (
+                                          <option key={o.value} value={o.value}>{o.label}</option>
+                                        ))}
+                                      </select>
+                                    </p>
                                   </div>
                                 </div>
                                 <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">

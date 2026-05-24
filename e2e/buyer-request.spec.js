@@ -56,7 +56,7 @@ test.describe('Buyer Land Request Page', () => {
   })
 
   test('has link to property listings (breadcrumb or main nav)', async ({ page }) => {
-    const listingsCrumb = page.getByRole('link', { name: /^Listings$/ })
+    const listingsCrumb = page.getByRole('link', { name: /^Properties$|^ఆస్తులు$/ })
     const navProperties = page.locator('header').getByRole('link', { name: /properties|ఆస్తులు/i })
     await expect(listingsCrumb.or(navProperties).first()).toBeVisible()
   })

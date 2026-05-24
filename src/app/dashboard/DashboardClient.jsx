@@ -1,11 +1,12 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '../../lib/supabase'
-import { LogOut, Home, FileText, MapPin, Phone, CheckCircle, Clock, XCircle } from 'lucide-react'
+import { LogOut, Home, MapPin, Phone } from 'lucide-react'
 import EmailVerificationBanner from '../../components/EmailVerificationBanner'
 import RoleRedirectBanner from '../../components/RoleRedirectBanner'
+import { content } from '../../data/content'
 
 const STATUS_BADGE = {
   pending:   { label: 'Pending',      color: 'bg-yellow-500/15 text-yellow-300 border-yellow-400/30' },
@@ -39,9 +40,26 @@ function LandRequestBadge({ status }) {
   )
 }
 
-export default function DashboardClient({ user, enquiries, interests, landRequests = [], initialTab = 'overview' }) {
+export default function DashboardClient({ user, enquiries, interests, landRequests = [], landShortlist: landShortlistInitial = [], initialTab = 'overview' }) {
   const router = useRouter()
+  const cta = content.en.cta
   const [tab, setTab] = useState(initialTab)
+  const [landShortlist, setLandShortlist] = useState(landShortlistInitial)
+
+  useEffect(() => { setTab(initialTab) }, [initialTab])
+
+  useEffect(() => { setLandShortlist(landShortlistInitial) }, [landShortlistInitial])
+
+  async function removeLandShortlistItem(wishlistRowId) {
+    const supabase = createClient()
+    const { error } = await supabase.from('buyer_wishlist').delete().eq('id', wishlistRowId).eq('buyer_id', user.id)
+    if (error) {
+      alert('Could not remove from shortlist. Please try again.')
+      return
+    }
+    setLandShortlist(prev => prev.filter(row => row.wishlistRowId !== wishlistRowId))
+    router.refresh()
+  }
 
   async function handleLogout() {
     const supabase = createClient()
@@ -104,10 +122,11 @@ export default function DashboardClient({ user, enquiries, interests, landReques
         </div>
 
         {/* Summary cards — match homepage/seller stat style */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
           {[
             { emoji: '📋', label: 'Enquiries',     value: enquiries.length,                                                              color: 'text-turmeric-400' },
             { emoji: '📍', label: 'Plot Interests', value: interests.length,                                                              color: 'text-paddy-300'   },
+            { emoji: '📌', label: cta.shortlistOverviewCard, value: landShortlist.length,                                           color: 'text-rose-200' },
             { emoji: '✅', label: 'Contacted',      value: enquiries.filter(e => e.status === 'contacted' || e.status === 'visited').length, color: 'text-green-300'  },
             { emoji: '🕐', label: 'Pending',        value: enquiries.filter(e => e.status === 'pending').length,                          color: 'text-yellow-300'  },
           ].map(card => (
@@ -122,10 +141,11 @@ export default function DashboardClient({ user, enquiries, interests, landReques
         {/* Tabs with icons */}
         <div className="flex flex-wrap gap-2 mb-6">
           {[
-            { id: 'overview',      icon: '🏠', label: 'Overview'       },
-            { id: 'enquiries',     icon: '📋', label: 'Enquiries',     count: enquiries.length     },
-            { id: 'interests',     icon: '📍', label: 'Plot Interests', count: interests.length     },
-            { id: 'land-requests', icon: '🗺️', label: 'Land Requests',  count: landRequests.length  },
+            { id: 'overview',       icon: '🏠', label: 'Overview'       },
+            { id: 'enquiries',      icon: '📋', label: 'Enquiries',     count: enquiries.length     },
+            { id: 'interests',      icon: '📍', label: 'Plot Interests', count: interests.length     },
+            { id: 'land-shortlist', icon: '📌', label: cta.shortlistDashboardTab, count: landShortlist.length },
+            { id: 'land-requests',  icon: '🗺️', label: 'Land Requests',  count: landRequests.length  },
           ].map(t => (
             <button
               key={t.id} onClick={() => setTab(t.id)}
@@ -175,6 +195,13 @@ export default function DashboardClient({ user, enquiries, interests, landReques
                   <div>
                     <p className="text-sm font-medium text-white">Browse &amp; book a site visit</p>
                     <p className="text-xs text-white/50">Pick a listing → book from its page</p>
+                  </div>
+                </Link>
+                <Link href="/dashboard?tab=land-shortlist" className="flex items-center gap-3 p-3 rounded-xl bg-rose-500/12 hover:bg-rose-500/20 border border-rose-400/25 transition-colors">
+                  <span className="text-lg shrink-0" aria-hidden>📌</span>
+                  <div>
+                    <p className="text-sm font-medium text-white">{cta.shortlistOverviewCard}</p>
+                    <p className="text-xs text-white/50">{cta.shortlistCompareHint}</p>
                   </div>
                 </Link>
                 <Link href="/buyer-request" className="flex items-center gap-3 p-3 rounded-xl bg-blue-500/15 hover:bg-blue-500/25 border border-blue-400/20 transition-colors">
@@ -290,6 +317,147 @@ export default function DashboardClient({ user, enquiries, interests, landReques
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* ── Land shortlist tab (buyer wishlist — compare & book visits) ── */}
+        {tab === 'land-shortlist' && (
+          <div className="space-y-4">
+            <p className={`text-white/45 text-xs leading-relaxed max-w-2xl`}>
+              {cta.shortlistDisclaimer}
+            </p>
+            <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+              {landShortlist.length === 0 ? (
+                <div className="text-center py-16 px-6">
+                  <p className="text-4xl mb-3">📌</p>
+                  <p className={`font-medium text-white/70`}>{cta.shortlistEmptyTitle}</p>
+                  <p className={`text-sm text-white/40 mt-1`}>{cta.shortlistEmptyHint}</p>
+                  <Link href="/properties" className={`inline-block mt-5 text-sm text-turmeric-400 hover:text-turmeric-300 font-medium`}>
+                    {cta.viewProperties} →
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                      <thead className="text-white/40 text-[11px] uppercase tracking-wide border-b border-white/10">
+                        <tr>
+                          <th className={`px-4 py-3 font-semibold`}>{cta.shortlistLocationCol}</th>
+                          <th className={`px-4 py-3 font-semibold`}>{cta.shortlistLandCol}</th>
+                          <th className="px-4 py-3 font-semibold text-right">{cta.shortlistAcresCol}</th>
+                          <th className={`px-4 py-3 font-semibold text-right`}>{cta.shortlistPricePerAcreCol}</th>
+                          <th className={`px-4 py-3 font-semibold text-right`}>{cta.shortlistTotalCol}</th>
+                          <th className={`px-4 py-3 font-semibold`}>{cta.shortlistSavedCol}</th>
+                          <th className="px-4 py-3 font-semibold text-right" aria-label="Actions" />
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/8">
+                        {landShortlist.map(row => {
+                          const sp = row.property
+                          const locLine = [sp.village, sp.mandal, sp.district, sp.state].filter(Boolean).join(', ')
+                          const acres = Number(sp.area_acres)
+                          const pp = Number(sp.expected_price)
+                          const total = (acres * pp).toLocaleString('en-IN')
+                          return (
+                            <tr key={row.wishlistRowId} className="hover:bg-white/3 transition-colors">
+                              <td className="px-4 py-3 text-white/90 max-w-[220px]">
+                                <Link href={`/properties/${sp.id}`} className="hover:text-turmeric-400 font-medium line-clamp-2">
+                                  {locLine || '—'}
+                                </Link>
+                                {sp.property_id && (
+                                  <p className="text-[11px] text-white/35 font-mono mt-0.5">{sp.property_id}</p>
+                                )}
+                              </td>
+                              <td className={`px-4 py-3 text-white/70`}>
+                                {[sp.land_soil_type, sp.land_used_type].filter(Boolean).join(' · ') || '—'}
+                              </td>
+                              <td className="px-4 py-3 text-white/85 text-right tabular-nums">{acres}</td>
+                              <td className="px-4 py-3 text-turmeric-300 text-right tabular-nums whitespace-nowrap">₹{pp.toLocaleString('en-IN')}</td>
+                              <td className="px-4 py-3 text-turmeric-400/95 font-medium text-right tabular-nums whitespace-nowrap">₹{total}</td>
+                              <td className="px-4 py-3 text-white/40 text-xs whitespace-nowrap">
+                                {new Date(row.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              </td>
+                              <td className="px-4 py-3 text-right">
+                                <div className="flex flex-wrap justify-end gap-2">
+                                  <Link
+                                    href={`/properties/${sp.id}`}
+                                    className="text-xs font-medium text-turmeric-400 hover:text-turmeric-300 whitespace-nowrap"
+                                  >
+                                    View
+                                  </Link>
+                                  <Link
+                                    href={`/properties/${sp.id}?book=1`}
+                                    className={`text-xs font-semibold text-white bg-turmeric-500/35 hover:bg-turmeric-500/50 px-2.5 py-1 rounded-lg border border-turmeric-400/30 whitespace-nowrap`}
+                                  >
+                                    {cta.shortlistBookSlot}
+                                  </Link>
+                                  <button
+                                    type="button"
+                                    onClick={() => removeLandShortlistItem(row.wishlistRowId)}
+                                    className={`text-xs font-medium text-white/55 hover:text-red-400 whitespace-nowrap`}
+                                  >
+                                    {cta.shortlistRemove}
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="md:hidden divide-y divide-white/8">
+                    {landShortlist.map(row => {
+                      const sp = row.property
+                      const locLine = [sp.village, sp.mandal, sp.district, sp.state].filter(Boolean).join(', ')
+                      const acres = Number(sp.area_acres)
+                      const pp = Number(sp.expected_price)
+                      const total = (acres * pp).toLocaleString('en-IN')
+                      return (
+                        <div key={row.wishlistRowId} className="p-5 space-y-3">
+                          <div className="flex justify-between gap-3 items-start">
+                            <Link href={`/properties/${sp.id}`} className={`text-sm font-medium text-white/90 hover:text-turmeric-400 min-w-0 leading-snug`}>
+                              {locLine || '—'}
+                              {sp.property_id && (
+                                <span className="block text-[11px] text-white/35 font-mono mt-1">{sp.property_id}</span>
+                              )}
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => removeLandShortlistItem(row.wishlistRowId)}
+                              className={`text-xs font-medium text-white/55 hover:text-red-400 shrink-0 pt-0.5`}
+                            >
+                              {cta.shortlistRemove}
+                            </button>
+                          </div>
+                          <p className="text-xs text-white/45 tabular-nums">
+                            {acres} acres · ₹{pp.toLocaleString('en-IN')} / acre · ₹{total}
+                          </p>
+                          <p className={`text-[11px] text-white/35`}>
+                            <span>{cta.shortlistSavedCol}: </span>
+                            <span>{new Date(row.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            <Link
+                              href={`/properties/${sp.id}?book=1`}
+                              className={`flex-1 min-w-[120px] text-center text-xs font-semibold text-white bg-turmeric-500/35 hover:bg-turmeric-500/50 px-3 py-2 rounded-xl border border-turmeric-400/30 transition-colors`}
+                            >
+                              {cta.shortlistBookSlot}
+                            </Link>
+                            <Link
+                              href={`/properties/${sp.id}`}
+                              className="flex-1 min-w-[100px] text-center text-xs font-medium text-white/70 border border-white/15 hover:bg-white/8 px-3 py-2 rounded-xl transition-colors"
+                            >
+                              View
+                            </Link>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         )}
 

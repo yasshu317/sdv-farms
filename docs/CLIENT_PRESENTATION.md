@@ -38,8 +38,8 @@ The platform is:
 | 5. Clicks "Book a Site Visit" | Picks date + time slot (1-hr slots, 2-hr lead time) | Appointment picker on detail page |
 | 6. Receives confirmation email | Auto-sent by Resend with date/slot/property details | — |
 | 7. Can't find what they need | Submits a land requirement form | [/buyer-request](https://sdv-farms.vercel.app/buyer-request) |
-| 8. Registers as buyer | Optional — unlocks wishlist (save up to 2 properties) | [/auth/register](https://sdv-farms.vercel.app/auth/register) |
-| 9. Views saved properties | Buyer dashboard | [/dashboard](https://sdv-farms.vercel.app/dashboard) |
+| 8. Registers as buyer | Optional — unlocks land shortlist (save up to 8 listings to compare) | [/auth/register](https://sdv-farms.vercel.app/auth/register) |
+| 9. Views saved listings | Buyer dashboard → **Land shortlist** tab | [/dashboard?tab=land-shortlist](https://sdv-farms.vercel.app/dashboard?tab=land-shortlist) |
 
 ---
 
@@ -113,7 +113,7 @@ The platform is:
 - ✅ 3-step property listing form with document upload
 - ✅ Public property browse page with advanced filters
 - ✅ Property detail page with photo gallery
-- ✅ Buyer wishlist (save up to 2 properties)
+- ✅ Buyer land shortlist (save up to 8 listings — compare before booking visits)
 - ✅ Appointment booking — date + time slot with 2-hr lead time
 - ✅ Auto email confirmations for appointments
 - ✅ Buyer land request form (anonymous or logged in)
@@ -200,7 +200,7 @@ Please go through each section below, visit the live links, and share your feedb
 | 7 | Is the property detail page clear? Is pricing information presented well? | |
 | 8 | Is the appointment booking flow (date + time slot) easy to understand? | |
 | 9 | Is the Buyer Land Request form ([/buyer-request](https://sdv-farms.vercel.app/buyer-request)) asking the right questions? | |
-| 10 | Should the wishlist limit of 2 properties be increased? | |
+| 10 | The land shortlist holds up to 8 listings for comparison — is that the right ceiling? | |
 
 ---
 

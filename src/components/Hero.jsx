@@ -228,6 +228,8 @@ function MangoLeafBorder() {
 export default function Hero() {
   const { lang } = useLang()
   const t = content[lang].hero
+  const nav = content[lang].nav
+  const cta = content[lang].cta
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => { setMounted(true) }, [])
@@ -320,26 +322,24 @@ export default function Hero() {
           {t.description}
         </p>
 
-        {/* CTAs */}
+        {/* CTAs — stakeholder priority: Talk to Team (gold); View properties (secondary) */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          {/* Primary: take them to actual listings where they can book a visit */}
-          <NextLink
-            href="/properties"
-            className={`btn-gold shadow-turmeric-500/30 ${lang === 'te' ? 'telugu' : ''}`}
-          >
-            🔍 {lang === 'en' ? 'Browse Listings' : 'జాబితాలు చూడండి'}
-          </NextLink>
-          {/* Secondary: scroll to enquiry/callback form */}
           <Link
             to="contact"
             smooth
             duration={600}
             offset={NAV_SCROLL_OFFSET}
-            className="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/25 text-white font-semibold py-3 px-8 rounded-full transition-all duration-200 backdrop-blur-sm cursor-pointer"
+            className={`btn-gold shadow-turmeric-500/30 flex items-center justify-center gap-2 ${lang === 'te' ? 'telugu' : ''}`}
           >
             <Phone size={17} />
-            {lang === 'en' ? 'Talk to Our Team' : 'మాతో మాట్లాడండి'}
+            {nav.talkToTeam}
           </Link>
+          <NextLink
+            href="/properties"
+            className={`flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/25 text-white font-semibold py-3 px-8 rounded-full transition-all duration-200 backdrop-blur-sm ${lang === 'te' ? 'telugu' : ''}`}
+          >
+            🔍 {cta.viewProperties}
+          </NextLink>
         </div>
         {/* Inline phone hint — no ambiguity */}
         <p className="mt-4 text-white/35 text-xs">

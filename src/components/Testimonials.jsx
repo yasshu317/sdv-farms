@@ -90,84 +90,83 @@ export default function Testimonials() {
   const wins         = items.filter(i => i.type === 'win')
 
   return (
-    <section className="py-16 overflow-hidden" style={{ background: 'linear-gradient(180deg, #0a1f0c 0%, #071709 100%)' }}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+    <section
+      className="py-20 overflow-hidden relative"
+      style={{
+        backgroundImage: 'url(/testimonials-bg.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center 40%',
+      }}
+    >
+      {/* Dark overlay so text stays legible */}
+      <div className="absolute inset-0 bg-gradient-to-b from-paddy-950/90 via-paddy-950/80 to-paddy-950/95 pointer-events-none" />
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
 
-        {/* Wins row */}
-        {wins.length > 0 && (
-          <div className="flex flex-wrap gap-3 justify-center mb-12">
-            {wins.map(w => (
-              <div key={w.id} className="flex items-center gap-2.5 bg-turmeric-500/10 border border-turmeric-400/20 rounded-full px-4 py-2">
-                <span className="text-xl leading-none">{w.win_icon || '🏆'}</span>
-                <span className="text-turmeric-200 text-sm font-semibold">{w.win_stat || w.message}</span>
+        {/* ── Centered header block ── */}
+        <div className="text-center mb-10">
+          <p className="text-turmeric-400 text-xs font-semibold uppercase tracking-widest mb-3">
+            {lang === 'te' ? 'వినియోగదారుల అభిప్రాయాలు' : 'What our customers say'}
+          </p>
+          <h2 className="font-display text-2xl sm:text-3xl font-bold text-white mb-4">
+            {lang === 'te' ? 'విశ్వాసం మాకు మూలధనం' : 'Trusted by investors across India'}
+          </h2>
+
+          {/* Aggregate rating */}
+          {avgRating !== null && ratingCount > 0 && (
+            <div className="inline-flex items-center gap-2 mb-6">
+              <div className="flex gap-0.5">
+                {[1,2,3,4,5].map(n => {
+                  const fill = Math.min(1, Math.max(0, avgRating - (n - 1)))
+                  if (fill >= 1) return <span key={n} className="text-turmeric-400 text-lg leading-none">★</span>
+                  if (fill > 0) return (
+                    <span key={n} className="relative text-lg leading-none inline-block">
+                      <span className="text-white/15">★</span>
+                      <span className="absolute inset-0 text-turmeric-400 overflow-hidden" style={{ width: `${fill * 100}%` }}>★</span>
+                    </span>
+                  )
+                  return <span key={n} className="text-white/15 text-lg leading-none">★</span>
+                })}
               </div>
-            ))}
-          </div>
-        )}
+              <span className="text-turmeric-300 font-bold">{avgRating}</span>
+              <span className="text-white/35 text-sm">
+                {lang === 'te'
+                  ? `${ratingCount} రేటింగ్‌లు ఆధారంగా`
+                  : `· ${ratingCount} rating${ratingCount !== 1 ? 's' : ''}`}
+              </span>
+            </div>
+          )}
 
-        {/* Header */}
+          {/* Wins pills — inline with the heading group */}
+          {wins.length > 0 && (
+            <div className="flex flex-wrap gap-2.5 justify-center">
+              {wins.map(w => (
+                <div key={w.id} className="inline-flex items-center gap-2 bg-turmeric-500/10 border border-turmeric-400/20 rounded-full px-4 py-1.5">
+                  <span className="text-base leading-none">{w.win_icon || '🏆'}</span>
+                  <span className="text-turmeric-200 text-sm font-semibold">{w.win_stat || w.message}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ── Carousel ── */}
         {testimonials.length > 0 && (
           <>
-            <div className="flex items-end justify-between mb-8 gap-4">
-              <div>
-                <p className="text-turmeric-400 text-xs font-semibold uppercase tracking-widest mb-2">
-                  {lang === 'te' ? 'వినియోగదారుల అభిప్రాయాలు' : 'What our customers say'}
-                </p>
-                <h2 className="font-display text-2xl sm:text-3xl font-bold text-white mb-3">
-                  {lang === 'te' ? 'విశ్వాసం మాకు మూలధనం' : 'Trusted by investors across India'}
-                </h2>
-                {avgRating !== null && ratingCount > 0 && (
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex gap-0.5">
-                      {[1,2,3,4,5].map(n => {
-                        const fill = Math.min(1, Math.max(0, avgRating - (n - 1)))
-                        if (fill >= 1) return <span key={n} className="text-turmeric-400 text-base leading-none">★</span>
-                        if (fill > 0) return (
-                          <span key={n} className="relative text-base leading-none inline-block">
-                            <span className="text-white/15">★</span>
-                            <span
-                              className="absolute inset-0 text-turmeric-400 overflow-hidden"
-                              style={{ width: `${fill * 100}%` }}
-                            >★</span>
-                          </span>
-                        )
-                        return <span key={n} className="text-white/15 text-base leading-none">★</span>
-                      })}
-                    </div>
-                    <span className="text-turmeric-300 font-bold text-sm">{avgRating}</span>
-                    <span className="text-white/35 text-xs">
-                      {lang === 'te'
-                        ? `${ratingCount} రేటింగ్‌లు ఆధారంగా`
-                        : `based on ${ratingCount} rating${ratingCount !== 1 ? 's' : ''}`}
-                    </span>
-                  </div>
-                )}
-              </div>
-              <div className="flex gap-2 shrink-0">
-                <button
-                  onClick={() => scroll(-1)}
-                  disabled={!canLeft}
-                  aria-label="Scroll left"
-                  className="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center text-white/60 hover:bg-white/10 disabled:opacity-25 transition-colors"
-                >
-                  ‹
-                </button>
-                <button
-                  onClick={() => scroll(1)}
-                  disabled={!canRight}
-                  aria-label="Scroll right"
-                  className="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center text-white/60 hover:bg-white/10 disabled:opacity-25 transition-colors"
-                >
-                  ›
-                </button>
-              </div>
+            <div className="flex justify-end gap-2 mb-4">
+              <button onClick={() => scroll(-1)} disabled={!canLeft} aria-label="Scroll left"
+                className="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center text-white/60 hover:bg-white/10 disabled:opacity-25 transition-colors">
+                ‹
+              </button>
+              <button onClick={() => scroll(1)} disabled={!canRight} aria-label="Scroll right"
+                className="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center text-white/60 hover:bg-white/10 disabled:opacity-25 transition-colors">
+                ›
+              </button>
             </div>
 
-            {/* Carousel */}
             <div
               ref={scrollRef}
               onScroll={updateArrows}
-              className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-hide"
+              className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {testimonials.map(item => (
@@ -176,10 +175,10 @@ export default function Testimonials() {
             </div>
 
             {/* CTA */}
-            <div className="mt-10 text-center">
+            <div className="mt-8 text-center">
               <Link
                 href="/testimonial"
-                className="inline-flex items-center gap-2 border border-turmeric-400/30 hover:border-turmeric-400/70 text-turmeric-300 hover:text-turmeric-200 text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
+                className="inline-flex items-center gap-2 border border-turmeric-400/30 hover:border-turmeric-400/60 text-turmeric-300 hover:text-turmeric-200 text-sm font-medium px-5 py-2.5 rounded-full transition-colors"
               >
                 ✍️ {lang === 'te' ? 'మీ అనుభవం పంచుకోండి' : 'Share your experience'}
               </Link>

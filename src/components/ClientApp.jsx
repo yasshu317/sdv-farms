@@ -9,6 +9,7 @@ import WhyInvest from './WhyInvest'
 import InvestmentBenefits from './InvestmentBenefits'
 import ProjectHighlights from './ProjectHighlights'
 import FeaturedProperties from './FeaturedProperties'
+import HomeStatsBar from './HomeStatsBar'
 import Gallery from './Gallery'
 import EnquiryForm from './EnquiryForm'
 import SampleDocuments from './SampleDocuments'
@@ -24,6 +25,7 @@ export default function ClientApp() {
       <div className="min-h-screen">
         <Navbar />
         <Hero />
+        <HomeStatsBar />
         <HowItWorks />
         <About />
         <WhyInvest />

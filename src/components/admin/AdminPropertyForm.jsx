@@ -5,7 +5,11 @@ import { createClient } from '../../lib/supabase'
 import StepForm from '../ui/StepForm'
 import FileUpload from '../ui/FileUpload'
 import locations from '../../data/locations.json'
-import { urlsToInitialItems } from '../../app/seller/property/propertyFormConstants'
+import {
+  urlsToInitialItems,
+  mergeSellerVerificationMetadata,
+  VERIFY_PHYSICAL_OPTIONS,
+} from '../../app/seller/property/propertyFormConstants'
 
 const STEPS = ['Location', 'Land Details', 'Documents & Photos']
 
@@ -39,6 +43,9 @@ const INITIAL = {
   seller_interest: '',
   doc_urls: [],
   photo_urls: [],
+  doc_verified: false,
+  verify_physical: 'pending',
+  metadata: {},
 }
 
 /**
@@ -118,6 +125,8 @@ export default function AdminPropertyForm({ mode, propertyId, initialForm }) {
             seller_interest: form.seller_interest || null,
             doc_urls: form.doc_urls,
             photo_urls: form.photo_urls,
+            doc_verified: !!form.doc_verified,
+            metadata: mergeSellerVerificationMetadata(form.metadata, form.verify_physical),
           })
           .eq('id', propertyId)
           .select('id, property_id')
@@ -157,6 +166,8 @@ export default function AdminPropertyForm({ mode, propertyId, initialForm }) {
           photo_urls: form.photo_urls,
           status: 'approved',
           property_id: newPropertyId,
+          doc_verified: !!form.doc_verified,
+          metadata: mergeSellerVerificationMetadata(form.metadata, form.verify_physical),
         })
         .select('id')
         .single()
@@ -297,6 +308,41 @@ export default function AdminPropertyForm({ mode, propertyId, initialForm }) {
     </div>,
 
     <div key="docs" className="space-y-6">
+      <div className="rounded-xl border border-gray-200 bg-gray-50/90 p-4 space-y-4">
+        <div>
+          <p className="text-sm font-semibold text-paddy-900">Verification</p>
+          <p className="text-xs text-gray-500 mt-0.5">
+            “Documents verified” feeds the homepage Clear count and the buyer legal badge when metadata does not
+            override legal status.
+          </p>
+        </div>
+        <label className="flex items-start gap-3 cursor-pointer text-sm text-gray-700">
+          <input
+            type="checkbox"
+            checked={!!form.doc_verified}
+            onChange={set('doc_verified')}
+            className="w-4 h-4 mt-0.5 accent-paddy-600"
+          />
+          <span>
+            <span className="font-medium text-gray-800">Documents verified (clear for marketing)</span>
+            <span className="block text-xs text-gray-500 mt-0.5">Check only after Pahani/ROR/RTC review is complete.</span>
+          </span>
+        </label>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Physical / site verification</label>
+          <select
+            value={form.verify_physical}
+            onChange={set('verify_physical')}
+            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-paddy-500 bg-white"
+          >
+            {VERIFY_PHYSICAL_OPTIONS.map(o => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
       <FileUpload
         key={`admin-docs-${propertyId || 'new'}`}
         variant="light"

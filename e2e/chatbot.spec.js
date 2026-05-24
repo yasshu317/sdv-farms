@@ -100,7 +100,7 @@ test.describe('ChatBot Widget', () => {
     await page.locator(CHAT_INPUT).fill('help')
     await page.locator(CHAT_INPUT).press('Enter')
     await expect(
-      page.locator(CHAT_WINDOW).getByText(/Book a site visit|Call us|Browse/i).first()
+      page.locator(CHAT_WINDOW).getByText(/View properties|Interested|7780312525/i).first()
     ).toBeVisible({ timeout: 10000 })
   })
 

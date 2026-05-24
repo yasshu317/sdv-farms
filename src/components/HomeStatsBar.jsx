@@ -9,16 +9,23 @@ function formatCount(n, lang) {
   return Number(n).toLocaleString(lang === 'te' ? 'te-IN' : 'en-IN')
 }
 
-export default function HomeStatsBar({ scrolled }) {
+/**
+ * Homepage KPI strip (stakeholder main screen). Gated behind `feature-flags.home_stats_bar`
+ * unless undefined (defaults visible).
+ */
+export default function HomeStatsBar() {
   const { lang } = useLang()
   const t = content[lang].stats
   const [visible, setVisible] = useState(true)
-  const [data, setData] = useState({
-    propertyEnquiries: null,
-    subscribedMembers: null,
+  const [data, setData] = useState(() => ({
     propertiesListed: null,
+    propertiesClearDocumentation: null,
     propertiesSold: null,
-  })
+    subscribedMembers: null,
+    listingPartnersDistinct: null,
+    totalEnquiries: null,
+    propertyEnquiries: null,
+  }))
 
   useEffect(() => {
     let cancelled = false
@@ -31,7 +38,7 @@ export default function HomeStatsBar({ scrolled }) {
           vis = !!fj.flags.home_stats_bar.enabled
         }
       } catch {
-        /* keep default visible */
+        /* visible */
       }
       if (cancelled) return
       setVisible(vis)
@@ -50,44 +57,63 @@ export default function HomeStatsBar({ scrolled }) {
   }, [])
 
   const items = [
-    { label: t.propertyEnquiries, value: data.propertyEnquiries },
-    { label: t.subscribedMembers, value: data.subscribedMembers },
-    { label: t.propertiesListed, value: data.propertiesListed },
-    { label: t.propertiesSold, value: data.propertiesSold },
+    { label: t.homeAvailable, value: data.propertiesListed, hint: null },
+    { label: t.homeClearDocs, value: data.propertiesClearDocumentation, hint: null },
+    { label: t.homeSold, value: data.propertiesSold, hint: null },
+    {
+      label: t.homeBeneficiaries,
+      value: data.subscribedMembers,
+      hint: t.homeBeneficiariesHint ?? null,
+    },
+    {
+      label: t.homeFarmersAgents,
+      value: data.listingPartnersDistinct,
+      hint: lang === 'en' ? 'Active listing sellers' : 'ప్రస్తుత జాబితా ఉన్న అమ్మకందారులు',
+    },
   ]
 
   if (!visible) return null
 
+  const enquiryTotal = Number(data.totalEnquiries ?? data.propertyEnquiries ?? NaN)
+
   return (
-    <div
-      className={`border-t text-[11px] sm:text-xs md:text-sm ${
-        scrolled
-          ? 'border-paddy-100 bg-white'
-          : 'border-white/15 bg-paddy-950/55 backdrop-blur-md'
-      }`}
+    <section
+      id="marketing-stats"
+      className="border-y border-white/12 bg-black/35 backdrop-blur-md"
       role="region"
-      aria-label={lang === 'en' ? 'Platform statistics' : 'ప్లాట్‌ఫారమ్ గణాంకాలు'}
+      aria-label={lang === 'en' ? 'SDV Farms public statistics' : 'SDV ఫామ్స్ ప్రజా గణాంకాలు'}
     >
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-3 py-2.5 md:py-3 items-center max-w-5xl mx-auto">
-        {items.map(({ label, value }) => (
-          <div key={label} className="flex flex-col items-center justify-center text-center min-w-0 gap-0.5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-5 py-4 sm:py-6 px-4 sm:px-6 items-stretch max-w-6xl mx-auto">
+        {items.map(({ label, value, hint }) => (
+          <div key={label} className="flex flex-col items-center justify-center text-center min-w-0 gap-1">
             <p
-              className={`font-medium leading-tight mb-0.5 truncate px-0.5 ${
-                scrolled ? 'text-paddy-600' : 'text-white/80'
-              } ${lang === 'te' ? 'telugu' : ''}`}
+              className={`font-medium leading-tight text-[11px] sm:text-xs text-white/80 ${lang === 'te' ? 'telugu' : ''}`}
             >
               {label}
             </p>
-            <p
-              className={`font-display font-bold tabular-nums text-sm sm:text-base md:text-lg ${
-                scrolled ? 'text-paddy-900' : 'text-white'
-              }`}
-            >
+            <p className={`font-display font-bold tabular-nums text-xl sm:text-2xl md:text-[1.65rem] text-white`}>
               {formatCount(value, lang)}
             </p>
+            {hint ? (
+              <p
+                className={`text-[10px] sm:text-[11px] text-white/40 max-w-[9.5rem] leading-snug ${lang === 'te' ? 'telugu' : ''}`}
+              >
+                {hint}
+              </p>
+            ) : null}
           </div>
         ))}
       </div>
-    </div>
+      {Number.isFinite(enquiryTotal) && enquiryTotal > 0 && (
+        <p
+          className={`text-center text-[10px] sm:text-[11px] text-white/35 pb-3 sm:pb-4 px-3 ${lang === 'te' ? 'telugu' : ''}`}
+        >
+          + {formatCount(enquiryTotal, lang)} {t.homeStripEnquiriesChip}
+          {typeof data.source === 'string' ? (
+            <span className="sr-only">{' '}(stats source {data.source})</span>
+          ) : null}
+        </p>
+      )}
+    </section>
   )
 }

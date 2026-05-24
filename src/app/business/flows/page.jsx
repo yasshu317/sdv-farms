@@ -159,7 +159,7 @@ export default function BusinessFlowsPage() {
           <BulletList
             items={[
               'Filter by state, then cascade to district and mandal; also soil type, land type, acreage bands, optional price ceiling.',
-              'Each card has Book Visit, Enquire (WhatsApp), and a ♥ Save button — saving adds the property to the buyer’s wishlist (max 2 saves; prompts sign-in if logged out).',
+              'Each card has Interested (visit picker), Enquire (WhatsApp), and a ♥ shortlist button — saves the listing on the buyer’s land shortlist (up to 8; prompts sign-in if logged out).',
               'Empty state prompts sellers to list land if inventory is thin.',
             ]}
           />
@@ -171,7 +171,7 @@ export default function BusinessFlowsPage() {
               'Buyers/guests can trigger enquiry / WhatsApp CTAs depending on wiring.',
               'Signed-in sellers may see edit links reserved for admins on some shells — default buyer path stays read/browse.',
               'Site visits: appointment/booking UX when surfaced on page. If no suitable slot is found, a “Notify Me” fallback lets the buyer submit their email; ops is alerted to contact within 48 hours.',
-              'Save / wishlist button (♥) on detail page; buyers can save up to 2 properties.',
+              'Shortlist button (♥) on detail page; buyers can save up to 8 listings and manage them under Dashboard → Land shortlist.',
             ]}
           />
 
@@ -474,7 +474,7 @@ export default function BusinessFlowsPage() {
               </>,
               <>
                 <strong>Wishlist on listing cards</strong> — property cards on <Path>/properties</Path> have a ♥/♡ Save button.
-                Buyers can save up to 2 properties. Saving prompts login when anonymous.
+                Buyers can save up to 8 listings on their land shortlist. Saving prompts login when anonymous.
               </>,
               <>
                 <strong>Seller “Interested” count</strong> — seller dashboard shows per-listing and total Interested

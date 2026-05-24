@@ -8,12 +8,15 @@ import FilterPanel from '../../components/ui/FilterPanel'
 import { createClient } from '../../lib/supabase'
 import locations from '../../data/locations.json'
 import { REGISTER_LIST_LAND } from '../../lib/routes'
+import { INTEREST_SHORTLIST_MAX } from '../../lib/interestShortlist'
+import { useLang } from '../../context/LanguageContext'
+import { content } from '../../data/content'
 
 const SOIL_TYPES  = ['Black', 'Red', 'Sandy', 'Mixed']
 const LAND_TYPES  = ['Agriculture', 'Estate Agriculture', 'Industrial', 'Commercial', 'Residential']
 const ALL_STATES  = Object.keys(locations)
 
-function PropertyCard({ p, user, isWishlisted, onToggleWishlist, wishlistLoading }) {
+function PropertyCard({ p, user, isWishlisted, onToggleWishlist, wishlistLoading, interestedLabel, shortlistAddLabel, shortlistAddedLabel }) {
   const router     = useRouter()
   const photo      = p.photo_urls?.[0]
   const totalPrice = (p.area_acres * p.expected_price).toLocaleString('en-IN')
@@ -77,20 +80,21 @@ function PropertyCard({ p, user, isWishlisted, onToggleWishlist, wishlistLoading
           href={`${detailHref}?book=1`}
           className="flex-1 flex items-center justify-center gap-1.5 bg-turmeric-500 hover:bg-turmeric-600 active:scale-95 text-white text-xs font-semibold py-2 rounded-xl transition-all"
         >
-          📅 Book Visit
+          ✨ {interestedLabel}
         </Link>
         {!isOwner && (
           <button
             onClick={handleWishlist}
             disabled={wishlistLoading}
-            title={isWishlisted ? 'Remove from saved' : 'Save property'}
-            className={`px-3 rounded-xl border text-sm transition-all disabled:opacity-50 ${
+            title={isWishlisted ? shortlistAddedLabel : shortlistAddLabel}
+            className={`px-3 rounded-xl border text-xs font-semibold transition-all disabled:opacity-50 max-sm:px-2.5 ${
               isWishlisted
                 ? 'bg-paddy-500/20 border-paddy-400/40 text-paddy-300'
                 : 'bg-white/8 hover:bg-white/15 border-white/15 text-white/70'
             }`}
           >
-            {isWishlisted ? '♥' : '♡'}
+            <span className="sm:hidden" aria-hidden>{isWishlisted ? '♥' : '♡'}</span>
+            <span className="hidden sm:inline">{isWishlisted ? `♥ ${shortlistAddedLabel}` : `♡ ${shortlistAddLabel}`}</span>
           </button>
         )}
         <a
@@ -106,6 +110,9 @@ function PropertyCard({ p, user, isWishlisted, onToggleWishlist, wishlistLoading
 }
 
 export default function PropertiesClient({ properties, user = null, wishlistIds: initialWishlistIds = [] }) {
+  const { lang } = useLang()
+  const nav = content[lang].nav
+  const ctaLabels = content[lang].cta
   const [filterValues, setFilterValues] = useState({
     state: '', district: '', mandal: '', soil: [], land_type: '', acres: {}, price: {},
   })
@@ -123,8 +130,8 @@ export default function PropertiesClient({ properties, user = null, wishlistIds:
         .from('buyer_wishlist')
         .select('id', { count: 'exact', head: true })
         .eq('buyer_id', user.id)
-      if (count >= 2) {
-        alert('You can save up to 2 properties. Remove one to add this.')
+      if (count >= INTEREST_SHORTLIST_MAX) {
+        alert(`${ctaLabels.shortlistLimitPart1}${INTEREST_SHORTLIST_MAX}${ctaLabels.shortlistLimitPart2}`)
         setWishlistLoading(false)
         return
       }
@@ -208,7 +215,7 @@ export default function PropertiesClient({ properties, user = null, wishlistIds:
           <p className="text-white/40 text-xs">
             <Link href="/" className="hover:text-white/60 transition-colors">Home</Link>
             <span className="mx-1.5">·</span>
-            <span className="text-white/55">Listings</span>
+            <span className="text-white/55">{nav.properties}</span>
           </p>
           <h1 className="text-white font-display text-3xl sm:text-4xl font-bold mt-3 mb-2">
             Find Your Agricultural Land
@@ -221,7 +228,7 @@ export default function PropertiesClient({ properties, user = null, wishlistIds:
             <span>·</span>
             <span>📋 Documents verified</span>
             <span>·</span>
-            <span>📅 Book site visit instantly</span>
+            <span>✨ {ctaLabels.interestedShort}</span>
           </div>
 
           {/* Mobile filter toggle */}
@@ -309,6 +316,9 @@ export default function PropertiesClient({ properties, user = null, wishlistIds:
                       isWishlisted={wishlistIds.has(p.id)}
                       onToggleWishlist={handleToggleWishlist}
                       wishlistLoading={wishlistLoading}
+                      interestedLabel={ctaLabels.interested}
+                      shortlistAddLabel={ctaLabels.shortlistAddTo}
+                      shortlistAddedLabel={ctaLabels.shortlistAdded}
                     />
                   ))}
                 </div>

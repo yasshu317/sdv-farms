@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { createClient } from '../lib/supabase'
 import { useLang } from '../context/LanguageContext'
 import { REGISTER_LIST_LAND } from '../lib/routes'
+import { content } from '../data/content'
 
 function PropertyCard({ p }) {
   const photo = p.photo_urls?.[0]
@@ -97,7 +98,7 @@ export default function FeaturedProperties() {
               Featured Properties
             </span>
             <h2 className={`text-white font-display text-2xl sm:text-3xl font-bold mt-3 ${lang === 'te' ? 'telugu' : ''}`}>
-              {lang === 'en' ? 'Latest Listings' : 'తాజా జాబితాలు'}
+              {content[lang].cta.latestProperties}
             </h2>
           </div>
           <Link href="/properties" className="text-turmeric-400 hover:text-turmeric-300 text-sm font-medium transition-colors whitespace-nowrap">

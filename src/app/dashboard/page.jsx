@@ -18,6 +18,7 @@ export default async function DashboardPage(props) {
     { data: enquiries },
     { data: interests },
     { data: landRequests },
+    { data: wishlistRows },
   ] = await Promise.all([
     supabase
       .from('enquiries')
@@ -34,9 +35,43 @@ export default async function DashboardPage(props) {
       .select('*')
       .eq('buyer_id', user.id)
       .order('created_at', { ascending: false }),
+    supabase
+      .from('buyer_wishlist')
+      .select(`
+        id,
+        created_at,
+        seller_properties (
+          id,
+          property_id,
+          state,
+          district,
+          mandal,
+          village,
+          area_acres,
+          expected_price,
+          photo_urls,
+          land_soil_type,
+          land_used_type,
+          status
+        )
+      `)
+      .eq('buyer_id', user.id)
+      .order('created_at', { ascending: false }),
   ])
 
-  const initialTab = searchParams?.tab === 'land-requests' ? 'land-requests' : 'overview'
+  const landShortlist = (wishlistRows ?? [])
+    .map(row => ({
+      wishlistRowId: row.id,
+      created_at: row.created_at,
+      property: row.seller_properties,
+    }))
+    .filter(row => row.property != null)
+
+  const qp = searchParams?.tab
+  const initialTab =
+    qp === 'land-requests' ? 'land-requests'
+    : qp === 'land-shortlist' ? 'land-shortlist'
+    : 'overview'
 
   return (
     <DashboardClient
@@ -44,6 +79,7 @@ export default async function DashboardPage(props) {
       enquiries={enquiries ?? []}
       interests={interests ?? []}
       landRequests={landRequests ?? []}
+      landShortlist={landShortlist}
       initialTab={initialTab}
     />
   )
