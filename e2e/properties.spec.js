@@ -11,12 +11,11 @@ test.describe('Properties Browse Page', () => {
   })
 
   test('shows listings count', async ({ page }) => {
-    // Results bar shows "X listing(s) found" — or empty state shows "No properties listed yet"
-    const countBar  = page.getByText(/listings? found/i)
-    const emptyState = page.getByText(/no properties/i)
-    const hasEither = await countBar.isVisible().catch(() => false) ||
-                      await emptyState.isVisible().catch(() => false)
-    expect(hasEither).toBe(true)
+    // Stable hook: summary line always renders (incl. "0 listings found" with placeholder DB).
+    // CI hits slow placeholder Supabase; avoid fragile getByText + isVisible() races.
+    const summary = page.getByTestId('properties-results-summary')
+    await expect(summary).toBeVisible({ timeout: 30_000 })
+    await expect(summary).toHaveText(/\d+\s+listing(s)?\s+found/)
   })
 
   test('filter panel is visible on desktop', async ({ page }) => {

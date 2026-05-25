@@ -244,7 +244,10 @@ export default function PropertiesClient({ properties, user = null, wishlistIds:
       {/* Results count bar */}
       <div className="border-b border-white/6 px-4 sm:px-6 py-3">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <p className="text-white/50 text-sm">
+          <p
+            className="text-white/50 text-sm"
+            data-testid="properties-results-summary"
+          >
             <span className="text-white font-semibold">{filtered.length}</span> listing{filtered.length !== 1 ? 's' : ''} found
             {hasActiveFilters && <span className="text-turmeric-400/70"> (filtered)</span>}
           </p>
