@@ -21,7 +21,7 @@
     "@emailjs/browser": "^4.4.1",
     "@google/generative-ai": "^0.24.1",
     "@supabase/ssr": "^0.10.3",
-    "@supabase/supabase-js": "^2.105.1",
+    "@supabase/supabase-js": "^2.106.1",
     "exceljs": "^4.4.0",
     "lucide-react": "^0.577.0",
     "next": "^16.2.0",
@@ -34,15 +34,15 @@
   "overrides": {
     "serialize-javascript": ">=7.0.5",
     "axios": ">=1.16.0",
-    "postcss": "8.5.14"
+    "postcss": "8.5.15"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
-    "@playwright/test": "^1.59.1",
+    "@playwright/test": "^1.60.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
-    "@types/react": "^19.2.14",
+    "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.5.0",
     "eslint": "^9.39.4",
@@ -52,7 +52,7 @@
     "globals": "^17.6.0",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
-    "postcss": "8.5.14",
+    "postcss": "8.5.15",
     "tailwindcss": "^3.4.19"
   }
 }
