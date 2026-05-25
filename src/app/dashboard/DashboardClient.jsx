@@ -118,7 +118,11 @@ export default function DashboardClient({ user, enquiries, interests, landReques
           <h1 className="font-display text-2xl sm:text-3xl font-bold text-white">
             Welcome back, {name.split(' ')[0]}! 👋
           </h1>
-          <p className="text-white/45 text-sm mt-1">Track your SDV Farms enquiries and plot interests below.</p>
+          <p className="text-white/45 text-sm mt-1">
+            Browse saved farmland on <strong className="text-white/55 font-medium">Land shortlist</strong>
+            {' · '}track enquiries · Phase&nbsp;1 <strong className="text-white/55 font-medium">Plot interests</strong>
+            {' · '}land requests.
+          </p>
         </div>
 
         {/* Summary cards — match homepage/seller stat style */}
@@ -293,7 +297,16 @@ export default function DashboardClient({ user, enquiries, interests, landReques
               <div className="text-center py-16">
                 <p className="text-4xl mb-3">📍</p>
                 <p className="font-medium text-white/70">No plot interests yet</p>
-                <p className="text-sm text-white/40 mt-1">Express interest in a plot from the plot layout section</p>
+                <p className="text-sm text-white/40 mt-1 max-w-sm mx-auto">
+                  Express interest in a plot from the <strong className="text-white/55">Phase 1</strong> plot layout section on the marketing site.
+                </p>
+                <p className="text-xs text-white/35 mt-3 max-w-sm mx-auto leading-relaxed">
+                  Farmland cards you ♥‑save appear under{' '}
+                  <button type="button" className="text-turmeric-400 hover:text-turmeric-300 font-medium underline-offset-2" onClick={() => setTab('land-shortlist')}>
+                    Land shortlist
+                  </button>
+                  {' '}— not here.
+                </p>
               </div>
             ) : (
               <div className="divide-y divide-white/8">
