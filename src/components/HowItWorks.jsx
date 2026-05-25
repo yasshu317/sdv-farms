@@ -4,17 +4,18 @@ import Link from 'next/link'
 import { useLang } from '../context/LanguageContext'
 import { createClient } from '../lib/supabase'
 import { REGISTER_LIST_LAND } from '../lib/routes'
+import { content } from '../data/content'
 
 const STEPS = [
   {
     icon: '🔍',
-    en: { title: 'Browse Properties',   desc: 'Filter by state, soil type, area and price to find your perfect agricultural land.' },
-    te: { title: 'ప్రాపర్టీలు చూడండి', desc: 'రాష్ట్రం, నేల రకం, విస్తీర్ణం మరియు ధర ప్రకారం వడపోత చేయండి.' },
+    en: { title: 'View properties', desc: 'Filter by state, soil type, area and price to find your agricultural land.' },
+    te: { title: 'ఆస్తులను చూడండి', desc: 'రాష్ట్రం, నేల రకం, విస్తీర్ణం మరియు ధర ప్రకారం వడపోత చేయండి.' },
   },
   {
-    icon: '📅',
-    en: { title: 'Book a Site Visit',   desc: 'Pick a date and time slot. Our team confirms within 2 hours and meets you on-site.' },
-    te: { title: 'సైట్ విజిట్ బుక్ చేయండి', desc: 'తేదీ మరియు సమయం ఎంచుకోండి. మా బృందం 2 గంటల్లో నిర్ధారిస్తుంది.' },
+    icon: '✨',
+    en: { title: 'Interested — book a visit', desc: 'Show interest on a listing, pick a slot, and our team confirms with you.' },
+    te: { title: 'ఆసక్తి — సందర్శన', desc: 'జాబితాలో ఆసక్తి తెలిపి, స్లాట్ ఎంచుకోండి.' },
   },
   {
     icon: '🤝',
@@ -101,7 +102,7 @@ export default function HowItWorks() {
             href="/properties"
             className="btn-gold px-8 py-3 text-sm font-semibold rounded-xl"
           >
-            {lang === 'en' ? 'Browse Listings →' : 'జాబితాలు చూడండి →'}
+            {content[lang].cta.viewProperties} →
           </Link>
           <Link
             href="/buyer-request"

@@ -4,10 +4,15 @@ import Link from 'next/link'
 import SiteHeader from '../../components/SiteHeader'
 import { createClient } from '../../lib/supabase'
 import BuyerLandRequestForm from '../../components/buyer/BuyerLandRequestForm'
+import { useLang } from '../../context/LanguageContext'
+import { content } from '../../data/content'
 
 const bg = 'linear-gradient(160deg, #071709 0%, #1a4520 60%, #286d2f 100%)'
 
 export default function BuyerRequestPage() {
+  const { lang } = useLang()
+  const nav = content[lang].nav
+  const ctaBrowse = content[lang].cta.viewProperties
   const [success, setSuccess] = useState(false)
   const [betaEnabled, setBetaEnabled] = useState(false)
 
@@ -59,7 +64,7 @@ export default function BuyerRequestPage() {
             href="/properties"
             className="inline-block bg-turmeric-500 hover:bg-turmeric-600 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
           >
-            Browse Available Properties →
+            {ctaBrowse} →
           </Link>
         </div>
         </div>
@@ -76,7 +81,7 @@ export default function BuyerRequestPage() {
           <p className="text-white/40 text-xs">
             <Link href="/" className="hover:text-white/60 transition-colors">Home</Link>
             <span className="mx-1.5">·</span>
-            <Link href="/properties" className="hover:text-white/60 transition-colors">Listings</Link>
+            <Link href="/properties" className="hover:text-white/60 transition-colors">{nav.properties}</Link>
             <span className="mx-1.5">·</span>
             <span className="text-white/55">Request</span>
           </p>

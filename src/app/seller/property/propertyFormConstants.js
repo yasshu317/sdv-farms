@@ -17,6 +17,12 @@ export const SELLER_INTEREST_OPTIONS = [
   { value: 'interested',    label: 'Interested / Open' },
 ]
 
+export const VERIFY_PHYSICAL_OPTIONS = [
+  { value: 'pending', label: 'Physical visit — pending' },
+  { value: 'verified', label: 'Physical visit — verified' },
+  { value: 'none', label: 'Physical visit — not applicable / none' },
+]
+
 export const INITIAL_FORM = {
   state: '',
   district: '',
@@ -34,6 +40,31 @@ export const INITIAL_FORM = {
   seller_interest: '',
   doc_urls: [],
   photo_urls: [],
+}
+
+/** @param {unknown} raw */
+export function parseSellerMetadata(raw) {
+  if (raw == null || raw === '') return {}
+  if (typeof raw === 'string') {
+    try {
+      const x = JSON.parse(raw)
+      return x && typeof x === 'object' ? { ...x } : {}
+    } catch {
+      return {}
+    }
+  }
+  if (typeof raw === 'object') return { ...raw }
+  return {}
+}
+
+/** @param {unknown} existing Previous row.metadata */
+export function mergeSellerVerificationMetadata(existing, physicalStatus) {
+  const m = parseSellerMetadata(existing)
+  m.verification = {
+    ...(typeof m.verification === 'object' && m.verification !== null ? m.verification : {}),
+    physical: physicalStatus,
+  }
+  return m
 }
 
 /** Map DB row → form state for edit */
@@ -56,6 +87,12 @@ export function mapSellerPropertyRowToForm(row) {
     seller_interest: row.seller_interest || '',
     doc_urls: Array.isArray(row.doc_urls) ? [...row.doc_urls] : [],
     photo_urls: Array.isArray(row.photo_urls) ? [...row.photo_urls] : [],
+    doc_verified: !!row.doc_verified,
+    metadata: parseSellerMetadata(row.metadata),
+    verify_physical: (() => {
+      const phy = parseSellerMetadata(row.metadata).verification?.physical
+      return phy === 'verified' || phy === 'none' || phy === 'pending' ? phy : 'pending'
+    })(),
   }
 }
 

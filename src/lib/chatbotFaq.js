@@ -52,7 +52,7 @@ export const CHATBOT_FAQ_RULES = [
   },
   {
     key: 'appointment',
-    matchEn: /\b(appointment|site visit|visit|book|slot|schedule)\b/i,
+    matchEn: /\b(appointment|site visit|visit|interested|book|slot|schedule)\b/i,
     matchTe: /(అపాయింట్‌మెంట్|సైట్ విజిట్|సందర్శన|బుక్|స్లాట్|షెడ్యూల్|విజిట్)/i,
   },
 ]

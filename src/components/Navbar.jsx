@@ -233,7 +233,7 @@ export default function Navbar() {
               offset={NAV_SCROLL_OFFSET}
               className="btn-gold py-1.5 px-3 lg:py-2 lg:px-4 text-xs lg:text-sm whitespace-nowrap leading-none shrink-0"
             >
-              {t.bookVisit}
+              {t.talkToTeam}
             </Link>
           </div>
 
@@ -351,7 +351,7 @@ export default function Navbar() {
             onClick={() => setOpen(false)}
             className="btn-gold mt-3 text-sm text-center w-full block"
           >
-            {t.bookVisit}
+            {t.talkToTeam}
           </Link>
         </div>
       )}

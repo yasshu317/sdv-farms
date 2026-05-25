@@ -26,7 +26,7 @@ A bilingual (English + Telugu) agricultural land investment platform with a two-
 | Property listing | 3-step form — Location → Land Details → Documents & Photos |
 | Document upload | Supabase Storage (`property-docs`, `property-photos`) |
 | Browse properties | Public listing page with filter sidebar (state, soil, area, price) |
-| Property detail | Full page with photo gallery, pricing, wishlist toggle (max 2) |
+| Property detail | Full page with photo gallery, pricing, shortlist toggle (compare up to 8 listings) |
 | Appointment booking | Date + 1-hr slot picker, 2-hr delay rule, email confirmation |
 | Buyer land request | Anonymous or logged-in request form matched by admin |
 | Seller dashboard | Listings, view counts, appointment tracking |

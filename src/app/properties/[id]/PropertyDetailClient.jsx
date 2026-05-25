@@ -7,16 +7,25 @@ import SiteHeader from '../../../components/SiteHeader'
 import { createClient } from '../../../lib/supabase'
 import StatusBadge from '../../../components/ui/StatusBadge'
 import AppointmentPicker from '../../../components/AppointmentPicker'
+import { useLang } from '../../../context/LanguageContext'
+import { content } from '../../../data/content'
+import { deriveVerificationSignals } from '../../../lib/propertyVerification'
+import { INTEREST_SHORTLIST_MAX } from '../../../lib/interestShortlist'
 
 export default function PropertyDetailClient({ property: p, user, initialWishlisted }) {
   const router       = useRouter()
   const searchParams = useSearchParams()
+  const { lang } = useLang()
+  const nav = content[lang].nav
+  const cta = content[lang].cta
+  const vv = content[lang].verification
+  const vz = deriveVerificationSignals(p)
   const [wishlisted, setWishlisted]           = useState(initialWishlisted)
   const [wishlistLoading, setWishlistLoading] = useState(false)
   const [showPicker, setShowPicker]           = useState(false)
   const [activePhoto, setActivePhoto]         = useState(0)
 
-  // Auto-open the booking picker when ?book=1 is in the URL (e.g. from "Book Visit" on listing card)
+  // Auto-open the booking picker when ?book=1 is in the URL (e.g. from Interested on listing card)
   useEffect(() => {
     if (searchParams.get('book') === '1' && user && !showPicker) {
       setShowPicker(true)
@@ -50,8 +59,8 @@ export default function PropertyDetailClient({ property: p, user, initialWishlis
         .from('buyer_wishlist')
         .select('id', { count: 'exact', head: true })
         .eq('buyer_id', user.id)
-      if (count >= 2) {
-        alert('You can save up to 2 properties. Remove one to add this.')
+      if (count >= INTEREST_SHORTLIST_MAX) {
+        alert(`${cta.shortlistLimitPart1}${INTEREST_SHORTLIST_MAX}${cta.shortlistLimitPart2}`)
         setWishlistLoading(false)
         return
       }
@@ -68,7 +77,7 @@ export default function PropertyDetailClient({ property: p, user, initialWishlis
         <nav className="text-white/45 text-xs mb-4" aria-label="Breadcrumb">
           <Link href="/" className="hover:text-white/70 transition-colors">Home</Link>
           <span className="mx-1.5">·</span>
-          <Link href="/properties" className="hover:text-white/70 transition-colors">Listings</Link>
+          <Link href="/properties" className="hover:text-white/70 transition-colors">{nav.properties}</Link>
           <span className="mx-1.5">·</span>
           <span className="text-white/60">{p.property_id || 'Property'}</span>
         </nav>
@@ -113,6 +122,36 @@ export default function PropertyDetailClient({ property: p, user, initialWishlis
                 {[p.district, p.state].filter(Boolean).join(', ')}
               </p>
 
+              <div className="mb-5">
+                <p className={`text-white/45 text-[11px] font-semibold uppercase tracking-wider mb-2 ${lang === 'te' ? 'telugu' : ''}`}>
+                  {vv.heading}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {(() => {
+                    const legalTxt =
+                      vz.legal === 'verified' ? vv.legalVerified
+                      : vz.legal === 'pending' ? vv.legalPending
+                        : vv.legalNone
+                    const phyTxt =
+                      vz.physical === 'verified' ? vv.physicalVerified
+                      : vz.physical === 'pending' ? vv.physicalPending
+                        : vv.physicalNone
+                    const chipCls = tier =>
+                      tier === 'verified'
+                        ? 'bg-emerald-500/15 text-emerald-200 border border-emerald-500/35'
+                        : tier === 'pending'
+                          ? 'bg-amber-500/15 text-amber-200 border border-amber-500/30'
+                          : 'bg-white/6 text-white/45 border border-white/12'
+                    return (
+                      <>
+                        <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${chipCls(vz.legal)} ${lang === 'te' ? 'telugu' : ''}`}>{legalTxt}</span>
+                        <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${chipCls(vz.physical)} ${lang === 'te' ? 'telugu' : ''}`}>{phyTxt}</span>
+                      </>
+                    )
+                  })()}
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-3 mb-5">
                 {[
                   { label: 'Area',        value: `${p.area_acres} acres` },
@@ -149,12 +188,15 @@ export default function PropertyDetailClient({ property: p, user, initialWishlis
                 <p className="text-white/50 text-xs mb-1">Total Price</p>
                 <p className="text-turmeric-400 font-bold text-3xl">₹{totalPrice}</p>
                 <p className="text-white/40 text-sm mt-0.5">₹{Number(p.expected_price).toLocaleString('en-IN')} per acre</p>
+                <p className={`text-white/38 text-[11px] mt-3 leading-snug ${lang === 'te' ? 'telugu' : ''}`}>
+                  {cta.priceIndicativeNote}
+                </p>
               </div>
 
               {isOwner ? (
                 <div className="space-y-3">
                   <p className="text-white/45 text-sm leading-relaxed">
-                    <strong className="text-white/80">Book a site visit</strong> is for <strong>buyers</strong> who want to see the land. Share this page with buyers, or open your listing to edit.
+                    {cta.sellerInterestedNote}
                   </p>
                   <Link
                     href={`/seller/property/${p.id}/edit`}
@@ -171,32 +213,35 @@ export default function PropertyDetailClient({ property: p, user, initialWishlis
                 </div>
               ) : (
                 <>
-                  <p className="text-white/40 text-xs mb-3 leading-relaxed">
-                    <strong className="text-white/60">For buyers:</strong> book a time to visit this land. SDV Farms coordinates with the listing owner and confirms with you.
+                  <p className={`text-white/40 text-xs mb-3 leading-relaxed ${lang === 'te' ? 'telugu' : ''}`}>
+                    {cta.interestedHelperPdp}
                   </p>
                   <div className="space-y-3">
                     <button
                       onClick={() => { if (!user) router.push('/auth/login'); else setShowPicker(s => !s) }}
-                      className="w-full bg-turmeric-500 hover:bg-turmeric-600 text-white font-semibold py-3 rounded-xl transition-colors"
+                      className={`w-full bg-turmeric-500 hover:bg-turmeric-600 text-white font-semibold py-3 rounded-xl transition-colors ${lang === 'te' ? 'telugu' : ''}`}
                     >
-                      📅 Book a Site Visit
+                      ✨ {cta.interested}
                     </button>
                     <button
                       onClick={handleWishlist}
                       disabled={wishlistLoading}
+                      title={wishlisted ? cta.shortlistAdded : cta.shortlistAddTo}
                       className={`w-full py-3 rounded-xl font-medium transition-all ${
                         wishlisted
                           ? 'bg-paddy-500/20 border border-paddy-400/40 text-paddy-300'
                           : 'bg-white/10 hover:bg-white/15 text-white border border-white/15'
-                      }`}
+                      } ${lang === 'te' ? 'telugu' : ''}`}
                     >
-                      {wishlisted ? '♥ Saved' : '♡ Save Property'}
+                      {wishlisted ? `♥ ${cta.shortlistAdded}` : `♡ ${cta.shortlistAddTo}`}
                     </button>
                   </div>
 
                   {!user && (
-                    <p className="text-white/30 text-xs text-center mt-3">
-                      <Link href="/auth/login" className="text-turmeric-400 hover:text-turmeric-300">Sign in</Link> to save or book
+                    <p className={`text-white/30 text-xs text-center mt-3 ${lang === 'te' ? 'telugu' : ''}`}>
+                      <Link href="/auth/login" className="text-turmeric-400 hover:text-turmeric-300">{nav.signIn}</Link>
+                      {' '}
+                      {cta.signInInterestSuffix}
                     </p>
                   )}
 

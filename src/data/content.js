@@ -9,7 +9,8 @@ export const content = {
       highlights: 'Highlights',
       gallery: 'Gallery',
       contact: 'Contact',
-      bookVisit: 'Book a Visit',
+      /** Navbar / SiteHeader gold CTA — scrolls to home #contact (stakeholder: Talk to Team) */
+      talkToTeam: 'Talk to Our Team',
       properties: 'Properties',
       services: 'Services',
       signIn: 'Sign in',
@@ -23,10 +24,28 @@ export const content = {
       phase1: 'Phase 1',
     },
     stats: {
+      /** Legacy About / mixed — kept for tooling */
       propertyEnquiries: 'Property enquiries',
       subscribedMembers: 'Subscribed members',
       propertiesListed: 'Properties listed',
       propertiesSold: 'Properties sold',
+      /** Homepage KPI strip — stakeholder wording (short labels for mobile) */
+      homeAvailable: 'Available',
+      homeClearDocs: 'Clear',
+      homeSold: 'Sold',
+      homeBeneficiaries: 'Community',
+      homeFarmersAgents: 'Farmers & agents',
+      homeStripEnquiriesChip: 'enquiries logged',
+      homeBeneficiariesHint: 'Registered profiles on SDV Farms',
+    },
+    verification: {
+      heading: 'Verification status',
+      legalVerified: 'Legally verified',
+      legalPending: 'Legal verification pending',
+      legalNone: 'Not legally verified',
+      physicalVerified: 'Physically verified',
+      physicalPending: 'Physical visit pending',
+      physicalNone: 'Not physically verified',
     },
     services: {
       heading: 'Our Services',
@@ -57,7 +76,7 @@ export const content = {
       tagline: 'Secure Land • Earn Income • Build Generational Wealth',
       description:
         'Own legally verified farmland and create a future-ready family asset. An agricultural land project designed for secure investment, long-term appreciation, and sustainable farming income.',
-      ctaVisit: 'Book a Site Visit',
+      ctaVisit: 'Interested — book a visit',
       ctaCall: 'Call Now',
       phone: '7780312525',
     },
@@ -166,17 +185,17 @@ export const content = {
       fallback:
         "I don’t have a saved answer for that yet. Try the **quick buttons** above, browse [/properties](/properties), or call **7780312525** · Mon–Sat 9AM–6PM.",
       quickQuestions: [
-        { label: 'Browse Properties', link: '/properties' },
+        { label: 'View properties', link: '/properties' },
         { label: 'How to sell my land?' },
-        { label: 'Book a site visit' },
+        { label: 'Interested / visit' },
         { label: 'Contact & Call' },
         { label: 'Available services' },
         { label: 'Are documents verified?' },
       ],
       menuActions: [
-        { icon: '🏡', label: 'Browse Properties', link: '/properties' },
+        { icon: '🏡', label: 'View properties', link: '/properties' },
         { icon: '🌾', label: 'Sell My Land', link: REGISTER_LIST_LAND },
-        { icon: '📅', label: 'Book a Site Visit', link: '/#contact' },
+        { icon: '✨', label: 'Talk to Our Team', link: '/#contact' },
         { icon: '🛠️', label: 'Our Services', link: '/services' },
         { icon: '📞', label: 'Call / WhatsApp', link: 'tel:7780312525' },
         { icon: '💬', label: 'FAQ & quick answers', action: 'chat' },
@@ -187,7 +206,7 @@ export const content = {
         sell: () =>
           `🌾 To list your land on SDV Farms:\n\n1. Register as a **Seller** at [list your land — free signup](${REGISTER_LIST_LAND})\n2. Pass a quick eligibility check (Poramboke, Forest & restricted land types are not allowed)\n3. Fill our 3-step form — location, land details, upload Pahani/ROR-1B\n\nOnce submitted, our team reviews and approves it within 24 hours. Free listing — no commission!`,
         buy: () =>
-          `🏡 To buy agricultural land through SDV Farms:\n\n1. **Browse** listings at [/properties](/properties)\n2. **Filter** by state, soil type, area, or price\n3. **Book a site visit** directly on any property page\n4. Or submit a **land request** at [/buyer-request](/buyer-request) if you can't find what you need\n\nAll listings have clear title & government verification. Call **7780312525** for guidance.`,
+          `🏡 To buy agricultural land through SDV Farms:\n\n1. **Browse** listings at [/properties](/properties)\n2. **Filter** by state, soil type, area, or price\n3. Tap **Interested** on any listing to schedule a visit\n4. Or submit a **land request** at [/buyer-request](/buyer-request) if you can't find what you need\n\nAll listings have clear title & government verification. Call **7780312525** for guidance.`,
         services: () =>
           `🛠️ **SDV Farms — Phase II Services** (for land owners):\n\n• 🔒 Compound Fencing\n• ⚡ Borewell & Electricity connection\n• 💧 Drip Irrigation setup\n• 🌱 Customised Farming Plan\n• 🌳 Quality Plants (1-year replacement)\n\nAll services are on-demand. Call **7780312525** or visit [/services](/services) for details.`,
         contact: () =>
@@ -199,10 +218,41 @@ export const content = {
         legal: () =>
           `✅ **SDV Farms — 100% legally verified:**\n\n• Clear title with full legal verification\n• Registered sale deed directly in the buyer's name\n• All documents (Pahani/ROR-1B/Adangal/RTC) verified before listing\n• No hidden charges — transparent pricing\n\nCall **7780312525** to review documents before any commitment.`,
         help: () =>
-          `👋 **Hi! Here's what I can help you with:**\n\n🏡 [Browse Properties](/properties) — filter by state, soil, area\n🌾 **Sell land** — register as a seller, free listing\n📅 **Book a site visit** — pick a date & slot on any property page\n🛠️ [Services](/services) — fencing, borewell, drip irrigation & more\n📞 **Call us** — 7780312525 (Mon–Sat, 9AM–6PM)\n\nJust type your question or tap one of the quick options below!`,
+          `👋 **Hi! Here's what I can help you with:**\n\n🏡 [View properties](/properties) — filter by state, soil, area\n🌾 **Sell land** — register as a seller, free listing\n✨ **Interested** — on any listing, show interest then pick a visit slot\n🛠️ [Services](/services) — fencing, borewell, drip irrigation & more\n📞 **Call us** — 7780312525 (Mon–Sat, 9AM–6PM)\n\nJust type your question or tap one of the quick options below!`,
         appointment: () =>
-          `📅 **Booking a site visit is easy:**\n\n1. Go to [/properties](/properties) and open any listing\n2. Click **"Book Site Visit"** on the property detail page\n3. Pick a date (within next 7 days) and time slot\n4. Pay ₹500 refundable token to confirm your slot\n\nOur team will call you before the visit. For immediate booking call **7780312525**.`,
+          `📅 **Booking a site visit is easy:**\n\n1. Go to [/properties](/properties) and open any listing\n2. Tap **Interested** — then choose a date (within next 7 days) and time slot\n3. Pay ₹500 refundable token to confirm your slot\n\nOur team will call you before the visit. For immediate booking call **7780312525**.`,
       },
+    },
+    cta: {
+      viewProperties: 'View properties',
+      interested: 'Interested',
+      interestedShort: 'Show interest, then schedule your visit.',
+      interestedHelperPdp:
+        'For buyers: tap Interested to choose a slot. We coordinate with the owner and confirm with you.',
+      sellerInterestedNote:
+        'Interested is how buyers schedule a site visit on this land. Share this page with buyers, or edit your listing.',
+      signInInterestSuffix: 'to save or express interest',
+      latestProperties: 'Latest properties',
+      priceIndicativeNote:
+        'Indicative asking price per acre — registration / guideline circle rates may vary by location.',
+      shortlistAddTo: 'Add to shortlist',
+      shortlistAdded: 'On shortlist',
+      shortlistDisclaimer: 'Shortlist helps you compare land — it is not a reservation or sale.',
+      shortlistDashboardTab: 'Land shortlist',
+      shortlistOverviewCard: 'Land shortlist',
+      shortlistEmptyTitle: 'No lands on your shortlist yet',
+      shortlistEmptyHint: 'Open any listing and tap Add to shortlist.',
+      shortlistRemove: 'Remove',
+      shortlistBookSlot: 'Book visit',
+      shortlistCompareHint: 'Compare listings here — open each one to show interest and choose a visit slot.',
+      shortlistLimitPart1: 'You can save up to ',
+      shortlistLimitPart2: ' listings. Remove one to add another.',
+      shortlistLocationCol: 'Location',
+      shortlistLandCol: 'Land',
+      shortlistAcresCol: 'Acres',
+      shortlistPricePerAcreCol: 'Price / acre',
+      shortlistTotalCol: 'Est. total',
+      shortlistSavedCol: 'Saved',
     },
     footer: {
       tagline: 'Invest in Land Today. Harvest Returns Tomorrow. Build Wealth for Generations.',
@@ -220,7 +270,7 @@ export const content = {
       highlights: 'ముఖ్యాంశాలు',
       gallery: 'గ్యాలరీ',
       contact: 'సంప్రదింపు',
-      bookVisit: 'సందర్శన బుక్ చేయండి',
+      talkToTeam: 'మాతో మాట్లాడండి',
       properties: 'ఆస్తులు',
       services: 'సేవలు',
       signIn: 'లాగిన్',
@@ -238,6 +288,22 @@ export const content = {
       subscribedMembers: 'నమోదైన సభ్యులు',
       propertiesListed: 'జాబితా చేసిన ఆస్తులు',
       propertiesSold: 'అమ్మబడిన ఆస్తులు',
+      homeAvailable: 'అందుబాటులో',
+      homeClearDocs: 'క్లియర్ పత్రాలు',
+      homeSold: 'అమ్మబడినవి',
+      homeBeneficiaries: 'సంఘం',
+      homeFarmersAgents: 'వ్యవసాయులు & జాబితా భాగస్వాములు',
+      homeStripEnquiriesChip: 'విచారణలు నమోదైనవి',
+      homeBeneficiariesHint: 'SDV Farms లో నమోదైన ప్రొఫైల్స్',
+    },
+    verification: {
+      heading: 'ధృవీకరణ స్థితి',
+      legalVerified: 'చట్టపరంగా ధృవీకరించబడింది',
+      legalPending: 'చట్టపరమైన ధృవీకరణ పెండింగ్‌లో ఉంది',
+      legalNone: 'చట్టపరమైన ధృవీకరణ లేదు',
+      physicalVerified: 'భౌతికంగా ధృవీకరించబడింది',
+      physicalPending: 'ప్రదేశ పరిశీలన పెండింగ్‌లో ఉంది',
+      physicalNone: 'భౌతిక ధృవీకరణ లేదు',
     },
     services: {
       heading: 'మా సేవలు',
@@ -268,7 +334,7 @@ export const content = {
       tagline: 'భూమి సురక్షితం • ఆదాయం సంపాదించండి • తరతరాల సంపద నిర్మించండి',
       description:
         'చట్టబద్ధంగా ధృవీకరించబడిన వ్యవసాయ భూమిని సొంతం చేసుకోండి మరియు భవిష్యత్తు సంసిద్ధమైన కుటుంబ ఆస్తిని సృష్టించండి. సురక్షిత పెట్టుబడి, దీర్ఘకాలిక మెచ్చుకోలు మరియు స్థిరమైన వ్యవసాయ ఆదాయం కోసం రూపొందించబడిన ప్రభుత్వ ఆమోదిత వ్యవసాయ భూమి ప్రాజెక్ట్.',
-      ctaVisit: 'సైట్ విజిట్ బుక్ చేయండి',
+      ctaVisit: 'ఆసక్తి — సందర్శన బుక్',
       ctaCall: 'ఇప్పుడు కాల్ చేయండి',
       phone: '7780312525',
     },
@@ -377,17 +443,17 @@ export const content = {
       fallback:
         'దానికి ఇంకా సిద్ధమైన సమాధానం లేదు. పైన **త్వరిత బటన్లు** ప్రయత్నించండి, [/properties](/properties) చూడండి, లేదా **7780312525** కి కాల్ చేయండి · సోమ–శని 9–6.',
       quickQuestions: [
-        { label: 'ప్రాపర్టీలు చూడండి', link: '/properties' },
+        { label: 'ఆస్తులు చూడండి', link: '/properties' },
         { label: 'నా భూమి ఎలా అమ్మాలి?' },
-        { label: 'సైట్ విజిట్ బుక్ చేయండి' },
+        { label: 'ఆసక్తి / సందర్శన' },
         { label: 'సంప్రదించండి & కాల్' },
         { label: 'అందుబాటులో ఉన్న సేవలు' },
         { label: 'ఇది ప్రభుత్వ ఆమోదం పొందిందా?' },
       ],
       menuActions: [
-        { icon: '🏡', label: 'ప్రాపర్టీలు చూడండి', link: '/properties' },
+        { icon: '🏡', label: 'ఆస్తులు చూడండి', link: '/properties' },
         { icon: '🌾', label: 'నా భూమి అమ్మాలి', link: REGISTER_LIST_LAND },
-        { icon: '📅', label: 'సైట్ విజిట్ బుక్ చేయండి', link: '/#contact' },
+        { icon: '✨', label: 'మా టీమ్తో మాట్లాడండి', link: '/#contact' },
         { icon: '🛠️', label: 'మా సేవలు', link: '/services' },
         { icon: '📞', label: 'కాల్ / వాట్సాప్', link: 'tel:7780312525' },
         { icon: '💬', label: 'త్వరిత సమాధానాలు', action: 'chat' },
@@ -398,7 +464,7 @@ export const content = {
         sell: () =>
           `🌾 SDV ఫామ్స్‌లో మీ భూమిని జాబితా చేయడం:\n\n1. [జాబితా చేయండి — ఉచిత నమోదు](${REGISTER_LIST_LAND}) వద్ద **విక్రేత**గా నమోదు చేయండి\n2. త్వరిత అర్హత తనిఖీ (పోరంబోకే, అటవీ మరియు నిరోధిత భూమి రకాలు అనుమతి లేదు)\n3. 3-దశల ఫారమ్ — స్థానం, భూమి వివరాలు, పహానీ/ROR-1B అప్‌లోడ్\n\nసమర్పించిన తర్వాత మా టీమ్ 24 గంటల్లోపు సమీక్షిస్తుంది. ఉచిత జాబితా — కమిషన్ లేదు!`,
         buy: () =>
-          `🏡 SDV ఫామ్స్ ద్వారా వ్యవసాయ భూమి కొనుగోలు:\n\n1. [/properties](/properties) వద్ద జాబితాలు **బ్రౌజ్** చేయండి\n2. రాష్ట్రం, నేల, విస్తీర్ణం, ధర ప్రకారం **ఫిల్టర్** చేయండి\n3. ఏదైనా ఆస్తి పేజీలో నేరుగా **సైట్ విజిట్ బుక్** చేయండి\n4. అవసరమైతే [/buyer-request](/buyer-request) వద్ద **భూమి అభ్యర్థన** పంపండి\n\nఅన్ని జాబితాలకు స్పష్టమైన శీర్షిక & ప్రభుత్వ ధృవీకరణ. మార్గదర్శనానికి **7780312525** కి కాల్ చేయండి.`,
+          `🏡 SDV ఫామ్స్ ద్వారా వ్యవసాయ భూమి కొనుగోలు:\n\n1. [/properties](/properties) వద్ద జాబితాలు **చూడండి**\n2. రాష్ట్రం, నేల, విస్తీర్ణం, ధర ప్రకారం **ఫిల్టర్** చేయండి\n3. ఏదైనా ఆస్తి పేజీలో **ఆసక్తి ఉంది** నొక్కి సందర్శనకు సమయం ఎంచుకోండి\n4. అవసరమైతే [/buyer-request](/buyer-request) వద్ద **భూమి అభ్యర్థన** పంపండి\n\nఅన్ని జాబితాలకు స్పష్టమైన శీర్షిక & ప్రభుత్వ ధృవీకరణ. మార్గదర్శనానికి **7780312525** కి కాల్ చేయండి.`,
         services: () =>
           `🛠️ **SDV ఫామ్స్ — దశ II సేవలు** (భూమి యజమానులకు):\n\n• 🔒 కంపౌండ్ ఫెన్సింగ్\n• ⚡ బోర్వెల్ & విద్యుత్ కనెక్షన్\n• 💧 డ్రిప్ ఇరిగేషన్ సెటప్\n• 🌱 అనుకూల వ్యవసాయ ప్రణాళిక\n• 🌳 నాణ్యమైన మొక్కలు (1-సంవత్సరం రీప్లేస్‌మెంట్)\n\nఅన్నీ ఆన్-డిమాండ్. వివరాలకు **7780312525** లేదా [/services](/services) చూడండి.`,
         contact: () =>
@@ -410,10 +476,41 @@ export const content = {
         legal: () =>
           `✅ **అవును — SDV ఫామ్స్ 100% ప్రభుత్వ ఆమోదితం:**\n\n• చట్టపరమైన ధృవీకరణతో స్పష్టమైన శీర్షిక\n• కొనుగోలుదారు పేరుపై నమోదు అమ్మకపు దస్తావేజు\n• జాబితా చేయడానికి ముందు పహానీ/ROR-1B/అడంగల్/RTC ధృవీకరణ\n• దాచిన ఛార్జీలు లేవు — పారదర్శక ధర\n\nనిర్ణయానికి ముందు పత్రాల కోసం **7780312525** కి కాల్ చేయండి.`,
         help: () =>
-          `👋 **నేను ఇలా సహాయం చేయగలను:**\n\n🏡 [ఆస్తులు](/properties) — రాష్ట్రం, నేల, విస్తీర్ణం ప్రకారం ఫిల్టర్\n🌾 **భూమి అమ్మకం** — విక్రేతగా నమోదు, ఉచిత జాబితా\n📅 **సైట్ విజిట్** — ఏదైనా ఆస్తి పేజీలో తేదీ & స్లాట్ ఎంచుకోండి\n🛠️ [సేవలు](/services) — ఫెన్సింగ్, బోర్వెల్, డ్రిప్ & మరిన్ని\n📞 **కాల్** — 7780312525 (సోమ–శని, 9–6)\n\nమీ ప్రశ్న టైప్ చేయండి లేదా క్రింద త్వరిత ఎంపికలు ట్యాప్ చేయండి!`,
+          `👋 **నేను ఇలా సహాయం చేయగలను:**\n\n🏡 [ఆస్తులు](/properties) — రాష్ట్రం, నేల, విస్తీర్ణం ప్రకారం ఫిల్టర్\n🌾 **భూమి అమ్మకం** — విక్రేతగా నమోదు, ఉచిత జాబితా\n✨ **ఆసక్తి** — ఏ ఆస్తి పేజీలోనైనా ఆసక్తి తెలిపి తర్వాత సందర్శన స్లాట్\n🛠️ [సేవలు](/services) — ఫెన్సింగ్, బోర్వెల్, డ్రిప్ & మరిన్ని\n📞 **కాల్** — 7780312525 (సోమ–శని, 9–6)\n\nమీ ప్రశ్న టైప్ చేయండి లేదా క్రింద త్వరిత ఎంపికలు ట్యాప్ చేయండి!`,
         appointment: () =>
-          `📅 **సైట్ విజిట్ బుకింగ్ సులభం:**\n\n1. [/properties](/properties) వద్ద ఏదైనా జాబితా తెరవండి\n2. ఆస్తి వివరాల పేజీలో **"సైట్ విజిట్ బుక్"** నొక్కండి\n3. వచ్చే 7 రోజుల్లో తేదీ మరియు సమయ స్లాట్ ఎంచుకోండి\n4. స్లాట్ నిర్ధారణకు ₹500 తిరిగి చెల్లించదగిన టోకెన్ చెల్లించండి\n\nసందర్శనకు ముందు మా టీమ్ కాల్ చేస్తుంది. తక్షణ బుకింగ్ కోసం **7780312525**.`,
+          `📅 **సందర్శనం ఎలా బుక్ చేసుకోవాలి:**\n\n1. [/properties](/properties) వద్ద ఏదైనా జాబితా తెరవండి\n2. **ఆసక్తి ఉంది** నొక్కి — తర్వాత వచ్చే 7 రోజుల్లో తేదీ & సమయ స్లాట్ ఎంచుకోండి\n3. స్లాట్ నిర్ధారణకు ₹500 తిరిగి చెల్లించదగిన టోకెన్ చెల్లించండి\n\nసందర్శనకు ముందు మా టీమ్ కాల్ చేస్తుంది. తక్షణ సహాయం **7780312525**.`,
       },
+    },
+    cta: {
+      viewProperties: 'ఆస్తులను చూడండి',
+      interested: 'ఆసక్తి ఉంది',
+      interestedShort: 'ముందుగా ఆసక్తి తెలియజేసి, ఆ తర్వాత సందర్శన సమయం ఎంచుకోండి.',
+      interestedHelperPdp:
+        'కొనుగోలుదారులకు: ఆసక్తి ఉంది నొక్కి స్లాట్ ఎంచుకోండి. యజమానితో సమన్వయం చేసి మేము నిర్ధారిస్తాము.',
+      sellerInterestedNote:
+        'ఆసక్తి ఉంది ద్వారా కొనుగోలుదారులు ఈ భూమి సందర్శనానికి సమయం బుక్ చేసుకుంటారు. ఈ పేజీని షేర్ చేయండి, లేదా జాబితాను సవరించండి.',
+      signInInterestSuffix: 'సేవ్ చేయడానికి లేదా ఆసక్తి తెలియజేయడానికి',
+      latestProperties: 'తాజా ఆస్తులు',
+      priceIndicativeNote:
+        'చూపించిన ఎకరానికి ధర మార్చబడదగినది — నమోదు / గైడ్లైన్ వృత్త దరులు ప్రాంతం ఆధారంగా మారవచ్చు.',
+      shortlistAddTo: 'షార్ట్‌లిస్ట్‌లో చేర్చండి',
+      shortlistAdded: 'షార్ట్‌లిస్ట్‌లో ఉంది',
+      shortlistDisclaimer: 'పోల్చుకోవడానికి షార్ట్‌లిస్ట్ — ఇది రిజర్వేషన్ లేదా అమ్మకం కాదు.',
+      shortlistDashboardTab: 'భూమి షార్ట్‌లిస్ట్',
+      shortlistOverviewCard: 'భూమి షార్ట్‌లిస్ట్',
+      shortlistEmptyTitle: 'ఇప్పటికీ షార్ట్‌లిస్ట్‌లో భూములు లేవు',
+      shortlistEmptyHint: 'ఏదైనా జాబితా తెరిచి “షార్ట్‌లిస్ట్‌లో చేర్చండి” నొక్కండి.',
+      shortlistRemove: 'తీసివేయి',
+      shortlistBookSlot: 'సందర్శన బుక్',
+      shortlistCompareHint: 'ఇక్కడ పోల్చుకోండి — ప్రతి జాబితాలో ఆసక్తి తెలియజేసి సందర్శన స్లాట్ ఎంచుకోండి.',
+      shortlistLimitPart1: 'గరిష్ఠంగా ',
+      shortlistLimitPart2: ' జాబితాలు మాత్రమే. మరొకటి చేర్చడానికి ఒకటి తొలగించండి.',
+      shortlistLocationCol: 'ప్రాంతం',
+      shortlistLandCol: 'నేల రకం',
+      shortlistAcresCol: 'ఎకరాలు',
+      shortlistPricePerAcreCol: 'ఎకరానికి ధర',
+      shortlistTotalCol: 'అంచనా మొత్తం',
+      shortlistSavedCol: 'చేర్చినది',
     },
     footer: {
       tagline: 'ఈరోజు భూమిలో పెట్టుబడి పెట్టండి. రేపు రాబడి కోయండి. తరతరాలకు సంపద నిర్మించండి.',

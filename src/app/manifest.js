@@ -16,9 +16,9 @@ export default function manifest() {
     ],
     shortcuts: [
       {
-        name: 'Book a Visit',
+        name: 'Talk to Our Team',
         url: '/#contact',
-        description: 'Book a site visit to SDV Farms',
+        description: 'Request a callback from SDV Farms',
       },
       {
         name: 'My Dashboard',
