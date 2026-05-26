@@ -228,21 +228,21 @@ export default function PropertyDetailClient({ property: p, user, initialWishlis
                   <div className="space-y-3">
                     <button
                       onClick={() => { if (!user) router.push('/auth/login'); else setShowPicker(s => !s) }}
-                      className={`w-full bg-turmeric-500 hover:bg-turmeric-600 text-white font-semibold py-3 rounded-xl transition-colors ${lang === 'te' ? 'telugu' : ''}`}
+                      className={`w-full bg-turmeric-500 hover:bg-turmeric-600 text-white font-semibold py-3 rounded-xl transition-colors border border-turmeric-400/35 shadow-[0_1px_0_0_rgba(0,0,0,0.2)] ${lang === 'te' ? 'telugu' : ''}`}
                     >
-                      ✨ {cta.interested}
+                      {cta.interested}
                     </button>
                     <button
                       onClick={handleWishlist}
                       disabled={wishlistLoading}
                       title={wishlisted ? cta.shortlistAdded : cta.shortlistAddTo}
-                      className={`w-full py-3 rounded-xl font-medium transition-all ${
+                      className={`w-full py-3 rounded-xl font-semibold transition-all ${
                         wishlisted
-                          ? 'bg-paddy-500/20 border border-paddy-400/40 text-paddy-300'
-                          : 'bg-white/10 hover:bg-white/15 text-white border border-white/15'
+                          ? 'bg-paddy-900/55 border border-paddy-500/35 text-paddy-200'
+                          : 'bg-white/[0.08] hover:bg-white/14 text-white/90 border border-white/14'
                       } ${lang === 'te' ? 'telugu' : ''}`}
                     >
-                      {wishlisted ? `♥ ${cta.shortlistAdded}` : `♡ ${cta.shortlistAddTo}`}
+                      {wishlisted ? cta.shortlistAdded : cta.shortlistAddTo}
                     </button>
                   </div>
 
@@ -273,9 +273,9 @@ export default function PropertyDetailClient({ property: p, user, initialWishlis
                 <a
                   href={`https://wa.me/917780312525?text=Hi, I'm interested in property ${p.property_id || p.id}`}
                   target="_blank" rel="noopener noreferrer"
-                  className="text-paddy-400 hover:text-paddy-300 text-sm font-medium transition-colors"
+                  className="text-turmeric-300 hover:text-turmeric-200 text-sm font-semibold transition-colors border-b border-transparent hover:border-turmeric-400/60 pb-px"
                 >
-                  💬 WhatsApp Us
+                  WhatsApp us
                 </a>
               </div>
             </div>
