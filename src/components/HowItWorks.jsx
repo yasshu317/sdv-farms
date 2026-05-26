@@ -42,7 +42,7 @@ export default function HowItWorks() {
   }, [])
 
   return (
-    <section className="py-16 px-4 sm:px-6" style={{ background: 'linear-gradient(180deg, #0a1f0c 0%, #0d2510 100%)' }}>
+    <section className="py-16 px-4 sm:px-6" style={{ background: 'linear-gradient(180deg, #061208 0%, #0d2510 55%, #0a1f0c 100%)' }}>
       <div className="max-w-5xl mx-auto">
 
         {/* Stats bar */}

@@ -194,10 +194,10 @@ function PaddyField() {
           />
         </g>
       ))}
-      {/* Wave transition to cream */}
+      {/* Wave transition into marketing stats strip (#marketing-stats — same greens) */}
       <path
         d="M0,120 C200,80 400,145 600,110 C800,75 1000,140 1200,100 C1300,82 1380,110 1440,95 L1440,160 L0,160 Z"
-        fill="#fdf8f0"
+        fill="#0e2c13"
       />
     </svg>
   )
