@@ -8,6 +8,7 @@ import { useLang } from '../context/LanguageContext'
 import { content } from '../data/content'
 import { createClient } from '../lib/supabase'
 import { REGISTER_LIST_LAND } from '../lib/routes'
+import { homePathForRole } from '../lib/authRedirects'
 import { isAdminOrStaff } from '../lib/roles'
 import BrandHeadingAccent from './BrandHeadingAccent'
 
@@ -64,15 +65,18 @@ export default function SiteHeader({ active: activeProp = null }) {
 
   const hashLinkClass = `text-sm font-medium transition-colors text-white/70 hover:text-white ${lang === 'te' ? 'telugu text-xs' : ''}`
 
-  /** Same sections as marketing Navbar — jump to home anchor from inner pages */
+  /** Marketing anchors — signed-in users need ?stay=1 or "/" would hub-redirect away from fragments */
   const homeSectionLinks = [
-    { href: '/#about',       label: t.about },
-    { href: '/#why-invest',  label: t.whyInvest },
-    { href: '/#benefits',    label: t.benefits },
-    { href: '/#highlights',  label: t.highlights },
-    { href: '/#gallery',     label: t.gallery },
-    { href: '/#location',    label: t.contact },
-  ]
+    { anchor: '#about',      label: t.about },
+    { anchor: '#why-invest', label: t.whyInvest },
+    { anchor: '#benefits',   label: t.benefits },
+    { anchor: '#highlights', label: t.highlights },
+    { anchor: '#gallery',    label: t.gallery },
+    { anchor: '#location',   label: t.contact },
+  ].map(({ anchor, label }) => ({
+    href: user ? `/?stay=1${anchor}` : `/${anchor}`,
+    label,
+  }))
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-paddy-950/95 backdrop-blur-md">
@@ -80,9 +84,9 @@ export default function SiteHeader({ active: activeProp = null }) {
         {/* Row 1 — brand + account + book (desktop) */}
         <div className="flex items-center justify-between gap-3 min-h-[3.25rem] py-2 md:min-h-[3.75rem] md:py-2.5">
           <NextLink
-            href="/"
+            href={user ? homePathForRole(user.user_metadata?.role) : '/'}
             className="flex shrink-0 items-center gap-1.5 text-white font-display font-bold text-base sm:text-lg hover:opacity-90 transition-opacity leading-none"
-            title="SDV Farms — Home"
+            title={user ? 'My hub' : 'SDV Farms — Home'}
           >
             <span aria-hidden className="text-lg">🌾</span>
             <span className="inline-flex flex-col items-stretch min-w-0">

@@ -53,7 +53,7 @@ export default function BuyerLandRequestForm({
   submitLabel = 'Submit Request',
   onSubmit,
 }) {
-  const [form, setForm] = useState(() => initialForm || BUYER_REQUEST_INITIAL)
+  const [form, setForm] = useState(() => ({ ...BUYER_REQUEST_INITIAL, ...(initialForm || {}) }))
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 

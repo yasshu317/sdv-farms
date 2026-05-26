@@ -3,7 +3,7 @@ import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '../../../lib/supabase'
-import { homePathForRole } from '../../../lib/authRedirects'
+import { homePathForRole, safeInternalNextPath } from '../../../lib/authRedirects'
 import BrandHeadingAccent from '../../../components/BrandHeadingAccent'
 
 const URL_ERROR_MESSAGES = {
@@ -17,6 +17,7 @@ const bg = 'linear-gradient(160deg, #071709 0%, #1a4520 60%, #286d2f 100%)'
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const nextSafe = safeInternalNextPath(searchParams.get('next'))
   const [email, setEmail]         = useState('')
   const [password, setPassword]   = useState('')
   const [error, setError]         = useState('')
@@ -42,7 +43,7 @@ function LoginForm() {
     // Auth succeeded — show branded redirect overlay while Next.js navigates
     setRedirecting(true)
     const role = data.user?.user_metadata?.role
-    router.push(homePathForRole(role))
+    router.push(nextSafe ?? homePathForRole(role))
     router.refresh()
   }
 
@@ -63,7 +64,7 @@ function LoginForm() {
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
           </svg>
-          Taking you to your dashboard…
+          Taking you {nextSafe ? 'back…' : 'to your dashboard…'}
         </div>
       </div>
     )
@@ -115,7 +116,10 @@ function LoginForm() {
 
       <p className="text-white/50 text-sm text-center mt-6">
         Don&apos;t have an account?{' '}
-        <Link href="/auth/register" className="text-turmeric-400 hover:text-turmeric-300 font-medium">
+        <Link
+          href={nextSafe ? `/auth/register?next=${encodeURIComponent(nextSafe)}` : '/auth/register'}
+          className="text-turmeric-400 hover:text-turmeric-300 font-medium"
+        >
           Register here
         </Link>
       </p>

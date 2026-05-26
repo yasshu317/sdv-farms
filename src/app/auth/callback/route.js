@@ -1,17 +1,11 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '../../../lib/supabase-server'
-import { homePathForRole } from '../../../lib/authRedirects.js'
-
-function safeInternalPath(p) {
-  if (!p || typeof p !== 'string') return null
-  if (!p.startsWith('/') || p.startsWith('//')) return null
-  return p
-}
+import { homePathForRole, safeInternalNextPath } from '../../../lib/authRedirects.js'
 
 export async function GET(request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  const nextParam = safeInternalPath(searchParams.get('next'))
+  const nextParam = safeInternalNextPath(searchParams.get('next'))
 
   if (code) {
     const supabase = await createClient()

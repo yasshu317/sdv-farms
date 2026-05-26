@@ -8,6 +8,7 @@ import { useLang } from '../context/LanguageContext'
 import { content } from '../data/content'
 import { createClient } from '../lib/supabase'
 import { REGISTER_LIST_LAND } from '../lib/routes'
+import { homePathForRole } from '../lib/authRedirects'
 import { isAdminOrStaff } from '../lib/roles'
 import { NAV_SCROLL_OFFSET } from '../lib/nav-scroll'
 import BrandHeadingAccent from './BrandHeadingAccent'
@@ -72,9 +73,9 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between min-h-[3.25rem] gap-2 sm:gap-3 min-w-0 py-2 md:py-2.5 md:min-h-0">
           <NextLink
-            href="/"
-            aria-label="SDV Farms — Home"
-            title="Home"
+            href={user ? homePathForRole(user.user_metadata?.role) : '/'}
+            aria-label={user ? 'Go to my hub' : 'SDV Farms — Home'}
+            title={user ? 'My hub' : 'Home'}
             className={`relative z-10 flex shrink-0 items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-opacity hover:opacity-90 ${
               scrolled
                 ? 'text-paddy-900 focus-visible:ring-paddy-500 focus-visible:ring-offset-white'
