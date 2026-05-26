@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '../../../lib/supabase'
 import BrandHeadingAccent from '../../../components/BrandHeadingAccent'
+import { safeInternalNextPath } from '../../../lib/authRedirects'
 
 const DISALLOWED_LAND_TYPES = [
   'Restricted land', 'Poramboke', 'Assigned land', 'Forest land',
@@ -32,6 +33,7 @@ const bg = 'linear-gradient(160deg, #071709 0%, #1a4520 60%, #286d2f 100%)'
 
 function RegisterForm() {
   const searchParams = useSearchParams()
+  const nextSafe = safeInternalNextPath(searchParams.get('next'))
   const listLandFlow = searchParams.get('flow') === 'seller'
 
   // Step 0 = role choice, Step 1 = eligibility (seller only), Step 2 = form
@@ -94,6 +96,7 @@ function RegisterForm() {
 
   // ── Success ──
   if (success) {
+    const loginHref = nextSafe ? `/auth/login?next=${encodeURIComponent(nextSafe)}` : '/auth/login'
     const roleIcon  = role === 'seller' ? '🌾' : '🏡'
     const roleLabel = role === 'seller' ? 'Seller' : 'Buyer'
     const roleDesc  = role === 'seller'
@@ -124,7 +127,7 @@ function RegisterForm() {
           </div>
 
           <Link
-            href="/auth/login"
+            href={loginHref}
             className="inline-flex w-full items-center justify-center bg-turmeric-500 hover:bg-turmeric-600 text-white font-semibold py-3 rounded-xl transition-colors mb-3"
           >
             Sign in with your credentials →
@@ -365,7 +368,7 @@ function RegisterForm() {
 
           <p className="text-white/50 text-sm text-center mt-6">
             Already have an account?{' '}
-            <Link href="/auth/login" className="text-turmeric-400 hover:text-turmeric-300 font-medium">Sign in</Link>
+            <Link href={nextSafe ? `/auth/login?next=${encodeURIComponent(nextSafe)}` : '/auth/login'} className="text-turmeric-400 hover:text-turmeric-300 font-medium">Sign in</Link>
           </p>
           <p className="text-center mt-3">
             <Link href="/" className="text-white/35 hover:text-white/60 text-xs transition-colors">← Back to SDV Farms</Link>

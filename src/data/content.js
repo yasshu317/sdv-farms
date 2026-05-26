@@ -225,12 +225,12 @@ export const content = {
     },
     cta: {
       viewProperties: 'View properties',
-      interested: 'Interested',
-      interestedShort: 'Show interest, then schedule your visit.',
+      interested: 'Book visit',
+      interestedShort: 'Pick a slot for a guided site visit on this listing.',
       interestedHelperPdp:
-        'For buyers: tap Interested to choose a slot. We coordinate with the owner and confirm with you.',
+        'For buyers: tap Book visit to choose a slot. We coordinate with the owner and confirm with you.',
       sellerInterestedNote:
-        'Interested is how buyers schedule a site visit on this land. Share this page with buyers, or edit your listing.',
+        'Buyers tap Book visit on this listing to schedule a site visit. Share this page with buyers, or edit your listing.',
       signInInterestSuffix: 'to save or express interest',
       latestProperties: 'Latest properties',
       priceIndicativeNote:
@@ -244,7 +244,7 @@ export const content = {
       shortlistEmptyHint: 'Open any listing and tap Add to shortlist.',
       shortlistRemove: 'Remove',
       shortlistBookSlot: 'Book visit',
-      shortlistCompareHint: 'Compare listings here — open each one to show interest and choose a visit slot.',
+      shortlistCompareHint: 'Compare listings here — open each one to book a visit or add to Land shortlist.',
       shortlistLimitPart1: 'You can save up to ',
       shortlistLimitPart2: ' listings. Remove one to add another.',
       shortlistLocationCol: 'Location',
@@ -252,7 +252,16 @@ export const content = {
       shortlistAcresCol: 'Acres',
       shortlistPricePerAcreCol: 'Price / acre',
       shortlistTotalCol: 'Est. total',
+      shortlistViewsCol: 'Listing views',
       shortlistSavedCol: 'Saved',
+      pendingShortlistBanner: pendingCount => {
+        if (pendingCount === 1) return 'One listing was saved before you signed in. Add it to your Land shortlist.'
+        return `${pendingCount} listings were saved before you signed in. Add them to your Land shortlist.`
+      },
+      pendingShortlistConfirm: 'Add to Land shortlist',
+      pendingShortlistAdding: 'Adding…',
+      enquiriesShortlistViewsLine: viewsTotal =>
+        `👁 ${viewsTotal} views across your Land shortlist`,
     },
     footer: {
       tagline: 'Invest in Land Today. Harvest Returns Tomorrow. Build Wealth for Generations.',
@@ -483,12 +492,12 @@ export const content = {
     },
     cta: {
       viewProperties: 'ఆస్తులను చూడండి',
-      interested: 'ఆసక్తి ఉంది',
-      interestedShort: 'ముందుగా ఆసక్తి తెలియజేసి, ఆ తర్వాత సందర్శన సమయం ఎంచుకోండి.',
+      interested: 'సందర్శన బుక్',
+      interestedShort: 'ఈ జాబితాపై మార్గదర్శిత సైట్ సందర్శనకు స్లాట్ ఎంచుకోండి.',
       interestedHelperPdp:
-        'కొనుగోలుదారులకు: ఆసక్తి ఉంది నొక్కి స్లాట్ ఎంచుకోండి. యజమానితో సమన్వయం చేసి మేము నిర్ధారిస్తాము.',
+        'కొనుగోలుదారులకు: సందర్శన బుక్ నొక్కి స్లాట్ ఎంచుకోండి. యజమానితో సమన్వయం చేసి మేము నిర్ధారిస్తాము.',
       sellerInterestedNote:
-        'ఆసక్తి ఉంది ద్వారా కొనుగోలుదారులు ఈ భూమి సందర్శనానికి సమయం బుక్ చేసుకుంటారు. ఈ పేజీని షేర్ చేయండి, లేదా జాబితాను సవరించండి.',
+        'సందర్శన బుక్ ద్వారా కొనుగోలుదారులు ఈ భూమికి సైట్ సందర్శనానికి సమయం బుక్ చేసుకుంటారు. ఈ పేజీని షేర్ చేయండి, లేదా జాబితాను సవరించండి.',
       signInInterestSuffix: 'సేవ్ చేయడానికి లేదా ఆసక్తి తెలియజేయడానికి',
       latestProperties: 'తాజా ఆస్తులు',
       priceIndicativeNote:
@@ -502,7 +511,8 @@ export const content = {
       shortlistEmptyHint: 'ఏదైనా జాబితా తెరిచి “షార్ట్‌లిస్ట్‌లో చేర్చండి” నొక్కండి.',
       shortlistRemove: 'తీసివేయి',
       shortlistBookSlot: 'సందర్శన బుక్',
-      shortlistCompareHint: 'ఇక్కడ పోల్చుకోండి — ప్రతి జాబితాలో ఆసక్తి తెలియజేసి సందర్శన స్లాట్ ఎంచుకోండి.',
+      shortlistCompareHint:
+        'ఇక్కడ పోల్చుకోండి — ప్రతి జాబితాలో సందర్శన బుక్ చేయండి లేదా ల్యాండ్ షార్ట్‌లిస్ట్‌లో చేర్చండి.',
       shortlistLimitPart1: 'గరిష్ఠంగా ',
       shortlistLimitPart2: ' జాబితాలు మాత్రమే. మరొకటి చేర్చడానికి ఒకటి తొలగించండి.',
       shortlistLocationCol: 'ప్రాంతం',
@@ -510,7 +520,14 @@ export const content = {
       shortlistAcresCol: 'ఎకరాలు',
       shortlistPricePerAcreCol: 'ఎకరానికి ధర',
       shortlistTotalCol: 'అంచనా మొత్తం',
+      shortlistViewsCol: 'లిస్టింగ్ వీక్షణలు',
       shortlistSavedCol: 'చేర్చినది',
+      pendingShortlistBanner: pendingCount =>
+        `సైన్ ఇన్ చేయకముందు ${pendingCount} జాబితా సేవ్ చేయబడింది. ల్యాండ్ షార్ట్‌లిస్ట్‌లో చేర్చండి.`,
+      pendingShortlistConfirm: 'ల్యాండ్ షార్ట్‌లిస్ట్‌లో చేర్చండి',
+      pendingShortlistAdding: 'జోడిస్తోంది…',
+      enquiriesShortlistViewsLine: viewsTotal =>
+        `మీ ల్యాండ్ షార్ట్‌లిస్ట్‌పై 👁 ${viewsTotal} వీక్షణలు`,
     },
     footer: {
       tagline: 'ఈరోజు భూమిలో పెట్టుబడి పెట్టండి. రేపు రాబడి కోయండి. తరతరాలకు సంపద నిర్మించండి.',

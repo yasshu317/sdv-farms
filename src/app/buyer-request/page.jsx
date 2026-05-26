@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import SiteHeader from '../../components/SiteHeader'
 import { createClient } from '../../lib/supabase'
 import BuyerLandRequestForm from '../../components/buyer/BuyerLandRequestForm'
@@ -10,11 +11,18 @@ import { content } from '../../data/content'
 const bg = 'linear-gradient(160deg, #071709 0%, #1a4520 60%, #286d2f 100%)'
 
 export default function BuyerRequestPage() {
+  const router = useRouter()
   const { lang } = useLang()
   const nav = content[lang].nav
   const ctaBrowse = content[lang].cta.viewProperties
   const [success, setSuccess] = useState(false)
   const [betaEnabled, setBetaEnabled] = useState(false)
+
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data }) => {
+      if (data.user) router.replace('/dashboard')
+    })
+  }, [router])
 
   useEffect(() => {
     fetch('/api/feature-flags')

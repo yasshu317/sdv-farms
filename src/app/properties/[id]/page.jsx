@@ -20,8 +20,10 @@ export default async function PropertyDetailPage({ params }) {
 
   if (error || !property) redirect('/properties')
 
-  // Increment view count (fire and forget)
-  supabase.from('seller_properties').update({ views: (property.views || 0) + 1 }).eq('id', id).then(() => {})
+  const { views: _viewsStored, ...propertyForClient } = property
+
+  // Increment view count (fire and forget) — don't expose counters on public PDP
+  supabase.from('seller_properties').update({ views: (_viewsStored || 0) + 1 }).eq('id', id).then(() => {})
 
   // Check if wishlisted
   let wishlisted = false
@@ -43,7 +45,7 @@ export default async function PropertyDetailPage({ params }) {
         <span className="text-4xl animate-pulse">🌾</span>
       </div>
     }>
-      <PropertyDetailClient property={property} user={clientUser} initialWishlisted={wishlisted} />
+      <PropertyDetailClient property={propertyForClient} user={clientUser} initialWishlisted={wishlisted} />
     </Suspense>
   )
 }

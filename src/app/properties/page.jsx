@@ -9,7 +9,7 @@ export default async function PropertiesPage() {
   const [propertiesRes, authRes] = await Promise.all([
     supabase
       .from('seller_properties')
-      .select('id, property_id, state, district, mandal, village, land_used_type, land_soil_type, road_access, area_acres, expected_price, photo_urls, views, created_at, seller_id')
+      .select('id, property_id, state, district, mandal, village, land_used_type, land_soil_type, road_access, area_acres, expected_price, photo_urls, created_at, seller_id')
       .eq('status', 'approved')
       .order('created_at', { ascending: false }),
     supabase.auth.getUser(),

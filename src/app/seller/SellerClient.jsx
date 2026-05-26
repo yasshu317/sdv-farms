@@ -12,7 +12,7 @@ import RoleRedirectBanner from '../../components/RoleRedirectBanner'
 const SELLER_STATUSES = ['pending', 'approved']
 const MAX_LISTINGS = 2
 
-export default function SellerClient({ user, properties, appointments, wishlistCountById = {} }) {
+export default function SellerClient({ user, properties, appointments, wishlistCountById = {}, visitRequestCountById = {} }) {
   const router = useRouter()
   const [tab, setTab] = useState('listings')
   const [showPicker, setShowPicker] = useState(false)
@@ -44,7 +44,7 @@ export default function SellerClient({ user, properties, appointments, wishlistC
   const pendingCount  = properties.filter(p => p.status === 'pending').length
   const approvedCount = properties.filter(p => p.status === 'approved').length
   const totalViews    = properties.reduce((acc, p) => acc + (p.views || 0), 0)
-  const totalInterested = Object.values(wishlistCountById).reduce((s, c) => s + c, 0)
+  const totalShortlist = Object.values(wishlistCountById).reduce((s, c) => s + c, 0)
 
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(180deg, #071709 0%, #0a1f0c 40%, #0d2510 100%)' }}>
@@ -106,7 +106,7 @@ export default function SellerClient({ user, properties, appointments, wishlistC
             { icon: '🕐', label: 'Pending Review',  value: pendingCount,     color: 'text-yellow-300' },
             { icon: '✅', label: 'Live / Approved', value: approvedCount,    color: 'text-paddy-300'   },
             { icon: '👁', label: 'Total Views',     value: totalViews,       color: 'text-turmeric-400' },
-            { icon: '♥',  label: 'Interested',      value: totalInterested,  color: 'text-red-300' },
+            { icon: '♥',  label: 'Shortlist', value: totalShortlist,  color: 'text-rose-200' },
           ].map(s => (
             <div key={s.label} className="bg-white/4 border border-white/8 rounded-2xl py-5 px-3 text-center">
               <p className="text-xl mb-1">{s.icon}</p>
@@ -185,24 +185,26 @@ export default function SellerClient({ user, properties, appointments, wishlistC
                           </div>
                           <p className="text-white/35 text-[11px] font-mono">Listing ID: {p.id}</p>
                         </div>
-                        {/* Edit only for pending listings — approved ones are live */}
-                        {p.status === 'pending' && (
-                          <Link
-                            href={`/seller/property/${p.id}/edit`}
-                            className="text-sm font-medium text-turmeric-400 hover:text-turmeric-300 transition-colors shrink-0 border border-turmeric-400/30 px-3 py-1.5 rounded-lg hover:bg-turmeric-400/10"
-                          >
-                            Edit listing →
-                          </Link>
-                        )}
-                        {p.status === 'approved' && (
-                          <Link
-                            href={`/properties/${p.id}`}
-                            target="_blank"
-                            className="text-sm font-medium text-paddy-300 hover:text-paddy-200 transition-colors shrink-0 border border-paddy-400/30 px-3 py-1.5 rounded-lg hover:bg-paddy-400/10"
-                          >
-                            View live listing ↗
-                          </Link>
-                        )}
+                        <div className="flex flex-wrap items-center gap-2 shrink-0">
+                          {(p.status === 'pending' || p.status === 'approved') && (
+                            <Link
+                              href={`/seller/property/${p.id}/edit`}
+                              className="text-sm font-medium text-turmeric-400 hover:text-turmeric-300 transition-colors border border-turmeric-400/30 px-3 py-1.5 rounded-lg hover:bg-turmeric-400/10"
+                            >
+                              Edit photos & details →
+                            </Link>
+                          )}
+                          {p.status === 'approved' && (
+                            <Link
+                              href={`/properties/${p.id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm font-medium text-paddy-300 hover:text-paddy-200 transition-colors border border-paddy-400/30 px-3 py-1.5 rounded-lg hover:bg-paddy-400/10"
+                            >
+                              View live ↗
+                            </Link>
+                          )}
+                        </div>
                       </div>
 
                       {/* ── Quick metrics ── */}
@@ -216,12 +218,13 @@ export default function SellerClient({ user, properties, appointments, wishlistC
                           <p className="text-white/40 text-xs">Per acre</p>
                         </div>
                         <div className="bg-white/5 rounded-xl py-2 px-1">
-                          <p className="text-white font-semibold">{p.views ?? 0}</p>
-                          <p className="text-white/40 text-xs">Views</p>
+                          <p className="text-white font-semibold">{visitRequestCountById[p.id] ?? 0}</p>
+                          <p className="text-white/38 text-[11px] mt-0.5 leading-tight">👁 {p.views ?? 0} views</p>
+                          <p className="text-white/40 text-xs mt-0.5">Enquiries</p>
                         </div>
                         <div className="bg-white/5 rounded-xl py-2 px-1">
-                          <p className="text-red-300 font-semibold">{wishlistCountById[p.id] ?? 0}</p>
-                          <p className="text-white/40 text-xs">Interested</p>
+                          <p className="text-rose-200 font-semibold">{wishlistCountById[p.id] ?? 0}</p>
+                          <p className="text-white/40 text-xs mt-0.5">Shortlist</p>
                         </div>
                       </div>
 

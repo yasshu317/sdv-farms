@@ -7,6 +7,7 @@ import SellerPropertyForm from '../../../../../components/seller/SellerPropertyF
 import { mapSellerPropertyRowToForm } from '../../propertyFormConstants'
 
 const bg = 'linear-gradient(160deg, #071709 0%, #1a4520 60%, #286d2f 100%)'
+const EDITABLE_STATUSES = new Set(['pending', 'approved'])
 
 export default function EditSellerPropertyPage() {
   const { id } = useParams()
@@ -14,6 +15,7 @@ export default function EditSellerPropertyPage() {
   const [loading, setLoading] = useState(true)
   const [blocked, setBlocked] = useState(null)
   const [initialForm, setInitialForm] = useState(null)
+  const [listingStatus, setListingStatus] = useState(null)
 
   useEffect(() => {
     let cancelled = false
@@ -36,11 +38,16 @@ export default function EditSellerPropertyPage() {
         setLoading(false)
         return
       }
-      if (row.status !== 'pending') {
-        setBlocked('Only listings that are still pending review can be edited.')
+      if (!EDITABLE_STATUSES.has(row.status)) {
+        setBlocked(
+          row.status === 'sold'
+            ? 'Sold listings cannot be edited. Contact SDV Farms if you need a change.'
+            : 'This listing cannot be edited. Please contact SDV Farms for help.',
+        )
         setLoading(false)
         return
       }
+      setListingStatus(row.status)
       setInitialForm(mapSellerPropertyRowToForm(row))
       setLoading(false)
     }
@@ -56,11 +63,11 @@ export default function EditSellerPropertyPage() {
     )
   }
 
-  if (blocked) {
+  if (blocked || !initialForm) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4" style={{ background: bg }}>
         <div className="text-center max-w-md">
-          <p className="text-red-300 text-sm mb-4">{blocked}</p>
+          <p className="text-red-300 text-sm mb-4">{blocked ?? 'Unable to load listing.'}</p>
           <Link href="/seller" className="text-turmeric-400 hover:text-turmeric-300 text-sm font-medium">
             ← Back to My Listings
           </Link>
@@ -69,5 +76,5 @@ export default function EditSellerPropertyPage() {
     )
   }
 
-  return <SellerPropertyForm variant="edit" propertyId={id} initialForm={initialForm} />
+  return <SellerPropertyForm variant="edit" propertyId={id} initialForm={initialForm} listingStatus={listingStatus} />
 }

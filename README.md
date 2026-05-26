@@ -84,6 +84,16 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
+### Demo: 10 listings + “Interested” counts
+
+For local/staging demos, add **`SUPABASE_SERVICE_ROLE_KEY`** to `.env.local`, run `node scripts/seed-test-users.mjs`, then:
+
+```bash
+npm run seed:demo-listings
+```
+
+See **[docs/DEMO_INTEREST_UI.md](docs/DEMO_INTEREST_UI.md)** for seller ♥ totals vs buyer shortlist vs site-visit picker.
+
 ---
 
 ## Supabase Setup

@@ -16,11 +16,12 @@ import {
   INITIAL_FORM,
   urlsToInitialItems,
 } from '../../app/seller/property/propertyFormConstants'
+import { PROPERTY_PHOTO_GUIDANCE } from '../../lib/storageUploadPolicy'
 
 /**
- * @param {{ variant: 'create' | 'edit', propertyId?: string, initialForm?: object }} props
+ * @param {{ variant: 'create' | 'edit', propertyId?: string, initialForm?: object, listingStatus?: string }} props
  */
-export default function SellerPropertyForm({ variant, propertyId, initialForm }) {
+export default function SellerPropertyForm({ variant, propertyId, initialForm, listingStatus }) {
   const router = useRouter()
   const [step, setStep] = useState(0)
   const [form, setForm] = useState(() => initialForm || INITIAL_FORM)
@@ -110,7 +111,7 @@ export default function SellerPropertyForm({ variant, propertyId, initialForm })
         })
         .eq('id', propertyId)
         .eq('seller_id', user.id)
-        .eq('status', 'pending')
+        .in('status', ['pending', 'approved'])
         .select('id')
 
       setLoading(false)
@@ -119,7 +120,7 @@ export default function SellerPropertyForm({ variant, propertyId, initialForm })
         return
       }
       if (!data?.length) {
-        setError('This listing can no longer be edited — it may have been approved or removed.')
+        setError('This listing can no longer be edited — it may be sold, removed, or you no longer have access.')
         return
       }
       setSuccess(true)
@@ -173,8 +174,11 @@ export default function SellerPropertyForm({ variant, propertyId, initialForm })
 
   const isEdit = variant === 'edit'
   const title = isEdit ? 'Edit listing' : 'Post Your Property'
+  const isApprovedListing = listingStatus === 'approved'
   const subtitle = isEdit
-    ? 'Changes apply while your listing is pending review'
+    ? isApprovedListing
+      ? 'Update photos and details — your listing stays live (SDV may follow up on major changes)'
+      : 'Changes apply while your listing is pending review'
     : "Fill in the details and we'll review within 48 hours"
   const submitLabel = isEdit ? 'Save changes' : 'Submit for Review'
 
@@ -189,7 +193,9 @@ export default function SellerPropertyForm({ variant, propertyId, initialForm })
           <div className="mb-6 space-y-2">
             <p className="text-white/60">
               {isEdit
-                ? 'Your updated details have been saved. SDV Farms will review any changes.'
+                ? isApprovedListing
+                  ? 'Your listing is updated and remains visible to buyers.'
+                  : 'Your updated details have been saved. SDV Farms will review any changes.'
                 : 'Your property is under review by the SDV Farms team.'}
             </p>
             {!isEdit && (
@@ -475,7 +481,7 @@ export default function SellerPropertyForm({ variant, propertyId, initialForm })
                   accept="photos"
                   maxFiles={5}
                   label="Property Photos"
-                  hint="Photos of the land — up to 5 images"
+                  hint={PROPERTY_PHOTO_GUIDANCE}
                   initialItems={isEdit ? urlsToInitialItems(form.photo_urls, 'Photo') : undefined}
                   onUpload={urls => setForm(f => ({ ...f, photo_urls: urls }))}
                 />

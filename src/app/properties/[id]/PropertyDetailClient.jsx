@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import SiteHeader from '../../../components/SiteHeader'
 import { createClient } from '../../../lib/supabase'
 import StatusBadge from '../../../components/ui/StatusBadge'
@@ -11,10 +11,13 @@ import { useLang } from '../../../context/LanguageContext'
 import { content } from '../../../data/content'
 import { deriveVerificationSignals } from '../../../lib/propertyVerification'
 import { INTEREST_SHORTLIST_MAX } from '../../../lib/interestShortlist'
+import { queuePendingShortlistId } from '../../../lib/pendingShortlist'
+import { safeInternalNextPath } from '../../../lib/authRedirects'
 
 export default function PropertyDetailClient({ property: p, user, initialWishlisted }) {
   const router       = useRouter()
   const searchParams = useSearchParams()
+  const pathname = usePathname()
   const { lang } = useLang()
   const nav = content[lang].nav
   const cta = content[lang].cta
@@ -25,7 +28,7 @@ export default function PropertyDetailClient({ property: p, user, initialWishlis
   const [showPicker, setShowPicker]           = useState(false)
   const [activePhoto, setActivePhoto]         = useState(0)
 
-  // Auto-open the booking picker when ?book=1 is in the URL (e.g. from Interested on listing card)
+  // Auto-open the booking picker when ?book=1 is in the URL (e.g. from Book visit on listing card)
   useEffect(() => {
     if (searchParams.get('book') === '1' && user && !showPicker) {
       setShowPicker(true)
@@ -43,7 +46,14 @@ export default function PropertyDetailClient({ property: p, user, initialWishlis
   const isOwner     = user && p.seller_id === user.id
 
   async function handleWishlist() {
-    if (!user) { router.push('/auth/login'); return }
+    if (!user) {
+      if (!wishlisted) queuePendingShortlistId(p.id)
+      const q = searchParams.toString()
+      const raw = q ? `${pathname}?${q}` : pathname || `/properties/${p.id}`
+      const next = safeInternalNextPath(raw) ?? `/properties/${p.id}`
+      router.push(`/auth/login?next=${encodeURIComponent(next)}`)
+      return
+    }
     if (isOwner) return
     setWishlistLoading(true)
     const supabase = createClient()
@@ -159,7 +169,6 @@ export default function PropertyDetailClient({ property: p, user, initialWishlis
                   { label: 'Land Type',   value: p.land_used_type || '—' },
                   { label: 'Road Access', value: p.road_access ? 'Yes' : 'No' },
                   { label: 'Doc Type',    value: p.land_doc_type || '—' },
-                  { label: 'Views',       value: p.views || 0 },
                 ].map(item => (
                   <div key={item.label} className="bg-white/5 rounded-xl p-3">
                     <p className="text-white/40 text-xs mb-0.5">{item.label}</p>

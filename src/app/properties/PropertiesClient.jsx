@@ -2,7 +2,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import SiteHeader from '../../components/SiteHeader'
 import FilterPanel from '../../components/ui/FilterPanel'
 import { createClient } from '../../lib/supabase'
@@ -11,12 +11,14 @@ import { REGISTER_LIST_LAND } from '../../lib/routes'
 import { INTEREST_SHORTLIST_MAX } from '../../lib/interestShortlist'
 import { useLang } from '../../context/LanguageContext'
 import { content } from '../../data/content'
+import { queuePendingShortlistId } from '../../lib/pendingShortlist'
+import { safeInternalNextPath } from '../../lib/authRedirects'
 
 const SOIL_TYPES  = ['Black', 'Red', 'Sandy', 'Mixed']
 const LAND_TYPES  = ['Agriculture', 'Estate Agriculture', 'Industrial', 'Commercial', 'Residential']
 const ALL_STATES  = Object.keys(locations)
 
-function PropertyCard({ p, user, isWishlisted, onToggleWishlist, wishlistLoading, interestedLabel, shortlistAddLabel, shortlistAddedLabel }) {
+function PropertyCard({ p, user, isWishlisted, onToggleWishlist, wishlistLoading, loginNextHref, visitCtaLabel, shortlistAddLabel, shortlistAddedLabel }) {
   const router     = useRouter()
   const photo      = p.photo_urls?.[0]
   const totalPrice = (p.area_acres * p.expected_price).toLocaleString('en-IN')
@@ -26,7 +28,11 @@ function PropertyCard({ p, user, isWishlisted, onToggleWishlist, wishlistLoading
 
   function handleWishlist(e) {
     e.preventDefault()
-    if (!user) { router.push('/auth/login'); return }
+    if (!user) {
+      if (!isWishlisted) queuePendingShortlistId(p.id)
+      router.push(`/auth/login?next=${encodeURIComponent(loginNextHref)}`)
+      return
+    }
     if (isOwner) return
     onToggleWishlist(p.id, isWishlisted)
   }
@@ -55,11 +61,6 @@ function PropertyCard({ p, user, isWishlisted, onToggleWishlist, wishlistLoading
               <span className="bg-paddy-700/80 text-white text-xs px-2 py-0.5 rounded-lg">🛣️ Road</span>
             )}
           </div>
-          {p.views > 0 && (
-            <div className="absolute bottom-2 right-2 bg-black/50 text-white/70 text-xs px-2 py-0.5 rounded-lg flex items-center gap-1">
-              <span>👁</span> {p.views}
-            </div>
-          )}
         </div>
         <div className="p-4">
           <p className="text-white font-semibold text-sm mb-0.5">
@@ -80,7 +81,7 @@ function PropertyCard({ p, user, isWishlisted, onToggleWishlist, wishlistLoading
           href={`${detailHref}?book=1`}
           className="flex-1 flex items-center justify-center gap-1.5 bg-turmeric-500 hover:bg-turmeric-600 active:scale-95 text-white text-xs font-semibold py-2 rounded-xl transition-all"
         >
-          ✨ {interestedLabel}
+          ✨ {visitCtaLabel}
         </Link>
         {!isOwner && (
           <button
@@ -113,6 +114,13 @@ export default function PropertiesClient({ properties, user = null, wishlistIds:
   const { lang } = useLang()
   const nav = content[lang].nav
   const ctaLabels = content[lang].cta
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const loginNextHref = useMemo(() => {
+    const q = searchParams.toString()
+    const raw = q ? `${pathname}?${q}` : pathname || '/properties'
+    return safeInternalNextPath(raw) ?? '/properties'
+  }, [pathname, searchParams])
   const [filterValues, setFilterValues] = useState({
     state: '', district: '', mandal: '', soil: [], land_type: '', acres: {}, price: {},
   })
@@ -319,7 +327,8 @@ export default function PropertiesClient({ properties, user = null, wishlistIds:
                       isWishlisted={wishlistIds.has(p.id)}
                       onToggleWishlist={handleToggleWishlist}
                       wishlistLoading={wishlistLoading}
-                      interestedLabel={ctaLabels.interested}
+                      loginNextHref={loginNextHref}
+                      visitCtaLabel={ctaLabels.interested}
                       shortlistAddLabel={ctaLabels.shortlistAddTo}
                       shortlistAddedLabel={ctaLabels.shortlistAdded}
                     />
