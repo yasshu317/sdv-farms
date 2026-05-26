@@ -58,7 +58,9 @@ function PropertyCard({ p, user, isWishlisted, onToggleWishlist, wishlistLoading
           </div>
           <div className="absolute top-2 right-2 flex gap-1.5">
             {p.road_access && (
-              <span className="bg-paddy-700/80 text-white text-xs px-2 py-0.5 rounded-lg">🛣️ Road</span>
+              <span className="bg-paddy-800/85 border border-white/10 text-white/85 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md">
+                Road
+              </span>
             )}
           </div>
         </div>
@@ -79,31 +81,30 @@ function PropertyCard({ p, user, isWishlisted, onToggleWishlist, wishlistLoading
       <div className="flex gap-2 px-4 pb-4">
         <Link
           href={`${detailHref}?book=1`}
-          className="flex-1 flex items-center justify-center gap-1.5 bg-turmeric-500 hover:bg-turmeric-600 active:scale-95 text-white text-xs font-semibold py-2 rounded-xl transition-all"
+          className="flex-1 flex items-center justify-center bg-turmeric-500 hover:bg-turmeric-600 active:scale-[0.98] text-white text-xs font-semibold py-2.5 rounded-xl transition-all border border-turmeric-400/40 shadow-[0_1px_0_0_rgba(0,0,0,0.25)]"
         >
-          ✨ {visitCtaLabel}
+          {visitCtaLabel}
         </Link>
         {!isOwner && (
           <button
             onClick={handleWishlist}
             disabled={wishlistLoading}
             title={isWishlisted ? shortlistAddedLabel : shortlistAddLabel}
-            className={`px-3 rounded-xl border text-xs font-semibold transition-all disabled:opacity-50 max-sm:px-2.5 ${
+            className={`min-w-[5.75rem] sm:min-w-0 shrink-0 px-3 rounded-xl border text-xs font-semibold transition-all disabled:opacity-50 ${
               isWishlisted
-                ? 'bg-paddy-500/20 border-paddy-400/40 text-paddy-300'
-                : 'bg-white/8 hover:bg-white/15 border-white/15 text-white/70'
+                ? 'bg-paddy-900/60 border-paddy-500/35 text-paddy-200'
+                : 'bg-white/[0.06] hover:bg-white/12 border-white/14 text-white/80'
             }`}
           >
-            <span className="sm:hidden" aria-hidden>{isWishlisted ? '♥' : '♡'}</span>
-            <span className="hidden sm:inline">{isWishlisted ? `♥ ${shortlistAddedLabel}` : `♡ ${shortlistAddLabel}`}</span>
+            {isWishlisted ? shortlistAddedLabel : shortlistAddLabel}
           </button>
         )}
         <a
           href={whatsapp}
           target="_blank" rel="noopener noreferrer"
-          className="flex-1 flex items-center justify-center gap-1.5 bg-white/8 hover:bg-white/15 border border-white/15 text-white text-xs font-semibold py-2 rounded-xl transition-all"
+          className="flex-1 flex items-center justify-center bg-white/[0.06] hover:bg-white/12 border border-white/14 text-white/90 text-xs font-semibold py-2.5 rounded-xl transition-all"
         >
-          💬 Enquire
+          Enquire
         </a>
       </div>
     </div>
@@ -231,12 +232,12 @@ export default function PropertiesClient({ properties, user = null, wishlistIds:
           <p className="text-white/50 text-sm mb-5">
             Browse verified listings across Telangana, Andhra Pradesh & Karnataka
           </p>
-          <div className="flex items-center justify-center gap-4 text-xs text-white/40">
-            <span>✅ Clear title</span>
-            <span>·</span>
-            <span>📋 Documents verified</span>
-            <span>·</span>
-            <span>✨ {ctaLabels.interestedShort}</span>
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-white/45">
+            <span className="text-white/55">Clear title</span>
+            <span className="text-white/25" aria-hidden>·</span>
+            <span className="text-white/55">Documents verified</span>
+            <span className="text-white/25" aria-hidden>·</span>
+            <span className="text-white/55">{ctaLabels.interestedShort}</span>
           </div>
 
           {/* Mobile filter toggle */}

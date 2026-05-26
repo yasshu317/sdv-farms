@@ -122,7 +122,7 @@ export default function BusinessFlowsPage() {
               </>,
               <>
                 <strong>Buyer</strong> — <Path>/dashboard</Path> tracks enquiries, plot interests, and land requests.
-                On <Path>/properties</Path> buyers can save (♥) listings; saved count is visible to the seller.
+                On <Path>/properties</Path> buyers use <strong>Book visit</strong>, <strong>shortlist</strong> (saved listings), and <strong>Enquire</strong> (WhatsApp); saved count is visible to the seller.
               </>,
               <>
                 <strong>Seller</strong> — <Path>/seller</Path> manages up to <strong>two</strong> active listings;
@@ -148,10 +148,20 @@ export default function BusinessFlowsPage() {
           <BulletList
             items={[
               'Marketing story: approvals, phases, gallery, maps / contact anchors.',
+              <>
+                Below the hero, a public <strong>stats strip</strong> (five KPIs + optional enquiry chip) pulls from{' '}
+                <Path>/api/platform-stats</Path> (<code className="text-turmeric-400">public.public_marketing_stats()</code>). Styling follows the dark paddy + turmeric homepage palette; toggle{' '}
+                <code className="text-turmeric-400">home_stats_bar</code> via Feature Flags when needed.
+              </>,
               'Sample Documents section: Sale Deed, Lease Agreement, Pahani guide, Registration process — available in English and Telugu with a WhatsApp CTA.',
               'Primary CTAs: browse listings (scroll + nav), Book a visit, Sign in.',
               '"List your land" in the navbar routes sellers into the seller registration shortcut.',
               'Assistant / chat launcher (if enabled) surfaces scripted FAQ links.',
+              <>
+                <strong>Signed-in visitors</strong> hitting <Path>/</Path> are redirected to their <strong>role hub</strong> (
+                <Path>/dashboard</Path>, <Path>/seller</Path>, or <Path>/admin</Path>). Use <Path>/?stay=1</Path> (
+                <code className="text-turmeric-400">browse=1</code> also accepted) to view the full marketing homepage while logged in.
+              </>,
             ]}
           />
 
@@ -159,7 +169,12 @@ export default function BusinessFlowsPage() {
           <BulletList
             items={[
               'Filter by state, then cascade to district and mandal; also soil type, land type, acreage bands, optional price ceiling.',
-              'Each card has Interested (visit picker), Enquire (WhatsApp), and a ♥ shortlist button — saves the listing on the buyer’s land shortlist (up to 8; prompts sign-in if logged out).',
+              <>
+                Each card: <strong>Book visit</strong> (opens listing with booking affordance), <strong>shortlist</strong>{' '}
+                (saved on the buyer&apos;s land shortlist, up to 8; prompts sign-in when logged out; pre-login queue persists where implemented),{' '}
+                and <strong>Enquire</strong> (opens WhatsApp with listing context). Copy is label-led (no emoji icons).
+              </>,
+              'Road-access listings show a small “Road” chip on the card image.',
               'Empty state prompts sellers to list land if inventory is thin.',
             ]}
           />
@@ -171,7 +186,7 @@ export default function BusinessFlowsPage() {
               'Buyers/guests can trigger enquiry / WhatsApp CTAs depending on wiring.',
               'Signed-in sellers may see edit links reserved for admins on some shells — default buyer path stays read/browse.',
               'Site visits: appointment/booking UX when surfaced on page. If no suitable slot is found, a “Notify Me” fallback lets the buyer submit their email; ops is alerted to contact within 48 hours.',
-              'Shortlist button (♥) on detail page; buyers can save up to 8 listings and manage them under Dashboard → Land shortlist.',
+              'Shortlist controls on detail page mirror the browse grid — text labels (“Add to shortlist” / “On shortlist”); buyers can save up to 8 listings and manage them under Dashboard → Land shortlist.',
             ]}
           />
 
@@ -190,6 +205,11 @@ export default function BusinessFlowsPage() {
               'Marketing copy for Phase II land-owner services: fencing, borewell, drip irrigation, agronomy packs, saplings, and <strong>Fertilizers &amp; Nutrition</strong> (6 services total).',
               'Per-service enquiry/booking dialogs send records to `/api/service-booking` (ops triages inside admin Services tab).',
               'Phase III “notify me” capture for roadmap interest.',
+              <>
+                <strong>Signed-in buyers</strong> (role other than seller / admin / staff) who open{' '}
+                <Path>/services</Path> are redirected to{' '}
+                <Path>/dashboard?services=1</Path> — the dashboard scrolls to the embedded Phase II services panel (same bookings, prefilled profile where available). Sellers, admins, staff, and anonymous visitors still see the public <Path>/services</Path> page.
+              </>,
             ]}
           />
 
@@ -454,8 +474,16 @@ export default function BusinessFlowsPage() {
             </li>
           </ul>
           <p className="text-sm">
-            Mirrors <code className="text-turmeric-400">homePathForRole</code> in auth callback. Sellers see both
-            "My Listings" and "Browse &amp; Buy" links in the nav; a contextual banner on <Path>/dashboard</Path>
+            Mirrors <code className="text-turmeric-400">homePathForRole</code> in login and auth callback (<code className="text-turmeric-400">safeInternalNextPath</code>{' '}
+            wins when <Path>?next=</Path> is set).
+          </p>
+          <p className="text-sm">
+            <strong>Marketing home vs hub:</strong> visiting <Path>/</Path> while signed in sends users to their hub unless they use{' '}
+            <Path>/?stay=1</Path> (or <code className="text-turmeric-400">browse=1</code>). Navbar / SiteHeader brand links point to the role hub when a session exists so “home” for signed-in users is operational, not the brochure page.
+          </p>
+          <p className="text-sm">
+            Sellers see both
+            &quot;My Listings&quot; and &quot;Browse &amp; Buy&quot; links in the nav; a contextual banner on <Path>/dashboard</Path>
             confirms they are in buyer mode and links back to their listings.
           </p>
         </FlowSection>
@@ -465,6 +493,20 @@ export default function BusinessFlowsPage() {
           <BulletList
             items={[
               <>
+                <strong>IA — hubs &amp; marketing home</strong> — Signed-in visits to <Path>/</Path> redirect to{' '}
+                <Path>/dashboard</Path>, <Path>/seller</Path>, or <Path>/admin</Path> per role unless <Path>/?stay=1</Path>. Brand links in Navbar / SiteHeader target the hub when logged in.
+              </>,
+              <>
+                <strong>Buyer services path</strong> — Signed-in buyers navigating to <Path>/services</Path> redirect to{' '}
+                <Path>/dashboard?services=1</Path> for the embedded Phase II panel; anon, sellers, admin, staff still use public <Path>/services</Path>.
+              </>,
+              <>
+                <strong>Home KPI strip — product styling</strong> — Stats bar uses deep paddy + turmeric accents aligned with homepage / listings (not neutral gray slab); enquiries footnote readable at turmeric tone.
+              </>,
+              <>
+                <strong>Listing grid &amp; PDP CTAs — text-led</strong> — Book visit / shortlist / Enquire use label typography and borders consistent with theme (no sparkle or heart glyphs in buttons).
+              </>,
+              <>
                 <strong>Sample Documents section</strong> — new homepage section between Contact and Location with 4 reference
                 document cards (Sale Deed, Lease Agreement, Pahani/Adangal guide, Registration process); EN + Telugu.
               </>,
@@ -473,8 +515,8 @@ export default function BusinessFlowsPage() {
                 Selecting a state reveals its districts; selecting a district reveals its mandals.
               </>,
               <>
-                <strong>Wishlist on listing cards</strong> — property cards on <Path>/properties</Path> have a ♥/♡ Save button.
-                Buyers can save up to 8 listings on their land shortlist. Saving prompts login when anonymous.
+                <strong>Wishlist on listing cards</strong> — property cards on <Path>/properties</Path> have{' '}
+                <strong>Add to shortlist</strong> / <strong>On shortlist</strong> actions (plus Book visit &amp; Enquire). Buyers can save up to 8 listings for the land shortlist. Saving prompts login when anonymous (with optional pre-login queue).
               </>,
               <>
                 <strong>Seller “Interested” count</strong> — seller dashboard shows per-listing and total Interested
@@ -537,7 +579,7 @@ export default function BusinessFlowsPage() {
               — always freshest.
             </li>
             <li>
-              <strong>Portable HTML snapshot:</strong> <Path>/business-user-flows.html</Path>
+              <strong>Portable HTML snapshot:</strong> <Path>/business-user-flows.html</Path> — regenerate when flows change (save from live <Path>/business/flows</Path> when copy is stable).
             </li>
           </ul>
         </section>

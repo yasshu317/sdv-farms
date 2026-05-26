@@ -79,24 +79,29 @@ export default function HomeStatsBar() {
   return (
     <section
       id="marketing-stats"
-      className="border-y border-white/12 bg-black/35 backdrop-blur-md"
+      className="relative border-y border-white/10 border-t-turmeric-500/25 bg-gradient-to-b from-[#0a2812]/92 via-[#0e3518]/88 to-[#071709]/95 backdrop-blur-md shadow-[inset_0_1px_0_0_rgba(234,179,8,0.1)]"
       role="region"
       aria-label={lang === 'en' ? 'SDV Farms public statistics' : 'SDV ఫామ్స్ ప్రజా గణాంకాలు'}
     >
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-5 py-4 sm:py-6 px-4 sm:px-6 items-stretch max-w-6xl mx-auto">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.06]"
+        style={{ backgroundImage: 'radial-gradient(circle at 40% 0%, rgb(217 119 6) 0, transparent 55%)' }}
+      />
+      <div className="relative grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-5 py-5 sm:py-7 px-4 sm:px-6 items-stretch max-w-6xl mx-auto">
         {items.map(({ label, value, hint }) => (
           <div key={label} className="flex flex-col items-center justify-center text-center min-w-0 gap-1">
             <p
-              className={`font-medium leading-tight text-[11px] sm:text-xs text-white/80 ${lang === 'te' ? 'telugu' : ''}`}
+              className={`font-medium leading-tight text-[11px] sm:text-xs text-white/70 ${lang === 'te' ? 'telugu' : ''}`}
             >
               {label}
             </p>
-            <p className={`font-display font-bold tabular-nums text-xl sm:text-2xl md:text-[1.65rem] text-white`}>
+            <p className={`font-display font-bold tabular-nums text-xl sm:text-2xl md:text-[1.65rem] text-turmeric-200`}>
               {formatCount(value, lang)}
             </p>
             {hint ? (
               <p
-                className={`text-[10px] sm:text-[11px] text-white/40 max-w-[9.5rem] leading-snug ${lang === 'te' ? 'telugu' : ''}`}
+                className={`text-[10px] sm:text-[11px] text-white/48 max-w-[9.5rem] leading-snug ${lang === 'te' ? 'telugu' : ''}`}
               >
                 {hint}
               </p>
@@ -106,7 +111,7 @@ export default function HomeStatsBar() {
       </div>
       {Number.isFinite(enquiryTotal) && enquiryTotal > 0 && (
         <p
-          className={`text-center text-[10px] sm:text-[11px] text-white/35 pb-3 sm:pb-4 px-3 ${lang === 'te' ? 'telugu' : ''}`}
+          className={`relative text-center text-[11px] sm:text-xs text-turmeric-300/90 font-medium pb-4 sm:pb-5 px-3 ${lang === 'te' ? 'telugu' : ''}`}
         >
           + {formatCount(enquiryTotal, lang)} {t.homeStripEnquiriesChip}
           {typeof data.source === 'string' ? (

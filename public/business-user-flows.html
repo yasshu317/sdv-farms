@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SDV Farms — Who uses the site &amp; how (user flows)</title>
-  <meta name="description" content="Visitor, buyer, seller, admin and staff journeys for SDV Farms." />
+  <title>SDV Farms — Business flows (portable snapshot)</title>
+  <meta name="description" content="Visitor, buyer, seller, admin and staff journeys; mirrors /business/flows when regenerated." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
@@ -60,6 +60,8 @@
     code, .path { font-family: ui-monospace, monospace; font-size: 0.85em; background: rgba(7,23,9,0.75); color: #fde68a; padding: 0.15rem 0.4rem; border-radius: 6px; }
     .muted { color: var(--muted); font-size: 0.9rem; }
     .foot { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--line); font-size: 0.8rem; color: var(--muted); text-align: center; }
+    section p { margin: 0.65rem 0; }
+    section > ol, section > ul { margin: 0.75rem 0 0; }
     header.top { border-bottom: 1px solid var(--line); padding: 1rem 1.25rem; background: rgba(14, 44, 19, 0.85); }
     header.top .inner { max-width: 42rem; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.75rem; align-items: center; }
     header.top a { color: var(--gold); text-decoration: none; font-size: 0.875rem; font-weight: 600; }
@@ -80,15 +82,16 @@
     </div>
   </header>
   <div class="wrap">
-    <p class="eyebrow">Product guide</p>
-    <h1 id="top">How people use this website</h1>
+    <p class="eyebrow">Product guide · portable snapshot</p>
+    <h1 id="top">Business flows — how people use the site</h1>
     <p class="lede">
-      <strong>Visitors</strong>, <strong>buyers</strong>, <strong>sellers</strong>, and <strong>admin / staff</strong> each follow a clear path.
-      The canonical <strong>detailed</strong> guide is the live page <span class="path">/business/flows</span> (bookmark on your domain). This HTML is a portable excerpt for email — always open it from the deployed site root so fonts load.
+      <strong>Canonical source:</strong> the live Next.js guide at <span class="path">/business/flows</span> on your deployed domain (always freshest).
+      This file is a <strong>self-contained HTML excerpt</strong> for email / offline sharing — fonts load from Google; no reliance on hashed <span class="path">/_next</span> assets.
     </p>
 
     <nav class="toc" aria-label="On this page">
       <p>Jump to</p>
+      <a href="#summary">At a glance</a>
       <a href="#visitors">Visitors</a>
       <a href="#buyers">Buyers</a>
       <a href="#sellers">Sellers</a>
@@ -98,16 +101,39 @@
       <a href="#changelog">Recent changes</a>
     </nav>
 
+    <section id="summary">
+      <h2>At a glance</h2>
+      <ul class="muted" style="list-style: disc; padding-left: 1.35rem;">
+        <li><strong>Visitor</strong> — brochure home + KPI strip, browse, PDP, land request, public services marketing, login/register.</li>
+        <li><strong>Buyer</strong> — <span class="path">/dashboard</span>; on <span class="path">/properties</span> uses <strong>Book visit</strong>, <strong>shortlist</strong> (wishlist), and <strong>Enquire</strong> (WhatsApp). Saved listings surface to sellers as Interested counts.</li>
+        <li><strong>Seller</strong> — <span class="path">/seller</span> (max two active listings); may also use <span class="path">/dashboard</span> as a buyer.</li>
+        <li><strong>Admin / staff</strong> — <span class="path">/admin</span> ops hub (staff: no Users tab).</li>
+      </ul>
+    </section>
+
     <section id="visitors">
       <h2>Visitors <span class="badge">No account</span></h2>
       <p>No login required unless the user wants dashboards or seller tools.</p>
       <ol>
-        <li><span class="path">/</span> — storytelling, gallery, map/contact anchors, language toggle, seller CTA. Includes <strong>Sample Documents</strong> section (Sale Deed, Lease Agreement, Pahani guide, Registration) in EN &amp; Telugu.</li>
-        <li><span class="path">/properties</span> — cascade filters: State &rarr; District &rarr; Mandal, plus soil type, land type, acres, price. Property cards have a ♥ Save button (adds to buyer wishlist, max&nbsp;2).</li>
-        <li><span class="path">/properties/[id]</span> — PDP, media, book visit / enquire / save widgets. If no appointment slot suits, buyer can submit "Notify Me" (ops contacts within 48&nbsp;hrs).</li>
-        <li><span class="path">/buyer-request</span> — capture requirements; works guest or signed-in.</li>
-        <li><span class="path">/services</span> — Phase II service marketing + booking forms. <strong>6 services</strong>: fencing, borewell, drip, farming plan, plants, Fertilizers &amp; Nutrition.</li>
-        <li><span class="path">/auth/*</span> — registration with buyer/seller split or seller shortcut <span class="path">?flow=seller</span>.</li>
+        <li>
+          <span class="path">/</span> — storytelling, hero, <strong>KPI strip</strong> below hero (five public metrics + optional enquiry chip from <span class="path">/api/platform-stats</span>; paddy + turmeric styling).
+          Includes <strong>Sample Documents</strong> (Sale Deed, Lease, Pahani guide, Registration) in EN &amp; Telugu.
+          <strong>Signed-in users</strong> are redirected to their role hub (<span class="path">/dashboard</span>, <span class="path">/seller</span>, or <span class="path">/admin</span>). Open <span class="path">/?stay=1</span> (or <code>?browse=1</code>) to see the full marketing homepage while logged in.
+        </li>
+        <li>
+          <span class="path">/properties</span> — filters: State &rarr; District &rarr; Mandal, soil, land type, acres, price.
+          Cards: <strong>Book visit</strong> → listing with booking; <strong>Add to shortlist</strong> / <strong>On shortlist</strong> (wishlist, max&nbsp;<strong>8</strong>; login prompt if anonymous);
+          <strong>Enquire</strong> opens WhatsApp with listing context — copy-led CTAs (no emoji icons).
+          Optional <strong>Road</strong> chip when road access is set.
+        </li>
+        <li><span class="path">/properties/[id]</span> — PDP; booking, shortlist, WhatsApp helpers. Appointment “Notify Me” if no suitable slot.</li>
+        <li><span class="path">/buyer-request</span> — structured requirements; guest or signed-in.</li>
+        <li>
+          <span class="path">/services</span> — Phase II marketing + booking dialogs (<strong>6 services</strong>).
+          <strong>Signed-in buyers</strong> (not seller/admin/staff) are redirected to <span class="path">/dashboard?services=1</span> (embedded services panel).
+          Anonymous and other roles stay on public <span class="path">/services</span>.
+        </li>
+        <li><span class="path">/auth/*</span> — register (buyer/seller) or <span class="path">?flow=seller</span> shortcut; callback honours <span class="path">homePathForRole</span> and optional <span class="path">?next=</span>.</li>
       </ol>
     </section>
 
@@ -170,18 +196,26 @@
     <section id="routing">
       <h2>After login — default home</h2>
       <ul class="muted" style="list-style: disc; padding-left: 1.3rem;">
-        <li><strong>Buyer</strong> (default) → <span class="path">/dashboard</span></li>
-        <li><strong>Seller</strong> → <span class="path">/seller</span> <em>(may also navigate to <span class="path">/dashboard</span> for buyer features — not blocked)</em></li>
+        <li><strong>Buyer</strong> (default role) → <span class="path">/dashboard</span></li>
+        <li><strong>Seller</strong> → <span class="path">/seller</span> <em>(may also open <span class="path">/dashboard</span> for buyer flows)</em></li>
         <li><strong>Admin / staff</strong> → <span class="path">/admin</span></li>
       </ul>
+      <p class="muted" style="margin-top:0.75rem;">
+        Mirrors <code>homePathForRole</code> on login + OAuth callback; <span class="path">?next=</span> wins when it is a safe internal path.
+        Navbar / header brand links go to the <strong>hub</strong> when a session exists (not the brochure <span class="path">/</span>).
+      </p>
     </section>
 
     <section id="changelog" style="margin-top:2.5rem">
-      <h2>Recent changes <span class="badge">Phase 11–14</span></h2>
+      <h2>Recent changes <span class="badge">Feb&nbsp;2026 + Phase 11–14</span></h2>
       <ol>
+        <li><strong>Hub routing &amp; marketing home</strong> — visiting <span class="path">/</span> signed-in redirects to the role hub unless <span class="path">/?stay=1</span>. Logo links target the hub when logged in.</li>
+        <li><strong>Buyer services shortcut</strong> — signed-in buyers opening <span class="path">/services</span> redirect to <span class="path">/dashboard?services=1</span>.</li>
+        <li><strong>Home KPI strip visuals</strong> — stats bar matches paddy + turmeric homepage theme.</li>
+        <li><strong>Listing grid &amp; PDP CTAs</strong> — text-led Book visit / shortlist / Enquire styling (aligned with theme).</li>
         <li><strong>Sample Documents section</strong> — new homepage section with Sale Deed, Lease Agreement, Pahani guide &amp; Registration process; EN + Telugu.</li>
         <li><strong>District &amp; Mandal cascade filters</strong> — Browse Properties: State &rarr; District &rarr; Mandal.</li>
-        <li><strong>Land shortlist on listing cards</strong> — ♥ shortlist button on property cards; buyers can save up to 8 listings (prompts login if anonymous). Manage from Dashboard → Land shortlist.</li>
+        <li><strong>Land shortlist on listing cards</strong> — Book visit / Add to shortlist / Enquire on property cards (max 8; login prompt if anonymous). Manage from Dashboard → Land shortlist.</li>
         <li><strong>Seller "Interested" count</strong> — per-listing + total count in seller dashboard from <code>buyer_wishlist</code>.</li>
         <li><strong>Relation to Owner &amp; Sale Intent</strong> — SellerPropertyForm Step 0 adds "Relation to Owner" (Self/Wife/Son etc.); Step 1 adds "Sale Intent" toggle.</li>
         <li><strong>Appointment "Notify Me"</strong> — fallback in AppointmentPicker: buyer submits email, ops alerted to contact within 48 hrs.</li>

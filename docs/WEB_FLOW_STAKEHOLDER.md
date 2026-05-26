@@ -16,6 +16,19 @@ Sold listings and enquiry totals need the SECURITY DEFINER function `public.publ
 
 Staff can flag **documents verified** and **physical / site verification** from **Admin → Properties → All details** or when editing **`/admin/property/[id]/edit`** (Documents step). Home “Clear” uses `seller_properties.doc_verified`; PDP physical badge reads `metadata.verification.physical`.
 
+## Shipped UX — hubs, services routing, KPI strip visuals
+
+Keep this aligned with **`/business/flows`** (`src/app/business/flows/page.jsx`) when behaviour changes.
+
+| Area | Current behaviour |
+|------|-------------------|
+| **`/` while signed in** | Redirect to **`/dashboard`**, **`/seller`**, or **`/admin`** per `homePathForRole` (see **`src/app/page.jsx`**). To see the **full marketing homepage** including stats strip anchors: **`/?stay=1`** or **`?browse=1`**. Navbar / SiteHeader logo points at the hub when a session exists. |
+| **`/services`** | **Buyer** (not seller / admin / staff) → redirect **`/dashboard?services=1`** (embedded Phase II panel + scroll). Everyone else sees public **`/services`**. (**`src/app/services/page.jsx`**) |
+| **Home KPI strip** | **`HomeStatsBar.jsx`** uses a **deep paddy + turmeric** treatment (consistent with homepage / listings), not a neutral gray slab; optional enquiry line stays secondary but readable. |
+| **Listing cards & PDP CTAs** | **Book visit**, **shortlist** labels, **Enquire** (WhatsApp): **copy-led buttons** — no sparkle/heart glyphs in chrome ( **`PropertiesClient.jsx`**, **`PropertyDetailClient.jsx`** ). |
+
+**Supabase:** sellers reading appointments on owned listings requires **`phase15_seller_select_listing_appointments.sql`** (`supabase/migrations/`).
+
 ---
 
 ## Pending checklist — stakeholder phase 1 (close the loop)
@@ -28,7 +41,7 @@ Use this block to ship what we already built; merge PRs **after** confirming CI 
 | 2 | **Supabase migration `phase14_public_marketing_stats`** | In Supabase SQL editor or CLI: run [`supabase/migrations/phase14_public_marketing_stats.sql`](../supabase/migrations/phase14_public_marketing_stats.sql) on **Stage** → verify `select * from public.public_marketing_stats();` → repeat on **Prod** after smoke test. |
 | 3 | **Verify homepage KPI strip in prod** | After (2): hit `/api/platform-stats` (or load home) and confirm sold / enquiry numbers look right vs admin reality. If wrong, check RLS and that RPC exists. |
 | 4 | **Stakeholder Word doc in repo (optional)** | If everyone should share one file version: `git add SDV_Farms_Web_Flow_Document.docx` → commit on a small PR (watch binary size / LFS). If not: keep local only and update this doc’s link when the file moves. |
-| 5 | **Post-merge smoke test** | Logged-out home → `/properties` → PDP → Interested flow; buyer login → Dashboard → Land shortlist tab; admin → listing edit → Documents / verification flags. |
+| 5 | **Post-merge smoke test** | **Anonymous:** home KPI strip → `/properties` → PDP (**Book visit** / shortlist / **Enquire**). **Buyer signed in:** `/` redirects to **`/dashboard`** (use **`/?stay=1`** to re-check brochure home); **`/services`** redirects to **`/dashboard?services=1`**; Dashboard → Land shortlist. **Admin:** listing edit → Documents / verification flags. |
 
 ---
 
