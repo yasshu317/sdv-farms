@@ -7,7 +7,6 @@ import { Menu, X, User, LogOut, LayoutDashboard } from 'lucide-react'
 import { useLang } from '../context/LanguageContext'
 import { content } from '../data/content'
 import { createClient } from '../lib/supabase'
-import { REGISTER_LIST_LAND } from '../lib/routes'
 import { homePathForRole } from '../lib/authRedirects'
 import { isAdminOrStaff } from '../lib/roles'
 import { NAV_SCROLL_OFFSET } from '../lib/nav-scroll'
@@ -115,7 +114,7 @@ export default function Navbar() {
               {t.landRequest}
             </NextLink>
             <NextLink
-              href={REGISTER_LIST_LAND}
+              href="/list-your-land"
               className={`shrink-0 whitespace-nowrap leading-none text-sm font-medium transition-colors hover:text-turmeric-500 ${
                 scrolled ? 'text-paddy-900' : 'text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]'
               } ${telugu ? 'telugu text-xs' : ''}`}
@@ -292,7 +291,7 @@ export default function Navbar() {
             {t.landRequest}
           </NextLink>
           <NextLink
-            href={REGISTER_LIST_LAND}
+            href="/list-your-land"
             onClick={() => setOpen(false)}
             className={`block py-3 text-paddy-800 font-medium border-b border-gray-50 hover:text-turmeric-600 transition-colors ${telugu ? 'telugu' : ''}`}
           >

@@ -10,10 +10,10 @@ export const PROPERTY_PHOTO_GUIDANCE =
 export function isValidStoragePrefix(bucket, prefix) {
   if (!prefix || prefix.includes('..') || prefix.startsWith('/') || /\\/.test(prefix)) return false
   if (bucket === 'property-docs') {
-    return prefix === 'admin' || /^docs\/[0-9]+$/.test(prefix)
+    return prefix === 'admin' || /^docs\/[0-9]+$/.test(prefix) || /^listing-submissions\/[0-9]+$/.test(prefix)
   }
   if (bucket === 'property-photos') {
-    return prefix === 'admin' || prefix === 'testimonials' || /^photos\/[0-9]+$/.test(prefix)
+    return prefix === 'admin' || prefix === 'testimonials' || /^photos\/[0-9]+$/.test(prefix) || /^listing-submissions\/[0-9]+$/.test(prefix)
   }
   return false
 }

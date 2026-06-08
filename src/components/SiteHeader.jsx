@@ -7,7 +7,6 @@ import { User, LogOut, LayoutDashboard, Menu, X } from 'lucide-react'
 import { useLang } from '../context/LanguageContext'
 import { content } from '../data/content'
 import { createClient } from '../lib/supabase'
-import { REGISTER_LIST_LAND } from '../lib/routes'
 import { homePathForRole } from '../lib/authRedirects'
 import { isAdminOrStaff } from '../lib/roles'
 import BrandHeadingAccent from './BrandHeadingAccent'
@@ -214,7 +213,7 @@ export default function SiteHeader({ active: activeProp = null }) {
                 )}
               </div>
             ) : (
-              <NextLink href={REGISTER_LIST_LAND} className="whitespace-nowrap leading-none text-sm font-medium text-white/75 hover:text-turmeric-300 transition-colors">
+              <NextLink href="/list-your-land" className="whitespace-nowrap leading-none text-sm font-medium text-white/75 hover:text-turmeric-300 transition-colors">
                 {t.listLand}
               </NextLink>
             )}
@@ -257,7 +256,7 @@ export default function SiteHeader({ active: activeProp = null }) {
               )}
             </>
           ) : (
-            <NextLink href={REGISTER_LIST_LAND} onClick={() => setMobileOpen(false)} className="block py-2.5 px-1 text-sm font-medium text-white/80 hover:text-turmeric-300">
+            <NextLink href="/list-your-land" onClick={() => setMobileOpen(false)} className="block py-2.5 px-1 text-sm font-medium text-white/80 hover:text-turmeric-300">
               {t.listLand}
             </NextLink>
           )}
