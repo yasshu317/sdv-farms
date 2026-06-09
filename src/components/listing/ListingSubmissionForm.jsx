@@ -85,23 +85,28 @@ export default function ListingSubmissionForm() {
   async function uploadFiles(files, type, setter, setUploading) {
     setUploadError('')
     setUploading(true)
-    const urls = []
-    for (const file of Array.from(files)) {
-      const fd = new FormData()
-      fd.append('file', file)
-      fd.append('type', type)
-      fd.append('folder', folderRef.current)
-      const res = await fetch('/api/listing-submissions/upload', { method: 'POST', body: fd })
-      const payload = await res.json().catch(() => ({}))
-      if (!res.ok) {
-        setUploadError(payload.error || `Upload failed (${res.status})`)
-        setUploading(false)
-        return
+    try {
+      const urls = []
+      for (const file of Array.from(files)) {
+        const fd = new FormData()
+        fd.append('file', file)
+        fd.append('type', type)
+        fd.append('folder', folderRef.current)
+        const res = await fetch('/api/listing-submissions/upload', { method: 'POST', body: fd })
+        const payload = await res.json().catch(() => ({}))
+        if (!res.ok) {
+          setUploadError(payload.error || `Upload failed (${res.status})`)
+          return
+        }
+        urls.push(payload.url)
       }
-      urls.push(payload.url)
+      setter(prev => [...prev, ...urls])
+    } catch (err) {
+      setUploadError('Upload failed — please check your connection and try again.')
+      console.error('[listing-upload]', err)
+    } finally {
+      setUploading(false)
     }
-    setter(prev => [...prev, ...urls])
-    setUploading(false)
   }
 
   function removeUrl(type, idx) {
@@ -125,23 +130,28 @@ export default function ListingSubmissionForm() {
     if (err) { setError(err); return }
     setError('')
     setLoading(true)
-
-    const res = await fetch('/api/listing-submissions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...form,
-        area_acres: form.area_acres ? Number(form.area_acres) : null,
-        expected_price: form.expected_price ? Number(form.expected_price) : null,
-      }),
-    })
-    const data = await res.json().catch(() => ({}))
-    setLoading(false)
-    if (!res.ok) {
-      setError(data.error || 'Something went wrong. Please try again.')
-      return
+    try {
+      const res = await fetch('/api/listing-submissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...form,
+          area_acres: form.area_acres ? Number(form.area_acres) : null,
+          expected_price: form.expected_price ? Number(form.expected_price) : null,
+        }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setError(data.error || 'Something went wrong. Please try again.')
+        return
+      }
+      setSuccess(true)
+    } catch (err) {
+      setError('Could not connect — please check your internet and try again.')
+      console.error('[listing-submit]', err)
+    } finally {
+      setLoading(false)
     }
-    setSuccess(true)
   }
 
   if (success) {
