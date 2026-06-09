@@ -19,6 +19,7 @@ export default async function AdminPage() {
     { data: buyerRequests },
     brnRes,
     ffRes,
+    lsRes,
   ] = await Promise.all([
     supabase.from('enquiries').select('*').order('created_at', { ascending: false }),
     supabase.from('plots').select('*').order('plot_number'),
@@ -27,10 +28,12 @@ export default async function AdminPage() {
     supabase.from('buyer_requests').select('*').order('created_at', { ascending: false }),
     supabase.from('buyer_request_notes').select('*').order('created_at', { ascending: false }),
     supabase.from('feature_flags').select('*').order('sort_order', { ascending: true }).order('key', { ascending: true }),
+    supabase.from('listing_submissions').select('*').order('created_at', { ascending: false }),
   ])
 
   const buyerRequestNotes = brnRes.error ? [] : (brnRes.data ?? [])
   const featureFlags = ffRes.error ? [] : (ffRes.data ?? [])
+  const listingSubmissions = lsRes.error ? [] : (lsRes.data ?? [])
 
   const notesByRequestId = {}
   for (const n of buyerRequestNotes) {
@@ -48,6 +51,7 @@ export default async function AdminPage() {
       buyerRequests={buyerRequests ?? []}
       buyerRequestNotesById={notesByRequestId}
       featureFlags={featureFlags}
+      listingSubmissions={listingSubmissions}
     />
   )
 }

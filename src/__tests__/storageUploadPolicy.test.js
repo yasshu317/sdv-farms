@@ -18,4 +18,21 @@ describe('isValidStoragePrefix', () => {
     expect(isValidStoragePrefix('property-docs', 'other/1')).toBe(false)
     expect(isValidStoragePrefix('unknown', 'docs/1')).toBe(false)
   })
+
+  it('allows listing-submissions timestamped prefix for docs bucket', () => {
+    expect(isValidStoragePrefix('property-docs', 'listing-submissions/1776690311952')).toBe(true)
+  })
+
+  it('allows listing-submissions timestamped prefix for photos bucket', () => {
+    expect(isValidStoragePrefix('property-photos', 'listing-submissions/1776690311952')).toBe(true)
+  })
+
+  it('rejects listing-submissions prefix without a timestamp', () => {
+    expect(isValidStoragePrefix('property-docs', 'listing-submissions')).toBe(false)
+    expect(isValidStoragePrefix('property-docs', 'listing-submissions/')).toBe(false)
+  })
+
+  it('rejects listing-submissions path traversal', () => {
+    expect(isValidStoragePrefix('property-docs', 'listing-submissions/../admin')).toBe(false)
+  })
 })

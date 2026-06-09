@@ -2,7 +2,7 @@
 import { useState, Fragment, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '../../lib/supabase'
-import { LogOut, Users, FileText, MapPin, RefreshCw, Home, Calendar, MessageSquare, ShieldCheck, Search, Plus, Flag, Star, Quote } from 'lucide-react'
+import { LogOut, Users, FileText, MapPin, RefreshCw, Home, Calendar, MessageSquare, ShieldCheck, Search, Plus, Flag, Star, Quote, Inbox } from 'lucide-react'
 import FileUpload from '../../components/ui/FileUpload'
 import NextLink from 'next/link'
 import StatusBadge from '../../components/ui/StatusBadge'
@@ -77,6 +77,7 @@ export default function AdminClient({
   appointments: initialAppts,
   buyerRequests: initialRequests,
   featureFlags: initialFeatureFlags = [],
+  listingSubmissions: initialLeads = [],
 }) {
   const canManageUsers = isAdminOnly(viewerRole)
   const isStaffViewer = viewerRole === 'staff'
@@ -88,6 +89,7 @@ export default function AdminClient({
     ['properties',  'Properties',  Home],
     ['appointments','Appointments',Calendar],
     ['requests',    'Requests',    MessageSquare],
+    ['leads',       'Leads',       Inbox],
     ['flags',       'Flags',       Flag],
     ['services',    'Services',    Users],
     ['feedback',    'Feedback',    Star],
@@ -134,6 +136,10 @@ export default function AdminClient({
   const [flagDraft, setFlagDraft]         = useState({
     key: '', enabled: false, description: '', sort_order: '100', payload: '{}',
   })
+
+  const [leads, setLeads]                 = useState(initialLeads ?? [])
+  const [leadNoteEdit, setLeadNoteEdit]   = useState({})
+  const [leadSaving, setLeadSaving]       = useState(null)
 
   useEffect(() => {
     const list = initialFeatureFlags ?? []
@@ -402,6 +408,20 @@ export default function AdminClient({
     setSaving(null)
   }
 
+  async function patchLead(id, patch) {
+    setLeadSaving(id)
+    const res = await fetch(`/api/admin/listing-submissions/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(patch),
+    })
+    if (res.ok) {
+      const updated = await res.json()
+      setLeads(prev => prev.map(l => l.id === id ? updated : l))
+    }
+    setLeadSaving(null)
+  }
+
   async function saveUserOccupation(userId, occupation) {
     setSaving(userId)
     const supabase = createClient()
@@ -615,6 +635,9 @@ export default function AdminClient({
               <Icon size={14} />{label}
               {id === 'properties' && stats.propPending > 0 && (
                 <span className="bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">{stats.propPending}</span>
+              )}
+              {id === 'leads' && leads.filter(l => l.status === 'new').length > 0 && (
+                <span className="bg-orange-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">{leads.filter(l => l.status === 'new').length}</span>
               )}
               {id === 'appointments' && stats.apptPending > 0 && (
                 <span className="bg-yellow-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">{stats.apptPending}</span>
@@ -2038,6 +2061,148 @@ export default function AdminClient({
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── LEADS TAB ─────────────────────────────────────────────────── */}
+        {tab === 'leads' && (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-50">
+              <h2 className="font-semibold text-gray-800">
+                Listing Leads ({leads.length})
+                {leads.filter(l => l.status === 'new').length > 0 && (
+                  <span className="ml-2 bg-orange-100 text-orange-700 text-xs font-medium px-2 py-0.5 rounded-full">
+                    {leads.filter(l => l.status === 'new').length} new
+                  </span>
+                )}
+              </h2>
+              <p className="text-xs text-gray-400 mt-1">
+                Submissions from the public <em>/list-your-land</em> form — no login required.
+              </p>
+            </div>
+
+            {leads.length === 0 ? (
+              <div className="text-center py-16 px-6">
+                <Inbox size={32} className="text-gray-200 mx-auto mb-3" />
+                <p className="text-gray-500 text-sm font-medium mb-1">No submissions yet</p>
+                <p className="text-gray-400 text-xs">Share <strong>sdv-farms.vercel.app/list-your-land</strong> to collect leads</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-50">
+                {leads.map(lead => {
+                  const statusColors = {
+                    new:       'bg-orange-100 text-orange-700',
+                    contacted: 'bg-blue-100 text-blue-700',
+                    converted: 'bg-green-100 text-green-700',
+                    rejected:  'bg-gray-100 text-gray-500',
+                  }
+                  const isSaving = leadSaving === lead.id
+                  return (
+                    <div key={lead.id} className="px-6 py-5">
+                      {/* Row summary */}
+                      <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <span className="font-semibold text-gray-800 text-sm">
+                              {lead.submitter_first_name} {lead.submitter_last_name}
+                            </span>
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${statusColors[lead.status] ?? 'bg-gray-100 text-gray-500'}`}>
+                              {lead.status}
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-500 space-y-0.5">
+                            <p>
+                              <a href={`tel:${lead.submitter_mobile}`} className="text-paddy-700 hover:underline font-medium">
+                                {lead.submitter_mobile}
+                              </a>
+                              {lead.submitter_email && <span className="ml-2 text-gray-400">{lead.submitter_email}</span>}
+                            </p>
+                            <p className="text-gray-600">
+                              {lead.mandal}, {lead.district}, {lead.state}
+                              {lead.village && ` · ${lead.village}`}
+                            </p>
+                            {(lead.area_acres || lead.land_used_type) && (
+                              <p>
+                                {lead.area_acres && <span>{lead.area_acres} acres </span>}
+                                {lead.land_used_type && <span>· {lead.land_used_type} </span>}
+                                {lead.land_soil_type && <span>· {lead.land_soil_type} soil </span>}
+                                {lead.expected_price && <span>· ₹{Number(lead.expected_price).toLocaleString('en-IN')}/acre</span>}
+                              </p>
+                            )}
+                            <p>
+                              <span className="font-medium text-gray-700">Farmer:</span> {lead.farmer_name}
+                              {lead.farmer_phone && <span className="ml-1 text-gray-400">· {lead.farmer_phone}</span>}
+                            </p>
+                            {lead.location_notes && (
+                              <p className="text-gray-400">Notes: {lead.location_notes}</p>
+                            )}
+                            <p className="text-gray-400 text-[11px]">
+                              Submitted {new Date(lead.created_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
+                            </p>
+                          </div>
+
+                          {/* Uploaded files */}
+                          {(lead.doc_urls?.length > 0 || lead.photo_urls?.length > 0) && (
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              {lead.doc_urls?.map((url, i) => (
+                                <a key={i} href={url} target="_blank" rel="noopener noreferrer"
+                                  className="text-xs text-paddy-700 hover:underline border border-paddy-100 rounded px-2 py-0.5 bg-paddy-50">
+                                  📄 Doc {i + 1}
+                                </a>
+                              ))}
+                              {lead.photo_urls?.map((url, i) => (
+                                <a key={i} href={url} target="_blank" rel="noopener noreferrer"
+                                  className="text-xs text-paddy-700 hover:underline border border-paddy-100 rounded px-2 py-0.5 bg-paddy-50">
+                                  🖼️ Photo {i + 1}
+                                </a>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Admin notes inline edit */}
+                          <div className="mt-3">
+                            <textarea
+                              value={leadNoteEdit[lead.id] ?? lead.admin_notes ?? ''}
+                              onChange={e => setLeadNoteEdit(p => ({ ...p, [lead.id]: e.target.value }))}
+                              placeholder="Add admin notes…"
+                              rows={2}
+                              className="w-full text-xs border border-gray-200 rounded-lg px-3 py-2 text-gray-700 placeholder-gray-300 focus:outline-none focus:border-paddy-400 resize-none"
+                            />
+                            {leadNoteEdit[lead.id] !== undefined && leadNoteEdit[lead.id] !== (lead.admin_notes ?? '') && (
+                              <button
+                                onClick={() => patchLead(lead.id, { admin_notes: leadNoteEdit[lead.id] })}
+                                disabled={isSaving}
+                                className="mt-1 text-xs text-paddy-700 hover:text-paddy-900 disabled:opacity-50"
+                              >
+                                {isSaving ? 'Saving…' : 'Save note'}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Status actions */}
+                        <div className="flex sm:flex-col gap-1.5 shrink-0">
+                          {['new', 'contacted', 'converted', 'rejected'].map(s => (
+                            <button
+                              key={s}
+                              disabled={lead.status === s || isSaving}
+                              onClick={() => patchLead(lead.id, { status: s })}
+                              className={`text-xs px-3 py-1.5 rounded-lg border transition-colors capitalize disabled:opacity-40 ${
+                                lead.status === s
+                                  ? `${statusColors[s]} border-transparent font-semibold cursor-default`
+                                  : 'border-gray-200 text-gray-600 hover:border-paddy-300 hover:text-paddy-700'
+                              }`}
+                            >
+                              {s}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             )}
           </div>

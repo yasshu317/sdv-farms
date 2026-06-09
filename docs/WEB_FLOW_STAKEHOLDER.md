@@ -22,12 +22,16 @@ Keep this aligned with **`/business/flows`** (`src/app/business/flows/page.jsx`)
 
 | Area | Current behaviour |
 |------|-------------------|
+| **`/list-your-land`** | **Public listing submission form** — no login required. Shareable URL for landowners/farmers. 2-step form: contact + location → land details + docs. Submissions go to **Admin → Leads** tab. Nav "List your land" points here (not to registration). Migration: `phase16_listing_submissions.sql`. |
 | **`/` while signed in** | Redirect to **`/dashboard`**, **`/seller`**, or **`/admin`** per `homePathForRole` (see **`src/app/page.jsx`**). To see the **full marketing homepage** including stats strip anchors: **`/?stay=1`** or **`?browse=1`**. Navbar / SiteHeader logo points at the hub when a session exists. |
 | **`/services`** | **Buyer** (not seller / admin / staff) → redirect **`/dashboard?services=1`** (embedded Phase II panel + scroll). Everyone else sees public **`/services`**. (**`src/app/services/page.jsx`**) |
 | **Home KPI strip** | **`HomeStatsBar.jsx`** uses a **deep paddy + turmeric** treatment (consistent with homepage / listings), not a neutral gray slab; optional enquiry line stays secondary but readable. |
 | **Listing cards & PDP CTAs** | **Book visit**, **shortlist** labels, **Enquire** (WhatsApp): **copy-led buttons** — no sparkle/heart glyphs in chrome ( **`PropertiesClient.jsx`**, **`PropertyDetailClient.jsx`** ). |
+| **Admin → Leads tab** | New 7th tab in `/admin`. Shows all `listing_submissions` rows. Status: new → contacted → converted → rejected. Orange badge for unread. Inline notes. |
 
 **Supabase:** sellers reading appointments on owned listings requires **`phase15_seller_select_listing_appointments.sql`** (`supabase/migrations/`).
+
+**Phase 16 migration required** before merging `feat/public-listing-form`: run `supabase/migrations/phase16_listing_submissions.sql` in Supabase SQL editor. Creates `listing_submissions` table with anon-insert RLS + admin/staff read-update policy.
 
 ---
 
@@ -72,6 +76,11 @@ Stakeholder `.docx` themes that need **design + contracts + often paid vendors**
 
 | Topic | Location |
 |-------|----------|
+| Public listing form | [`src/app/list-your-land/page.jsx`](../src/app/list-your-land/page.jsx), [`src/components/listing/ListingSubmissionForm.jsx`](../src/components/listing/ListingSubmissionForm.jsx) |
+| Listing submission API | [`src/app/api/listing-submissions/route.js`](../src/app/api/listing-submissions/route.js) |
+| Listing submission upload | [`src/app/api/listing-submissions/upload/route.js`](../src/app/api/listing-submissions/upload/route.js) |
+| Admin leads PATCH API | [`src/app/api/admin/listing-submissions/[id]/route.js`](../src/app/api/admin/listing-submissions/%5Bid%5D/route.js) |
+| DB migration (phase 16) | [`supabase/migrations/phase16_listing_submissions.sql`](../supabase/migrations/phase16_listing_submissions.sql) |
 | Public marketing stats API | [`src/app/api/platform-stats/route.js`](../src/app/api/platform-stats/route.js), [`src/lib/marketing-stats.js`](../src/lib/marketing-stats.js) |
 | Home stats UI | [`src/components/HomeStatsBar.jsx`](../src/components/HomeStatsBar.jsx) |
 | PDP verification | [`src/lib/propertyVerification.js`](../src/lib/propertyVerification.js), [`src/app/properties/[id]/PropertyDetailClient.jsx`](../src/app/properties/[id]/PropertyDetailClient.jsx) |
