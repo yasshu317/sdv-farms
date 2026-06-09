@@ -24,7 +24,8 @@ test.describe('/list-your-land — public listing form', () => {
 
   test('step 1 → step 2 navigation blocked when fields empty', async ({ page }) => {
     await page.goto('/list-your-land')
-    await page.getByRole('button', { name: /Next/i }).click()
+    // Target submit button by type to avoid matching Next.js dev tools button
+    await page.locator('button[type="submit"]').click()
     // Should stay on step 1 — error shown, URL unchanged
     await expect(page).toHaveURL(/\/list-your-land/)
     await expect(page.getByPlaceholder(/First name/i)).toBeVisible()
@@ -37,15 +38,15 @@ test.describe('/list-your-land — public listing form', () => {
     await page.getByPlaceholder(/Last name/i).fill('Kumar')
     await page.getByPlaceholder(/10-digit mobile/i).fill('9876543210')
 
-    // Select state
-    await page.selectOption('select', { label: 'Telangana' })
+    // Select state using the first <select> on the page
+    await page.locator('select').first().selectOption('Telangana')
     // Wait for district options to populate then select
     await page.waitForFunction(() => {
       const selects = document.querySelectorAll('select')
       return selects[1] && selects[1].options.length > 1
     })
     await page.locator('select').nth(1).selectOption({ index: 1 })
-    // Mandal
+    // Wait for mandal options to populate then select
     await page.waitForFunction(() => {
       const selects = document.querySelectorAll('select')
       return selects[2] && selects[2].options.length > 1
@@ -54,7 +55,8 @@ test.describe('/list-your-land — public listing form', () => {
 
     await page.getByPlaceholder(/Village name/i).fill('Kongara')
 
-    await page.getByRole('button', { name: /Next/i }).click()
+    // Use submit button type to avoid strict-mode clash with Next.js dev tools button
+    await page.locator('button[type="submit"]').click()
 
     // Step 2 should now be visible
     await expect(page.getByPlaceholder(/Exact name on Pahani/i)).toBeVisible()
@@ -67,15 +69,15 @@ test.describe('/list-your-land — public listing form', () => {
     await page.getByPlaceholder(/First name/i).fill('Ravi')
     await page.getByPlaceholder(/Last name/i).fill('Kumar')
     await page.getByPlaceholder(/10-digit mobile/i).fill('9876543210')
-    await page.selectOption('select', { label: 'Telangana' })
+    await page.locator('select').first().selectOption('Telangana')
     await page.waitForFunction(() => document.querySelectorAll('select')[1]?.options.length > 1)
     await page.locator('select').nth(1).selectOption({ index: 1 })
     await page.waitForFunction(() => document.querySelectorAll('select')[2]?.options.length > 1)
     await page.locator('select').nth(2).selectOption({ index: 1 })
     await page.getByPlaceholder(/Village name/i).fill('Kongara')
-    await page.getByRole('button', { name: /Next/i }).click()
+    await page.locator('button[type="submit"]').click()
 
-    // Click back
+    // Step 2: click back
     await page.getByRole('button', { name: /Back/i }).click()
     await expect(page.getByPlaceholder(/First name/i)).toBeVisible()
   })
