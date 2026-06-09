@@ -118,7 +118,9 @@ export default function BusinessFlowsPage() {
               <>
                 <strong>Visitor</strong> — marketing home (incl. Sample Documents section), filtered listings with
                 state/district/mandal cascade, property detail with book/enquire/save, land request form, Phase II
-                services (incl. Fertilizers &amp; Nutrition), language toggle, login/register.
+                services (incl. Fertilizers &amp; Nutrition), language toggle, login/register.{' '}
+                <strong>Landowners</strong> can submit property details without an account via the shareable{' '}
+                <Path>/list-your-land</Path> form — submissions land in the Admin <strong>Leads</strong> tab.
               </>,
               <>
                 <strong>Buyer</strong> — <Path>/dashboard</Path> tracks enquiries, plot interests, and land requests.
@@ -131,9 +133,9 @@ export default function BusinessFlowsPage() {
                 to browse and enquire as a buyer — both roles are available to the same account.
               </>,
               <>
-                <strong>Admin</strong> — full ops at <Path>/admin</Path> (10 tabs): Properties, Users, Enquiries, Bookings,
-                Land Requests, Services, Feature Flags, Notes, Feedback, Testimonials. Role changes via API.
-                Sitewide <strong>maintenance mode</strong> is controlled by a feature flag.
+                <strong>Admin</strong> — full ops at <Path>/admin</Path> (11 tabs): Enquiries, Users, Plots, Properties,
+                Appointments, Requests, <strong>Leads</strong> (public listing submissions), Flags, Services, Feedback, Testimonials.
+                Role changes via API. Sitewide <strong>maintenance mode</strong> is controlled by a feature flag.
               </>,
               <>
                 <strong>Staff</strong> — same <Path>/admin</Path> shell; <strong>Users</strong> tab hidden.
@@ -216,10 +218,39 @@ export default function BusinessFlowsPage() {
           <SubHeading>Authentication — <Path>/auth/register</Path> · <Path>/auth/login</Path></SubHeading>
           <BulletList
             items={[
-              'Register: Buyer vs Seller (or shortcut <Path>/auth/register?flow=seller</Path> skips buyer/seller picker).',
+              'Register: Buyer vs Seller (or shortcut /auth/register?flow=seller skips buyer/seller picker).',
               'Seller path includes eligibility questionnaire blocking illegal/forbidden tenure types.',
               'Email verification when Supabase mandates it → callback routes user to correct home (/dashboard vs /seller vs /admin).',
               'Already signed-in browsers visiting auth URLs redirect to role home.',
+            ]}
+          />
+
+          <SubHeading>Public listing submission — <Path>/list-your-land</Path></SubHeading>
+          <BulletList
+            items={[
+              <>
+                <strong>No login required</strong> — any landowner or farmer can fill the 2-step form and submit.
+                Shareable URL: <code className="text-turmeric-400">sdv-farms.vercel.app/list-your-land</code> (can be sent via WhatsApp, printed on flyers, posted on social).
+              </>,
+              <>
+                <strong>Step 1 — Contact &amp; Location:</strong> submitter first name, last name, mobile, email (optional),
+                State → District → Mandal cascade, village, location notes (survey no., map link).
+              </>,
+              <>
+                <strong>Step 2 — Land &amp; Farmer details:</strong> farmer name as on document, farmer phone (optional),
+                land type, soil type, area (acres), expected price (₹/acre), selling intent, road access flag,
+                document uploads (Pahani / ROR-1B etc.) and site photos (both optional).
+              </>,
+              <>
+                On submit, the record lands in the <strong>Admin → Leads</strong> tab. SDV staff can mark it as{' '}
+                <em>new → contacted → converted / rejected</em> and add internal notes. A successful submission shows
+                a thank-you screen with a WhatsApp CTA and a link to browse properties.
+              </>,
+              <>
+                <strong>Nav &quot;List your land&quot; link</strong> now points to <Path>/list-your-land</Path> for
+                anonymous visitors and buyers — no forced registration. Sellers and admins who already have accounts
+                continue to use their respective hubs.
+              </>,
             ]}
           />
         </FlowSection>
@@ -337,11 +368,15 @@ export default function BusinessFlowsPage() {
             &rarr;{' '}
             <strong className="text-paddy-100 print:text-paddy-900">Requests</strong>{' '}
             &rarr;{' '}
+            <strong className="text-paddy-100 print:text-paddy-900">Leads</strong>{' '}
+            &rarr;{' '}
             <strong className="text-paddy-100 print:text-paddy-900">Flags</strong>{' '}
             &rarr;{' '}
             <strong className="text-paddy-100 print:text-paddy-900">Services</strong>{' '}
             &rarr;{' '}
-            <strong className="text-paddy-100 print:text-paddy-900">Feedback</strong>.
+            <strong className="text-paddy-100 print:text-paddy-900">Feedback</strong>{' '}
+            &rarr;{' '}
+            <strong className="text-paddy-100 print:text-paddy-900">Testimonials</strong>.
           </p>
           <SubHeading>Enquiries</SubHeading>
           <BulletList
@@ -399,6 +434,23 @@ export default function BusinessFlowsPage() {
             ]}
           />
 
+          <SubHeading>Leads (public listing submissions)</SubHeading>
+          <BulletList
+            items={[
+              <>
+                Inbox for submissions from <Path>/list-your-land</Path> (no-login public form). Orange badge shows count of <em>new</em> (unprocessed) leads.
+              </>,
+              'Columns: submitted date, submitter name, mobile, state/district, area, status, uploaded docs/photos.',
+              'Status lifecycle: new → contacted → converted → rejected. Staff update inline.',
+              'Admin notes field per lead (editable inline — save button appears when draft differs from stored value).',
+              <>
+                <strong>Converting a lead:</strong> after calling the landowner, mark as <em>contacted</em>; if they
+                agree to list, create the property in the Properties tab or invite them to register as a seller, then mark as <em>converted</em>.
+              </>,
+              'DB table: listing_submissions (phase16 migration). RLS: anon insert only; admin/staff read + update.',
+            ]}
+          />
+
           <SubHeading>Flags</SubHeading>
           <BulletList
             items={[
@@ -446,6 +498,7 @@ export default function BusinessFlowsPage() {
                   ['Buyer land requests', 'open · in_progress · matched · closed'],
                   ['Buyer SDVF checkpoints (where used)', 'checking · approved · rejected'],
                   ['Listing lifecycle (seller view)', 'pending · approved (+ rejected/archived variants if enabled)'],
+                  ['Listing leads (public /list-your-land)', 'new · contacted · converted · rejected'],
                   ['Business feedback', 'new · read · replied · archived'],
                 ].map(([a, b]) => (
                   <tr key={a} className="bg-paddy-950/40 print:bg-white">
@@ -492,6 +545,14 @@ export default function BusinessFlowsPage() {
         <FlowSection id="changelog" title="Recent changes" badge="v Phase 11–13">
           <BulletList
             items={[
+              <>
+                <strong>Public listing submission form (Phase 16)</strong> &mdash; New <Path>/list-your-land</Path> page (no
+                login required). Landowners fill a 2-step form (contact + location &rarr; land details + docs);
+                submissions land in the new <strong>Admin &rarr; Leads</strong> tab with status workflow
+                new &rarr; contacted &rarr; converted / rejected. Nav &ldquo;List your land&rdquo; link now routes to this form.
+                Requires DB migration{' '}
+                <code className="text-turmeric-400">phase16_listing_submissions.sql</code>.
+              </>,
               <>
                 <strong>IA — hubs &amp; marketing home</strong> — Signed-in visits to <Path>/</Path> redirect to{' '}
                 <Path>/dashboard</Path>, <Path>/seller</Path>, or <Path>/admin</Path> per role unless <Path>/?stay=1</Path>. Brand links in Navbar / SiteHeader target the hub when logged in.
