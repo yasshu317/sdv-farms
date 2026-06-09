@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '../../../../lib/supabase-server'
+import { createAdminClient } from '../../../../lib/supabase-admin'
 import { sanitizeStorageFileName } from '../../../../lib/storageFilename'
 import { STORAGE_MAX_BYTES } from '../../../../lib/storageUploadPolicy'
 
@@ -37,7 +37,7 @@ export async function POST(request) {
     const safeName = sanitizeStorageFileName(file.name)
     const path = `${prefix}/${crypto.randomUUID()}-${safeName}`
 
-    const supabase = await createClient()
+    const supabase = createAdminClient()
     const buf = Buffer.from(await file.arrayBuffer())
 
     const { error: upErr } = await supabase.storage
