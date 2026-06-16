@@ -13,6 +13,8 @@ const customJestConfig = {
   testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
   testPathIgnorePatterns: ['/node_modules/', '/e2e/', '/.next/', '/patch/'],
   modulePathIgnorePatterns: ['<rootDir>/patch/'],
+  // uuid@11+ ships ESM only — let Jest/Babel transform it to CJS
+  transformIgnorePatterns: ['node_modules/(?!(uuid)/)'],
   collectCoverageFrom: [
     'src/components/**/*.{js,jsx}',
     'src/lib/**/*.{js,jsx}',
