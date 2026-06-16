@@ -140,6 +140,11 @@ export default function AdminClient({
   const [leads, setLeads]                 = useState(initialLeads ?? [])
   const [leadNoteEdit, setLeadNoteEdit]   = useState({})
   const [leadSaving, setLeadSaving]       = useState(null)
+  const [sellers, setSellers]             = useState(null)          // null = not loaded yet
+  const [sellersLoading, setSellersLoading] = useState(false)
+  const [leadSellerPick, setLeadSellerPick] = useState({})          // { [leadId]: sellerId }
+  const [leadProvisioning, setLeadProvisioning] = useState(null)    // leadId being provisioned
+  const [leadProvisionErr, setLeadProvisionErr] = useState({})
 
   useEffect(() => {
     const list = initialFeatureFlags ?? []
@@ -420,6 +425,52 @@ export default function AdminClient({
       setLeads(prev => prev.map(l => l.id === id ? updated : l))
     }
     setLeadSaving(null)
+  }
+
+  async function loadSellers() {
+    if (sellers !== null || sellersLoading) return
+    setSellersLoading(true)
+    try {
+      const res = await fetch('/api/admin/sellers')
+      if (res.ok) {
+        const data = await res.json()
+        setSellers(data.sellers ?? [])
+      } else {
+        setSellers([])
+      }
+    } catch {
+      setSellers([])
+    } finally {
+      setSellersLoading(false)
+    }
+  }
+
+  async function provisionLead(leadId) {
+    const sellerId = leadSellerPick[leadId]
+    if (!sellerId) return
+    setLeadProvisioning(leadId)
+    setLeadProvisionErr(p => ({ ...p, [leadId]: '' }))
+    try {
+      const res = await fetch(`/api/admin/listing-submissions/${leadId}/provision`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ seller_id: sellerId }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setLeadProvisionErr(p => ({ ...p, [leadId]: data.error ?? 'Provision failed' }))
+        return
+      }
+      setLeads(prev => prev.map(l =>
+        l.id === leadId
+          ? { ...l, status: 'converted', converted_listing_id: data.property_id, seller_id: sellerId }
+          : l
+      ))
+    } catch {
+      setLeadProvisionErr(p => ({ ...p, [leadId]: 'Network error — please try again.' }))
+    } finally {
+      setLeadProvisioning(null)
+    }
   }
 
   async function saveUserOccupation(userId, occupation) {
@@ -2200,6 +2251,55 @@ export default function AdminClient({
                           ))}
                         </div>
                       </div>
+
+                      {/* ── Provision as Listing ── */}
+                      {lead.converted_listing_id ? (
+                        <div className="mt-3 flex items-center gap-2 text-xs text-green-700 bg-green-50 border border-green-100 rounded-lg px-3 py-2">
+                          <span>✓ Provisioned as listing</span>
+                          <a
+                            href={`/admin?highlight=${lead.converted_listing_id}`}
+                            className="underline font-medium hover:text-green-900"
+                          >
+                            View property →
+                          </a>
+                        </div>
+                      ) : (
+                        <div className="mt-3 border border-dashed border-gray-200 rounded-lg px-3 py-3">
+                          <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                            Provision as listing
+                          </p>
+                          <div className="flex flex-col sm:flex-row gap-2">
+                            <select
+                              className="flex-1 text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:border-paddy-400"
+                              value={leadSellerPick[lead.id] ?? ''}
+                              onFocus={loadSellers}
+                              onChange={e => setLeadSellerPick(p => ({ ...p, [lead.id]: e.target.value }))}
+                            >
+                              <option value="">
+                                {sellersLoading ? 'Loading sellers…' : '— Select a seller account —'}
+                              </option>
+                              {(sellers ?? []).map(s => (
+                                <option key={s.id} value={s.id}>
+                                  {s.full_name} ({s.email})
+                                </option>
+                              ))}
+                            </select>
+                            <button
+                              disabled={!leadSellerPick[lead.id] || leadProvisioning === lead.id}
+                              onClick={() => provisionLead(lead.id)}
+                              className="text-xs px-4 py-1.5 rounded-lg bg-paddy-700 text-white font-medium hover:bg-paddy-800 disabled:opacity-40 transition-colors whitespace-nowrap"
+                            >
+                              {leadProvisioning === lead.id ? 'Creating…' : 'Provision Listing'}
+                            </button>
+                          </div>
+                          {leadProvisionErr[lead.id] && (
+                            <p className="mt-1 text-xs text-red-600">{leadProvisionErr[lead.id]}</p>
+                          )}
+                          <p className="mt-1.5 text-[10px] text-gray-400">
+                            Creates a pending property listing linked to the chosen seller, pre-filled with this lead&apos;s data.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )
                 })}
