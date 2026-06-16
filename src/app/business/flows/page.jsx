@@ -444,10 +444,12 @@ export default function BusinessFlowsPage() {
               'Status lifecycle: new → contacted → converted → rejected. Staff update inline.',
               'Admin notes field per lead (editable inline — save button appears when draft differs from stored value).',
               <>
-                <strong>Converting a lead:</strong> after calling the landowner, mark as <em>contacted</em>; if they
-                agree to list, create the property in the Properties tab or invite them to register as a seller, then mark as <em>converted</em>.
+                <strong>Provision as Listing (Phase 17):</strong> each lead card shows a seller picker dropdown + &ldquo;Provision Listing&rdquo; button.
+                Admin selects a registered seller account, clicks Provision &mdash; this auto-creates a <em>pending</em> <code className="text-turmeric-400">seller_properties</code> row
+                pre-filled with the lead&apos;s location, acreage, price, soil type, road access, and uploaded files. Lead status is set to <em>converted</em> and linked via <code className="text-turmeric-400">converted_listing_id</code>.
+                A &ldquo;View property &rarr;&rdquo; link appears on the card once provisioned.
               </>,
-              'DB table: listing_submissions (phase16 migration). RLS: anon insert only; admin/staff read + update.',
+              'DB tables: listing_submissions (phase16) + seller_id column (phase17). API: POST /api/admin/listing-submissions/[id]/provision. Seller list: GET /api/admin/sellers.',
             ]}
           />
 
@@ -545,6 +547,13 @@ export default function BusinessFlowsPage() {
         <FlowSection id="changelog" title="Recent changes" badge="v Phase 11–13">
           <BulletList
             items={[
+              <>
+                <strong>Lead &rarr; Listing provisioning (Phase 17)</strong> &mdash; Admin can convert a lead directly into a
+                seller property listing from the Leads tab. Select a registered seller, click &ldquo;Provision Listing&rdquo; &mdash; a <em>pending</em>{' '}
+                <code className="text-turmeric-400">seller_properties</code> row is created pre-filled with the lead&apos;s
+                data (location, acreage, price, soil type, docs/photos) and linked via <code className="text-turmeric-400">converted_listing_id</code>.
+                Requires <code className="text-turmeric-400">phase17_lead_provision.sql</code> (adds <code className="text-turmeric-400">seller_id</code> column).
+              </>,
               <>
                 <strong>Public listing submission form (Phase 16)</strong> &mdash; New <Path>/list-your-land</Path> page (no
                 login required). Landowners fill a 2-step form (contact + location &rarr; land details + docs);
