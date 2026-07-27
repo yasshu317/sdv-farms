@@ -1,7 +1,7 @@
 {
   "name": "sdv-farms",
   "private": true,
-  "version": "0.9.5",
+  "version": "0.9.6",
   "type": "module",
   "scripts": {
     "prepare": "sh scripts/install-hooks.sh",
@@ -25,7 +25,7 @@
     "@supabase/supabase-js": "^2.107.0",
     "exceljs": "^4.4.0",
     "lucide-react": "^0.577.0",
-    "next": "^16.2.9",
+    "next": "^16.2.12",
     "razorpay": "^2.9.6",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
@@ -34,13 +34,16 @@
   },
   "overrides": {
     "serialize-javascript": ">=7.0.5",
-    "axios": ">=1.16.0",
-    "postcss": "8.5.15",
+    "axios": ">=1.18.0",
+    "postcss": "8.5.23",
+    "brace-expansion": ">=5.0.8",
+    "fast-uri": ">=4.1.1",
+    "js-yaml": ">=5.2.2",
+    "sharp": ">=0.35.0",
     "uuid": ">=11.1.1",
     "exceljs": {
       "uuid": "^8.3.2"
-    },
-    "js-yaml": ">=4.1.0"
+    }
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
@@ -58,7 +61,7 @@
     "globals": "^17.6.0",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
-    "postcss": "8.5.15",
+    "postcss": "8.5.23",
     "tailwindcss": "^3.4.19"
   }
 }
